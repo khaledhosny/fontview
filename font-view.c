@@ -165,13 +165,13 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	cairo_font_extents (cr, &extents);
 	cairo_text_extents (cr, "HJKLMTYXi", &t_extents);
 	ascender = t_extents.y_bearing;
-
-	str = g_strconcat (priv->model->family, " ", priv->model->style, NULL);
+	
+	/* http://en.wikipedia.org/wiki/Pangram */
+	str = "How quickly daft jumping zebras vex.";
 	cairo_text_extents (cr, str, &t_extents);
 	
 	cairo_move_to (cr, 0, -ascender);
 	cairo_show_text (cr, str);
-	g_free (str);
 
 	width = t_extents.width;
 	height = t_extents.height;
@@ -202,6 +202,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	gdouble xheight, ascender, y, x;
 	FontViewPrivate *priv;
 	gdouble px;
+	gchar *title;
 	
 	priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 	
@@ -278,6 +279,24 @@ static void render (GtkWidget *w, cairo_t *cr) {
 		cairo_paint (cr);
 	
 	}
+	
+	
+	/* draw header bar */
+	cairo_select_font_face (cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
+	cairo_set_font_size (cr, 10);
+	
+	title = g_strdup_printf ("%s %s - %.0fpt", priv->model->family, priv->model->style, priv->size);
+
+	cairo_text_extents (cr, title, &t_extents);
+	cairo_font_extents (cr, &extents);
+	cairo_rectangle (cr, 0, 0, width, t_extents.height + extents.descent + 1);
+	cairo_set_source_rgb (cr, 0.2, 0.2, 0.2);
+	cairo_fill (cr);
+
+	cairo_set_source_rgb (cr, 1, 1, 1);
+	cairo_move_to (cr, 5, t_extents.height);
+	cairo_show_text (cr, title);
+	g_free (title);
 	
 	font_model_face_destroy (priv->model);
 }
