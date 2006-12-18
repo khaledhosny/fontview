@@ -25,6 +25,7 @@ int main (int argc, char *argv[]) {
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	
 	gtk_window_set_default_size (GTK_WINDOW(window), 490, 200);
+	gtk_window_set_title (GTK_WINDOW(window), "FontView");
 	
 	//model = FONT_MODEL(font_model_new ("/home/bse/src/georgia.ttf"));
 	font = font_view_new_with_model (argv[1]);
