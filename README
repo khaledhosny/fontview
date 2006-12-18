@@ -1,0 +1,20 @@
+FontView
+(c) 2006, Alex Roberts <alex AT redprocess DOT com>
+
+Highly experimental testing code for future font handling widget.
+
+
+BUILDING
+========
+
+Requires Gtk+ 2.10+, Cairo, Pango, Freetype2.
+
+To build:
+ gcc font-model.c font-view.c main.c -o fv `pkg-config --libs --cflags gtk+-2.0 pango freetype2`
+
+To run:
+ ./fv /path/to/a/typeface
+ 
+ 
+ 
+See COPYING for license information.
