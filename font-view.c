@@ -231,7 +231,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	px = priv->dpi * (priv->size/72);
 	
 	width = w->allocation.width;
-	height = w->allocation.height;
+	height = w->allocation.height + 8;
 
 	cairo_rectangle (cr, 0, 0, width, height);
 	cairo_set_source_rgb (cr, 1, 1, 1);
