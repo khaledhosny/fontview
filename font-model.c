@@ -11,6 +11,7 @@
  * FontView Test - font viewing widget test app
  * Part of the Fontable Project
  * Copyright (C) 2006 Alex Roberts
+ * Copyright (C) 2006 Jon Phillips, <jon@rejon.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -83,6 +84,10 @@ GType font_model_get_type (void) {
 }
 
 GObject *font_model_new (gchar *fontfile) {
+    if ( ! fontfile ) {
+        print_usage();
+    }
+
 	FontModel *model;
 	FT_Library library;
 
@@ -98,6 +103,9 @@ GObject *font_model_new (gchar *fontfile) {
 	FcPatternPrint (pattern);
 	model->desc = pango_fc_font_description_from_pattern (pattern, FALSE);
 	*/
+
+    // TODO: Need to check if font exists before opening it
+
 	model->file = fontfile;
 	model->family = model->ft_face->family_name;
 	model->style = model->ft_face->style_name;

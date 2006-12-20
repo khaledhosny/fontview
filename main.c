@@ -11,6 +11,7 @@
  * FontView Test - font viewing widget test app
  * Part of the Fontable Project
  * Copyright (C) 2006 Alex Roberts
+ * Copyright (C) 2006 Jon Phillips, <jon@rejon.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,6 +37,12 @@
 
 void view_sized (GtkWidget *w, gdouble size) {
 	g_print ("signal! FontView changed font size to %.2fpt.\n", size);
+}
+
+void print_usage ()
+{
+    g_print ("\nUsage:\n\tfv <path_to_font>\n\n");
+    exit(1);
 }
 
 int main (int argc, char *argv[]) {
