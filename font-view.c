@@ -128,6 +128,8 @@ GtkWidget *font_view_new_with_model (gchar *font) {
 	FontView *view;
 	FontViewPrivate *priv;
 
+	g_return_val_if_fail (font, NULL);
+
 	view = g_object_new (FONT_VIEW_TYPE, NULL);
 	priv = FONT_VIEW_GET_PRIVATE(view);
 		

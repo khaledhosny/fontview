@@ -84,13 +84,10 @@ GType font_model_get_type (void) {
 }
 
 GObject *font_model_new (gchar *fontfile) {
-    if ( ! fontfile ) {
-        print_usage();
-    }
-
 	FontModel *model;
 	FT_Library library;
-
+	
+	g_return_val_if_fail (fontfile, NULL);
 	
 	FT_Init_FreeType(&library);
 

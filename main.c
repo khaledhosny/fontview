@@ -56,7 +56,10 @@ int main (int argc, char *argv[]) {
 	gtk_window_set_default_size (GTK_WINDOW(window), 490, 200);
 	gtk_window_set_title (GTK_WINDOW(window), "FontView");
 	
-	//model = FONT_MODEL(font_model_new ("/home/bse/src/georgia.ttf"));
+	if (!argv[1]) {
+		print_usage();
+	}	
+	
 	font = font_view_new_with_model (argv[1]);
 	g_signal_connect (font, "sized", G_CALLBACK (view_sized), NULL);
 	
