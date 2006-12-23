@@ -126,7 +126,7 @@ GObject *font_model_new (gchar *fontfile) {
 				continue;
 			}
 			
-			g_print ("sfname: (%d) %d: %s\n", sfname.platform_id, sfname.name_id, sfname.string);
+			g_message ("sfname: (%d) %d: %s\n", sfname.platform_id, sfname.name_id, sfname.string);
 			
 		}
 	}
