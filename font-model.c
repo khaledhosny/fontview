@@ -33,6 +33,8 @@
 #include "font-model.h"
 
 #include <ft2build.h>
+#include FT_SFNT_NAMES_H
+#include FT_TRUETYPE_IDS_H
 #include <pango/pango.h>
 #include <pango/pangofc-fontmap.h>
 
@@ -86,6 +88,8 @@ GType font_model_get_type (void) {
 GObject *font_model_new (gchar *fontfile) {
 	FontModel *model;
 	FT_Library library;
+	FT_SfntName sfname;
+	gint len, i;
 	
 	g_return_val_if_fail (fontfile, NULL);
 	
@@ -110,6 +114,22 @@ GObject *font_model_new (gchar *fontfile) {
 	g_print ("FontModel instantiated.\nFont File: %s\nFont Family: %s\nFont Style: %s\n\n", 
 				model->file, model->family, model->style);
 	
+	if (FT_IS_SFNT(model->ft_face)) {
+		g_print ("success! font is TTF or OTF.\n");
+		
+		len = FT_Get_Sfnt_Name_Count (model->ft_face);
+		
+		for (i = 0; i < len; i++) {
+			FT_Get_Sfnt_Name (model->ft_face, i, &sfname);
+
+			if (sfname.platform_id != TT_PLATFORM_MACINTOSH) {
+				continue;
+			}
+			
+			g_print ("sfname: (%d) %d: %s\n", sfname.platform_id, sfname.name_id, sfname.string);
+			
+		}
+	}
 	
 	
 	return G_OBJECT (model);
