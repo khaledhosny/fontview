@@ -51,7 +51,7 @@ static void font_model_init (GTypeInstance *instance, gpointer g_class) {
 	
 	/* initialise other members */
 	
-	g_print ("Font model init'd.\n");
+	g_message ("Font model init'd.");
 	
 }
 
@@ -111,11 +111,11 @@ GObject *font_model_new (gchar *fontfile) {
 	model->family = model->ft_face->family_name;
 	model->style = model->ft_face->style_name;
 	
-	g_print ("FontModel instantiated.\nFont File: %s\nFont Family: %s\nFont Style: %s\n\n", 
+	g_message ("FontModel instantiated.\nFont File: %s\nFont Family: %s\nFont Style: %s\n", 
 				model->file, model->family, model->style);
 	
 	if (FT_IS_SFNT(model->ft_face)) {
-		g_print ("success! font is TTF or OTF.\n");
+		g_message ("success! font is TTF or OTF.");
 		
 		len = FT_Get_Sfnt_Name_Count (model->ft_face);
 		
@@ -126,7 +126,7 @@ GObject *font_model_new (gchar *fontfile) {
 				continue;
 			}
 			
-			g_message ("sfname: (%d) %d: %s\n", sfname.platform_id, sfname.name_id, sfname.string);
+			g_message ("sfname: (%d) %d: %s", sfname.platform_id, sfname.name_id, sfname.string);
 			
 		}
 	}

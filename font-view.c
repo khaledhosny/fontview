@@ -171,7 +171,7 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	
 	px = priv->dpi * (size/72);
 	
-	g_print ("pre rendering at size: %.2fpt - %.2fpx @ %.0fdpi\n", size, px, priv->dpi);
+	g_message ("pre rendering at size: %.2fpt - %.2fpx @ %.0fdpi", size, px, priv->dpi);
 	
 	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 3000, 3000);
 
