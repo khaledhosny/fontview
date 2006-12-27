@@ -1,0 +1,20 @@
+AC_INIT(src/main.c)
+AM_INIT_AUTOMAKE(fv,0.0.1)
+AM_CONFIG_HEADER(config.h)
+
+CFLAGS=
+
+AC_PROG_CC
+AC_PROG_INSTALL
+AC_PROG_MAKE_SET
+
+AC_HEADER_STDC
+
+AC_LANG_C
+
+
+AM_PATH_GTK_2_0(2.10.0)
+AC_CHECK_FT2(9.10.3,,AC_MSG_ERROR(FontView requires FreeType2))
+
+
+AC_OUTPUT(Makefile src/Makefile)
