@@ -14,7 +14,10 @@ AC_LANG_C
 
 
 AM_PATH_GTK_2_0(2.8.0)
-AC_CHECK_FT2(9.10.3,,AC_MSG_ERROR(FontView requires FreeType2))
+
+AC_SUBST(CFLAGS)
+PKG_CHECK_MODULES(FONTVIEW, libglade-2.0 >= 2.4.0 freetype2 >= 9.10.0)
+AC_C_CONST
 
 
 AC_OUTPUT(Makefile src/Makefile)

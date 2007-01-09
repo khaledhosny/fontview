@@ -57,6 +57,8 @@ struct _FontViewPrivate {
 
 	gdouble dpi;
 	
+	gchar *render_str;
+	
 	FontModel *model;
 };
 
@@ -114,6 +116,9 @@ static void font_view_init (FontView *view) {
 	   we can guess for now. */
 	priv->dpi = 72;
 	
+	/* default string to render */
+	priv->render_str = "How quickly daft jumping zebras vex.";
+	
 	gtk_widget_add_events (GTK_WIDGET (view),
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
 			GDK_KEY_PRESS_MASK | GDK_KEY_RELEASE_MASK);
@@ -163,7 +168,6 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	cairo_font_extents_t extents;
 	cairo_text_extents_t t_extents;
 	gdouble ascender;
-	gchar *str;
     cairo_t *cr;
     gdouble px;
 	
@@ -197,11 +201,10 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	priv->max_ascend = ascender;
 	
 	/* http://en.wikipedia.org/wiki/Pangram */
-	str = "How quickly daft jumping zebras vex.";
-	cairo_text_extents (cr, str, &t_extents);
+	cairo_text_extents (cr, priv->render_str, &t_extents);
 
 	cairo_move_to (cr, 0, ascender);
-	cairo_show_text (cr, str);
+	cairo_show_text (cr, priv->render_str);
 
 	width = t_extents.width;
 	height = t_extents.height;

@@ -32,8 +32,11 @@
  
  
 #include <gtk/gtk.h>
+#include <glade/glade.h>
 #include "font-model.h"
 #include "font-view.h"
+
+GladeXML *xml;
 
 void view_sized (GtkWidget *w, gdouble size) {
 	g_print ("signal! FontView changed font size to %.2fpt.\n", size);
@@ -46,16 +49,24 @@ void print_usage ()
 }
 
 int main (int argc, char *argv[]) {
-	GtkWidget *window;
+	GtkWidget *window, *vbox;
 	GtkWidget *font;
 	
 	gtk_init (&argc, &argv);
 	
+	xml = glade_xml_new ("mainwindow.glade", NULL, NULL);
+	if (!xml) {
+		xml = glade_xml_new (PACKAGE_DATA_DIR"/mainwindow.glade", NULL, NULL);
+	}
+	g_return_if_fail (xml);
+	
+	glade_xml_signal_autoconnect (xml);
+	/*
 	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
 	
 	gtk_window_set_default_size (GTK_WINDOW(window), 490, 200);
 	gtk_window_set_title (GTK_WINDOW(window), "FontView");
-	
+	*/
 	if (!argv[1]) {
 		print_usage();
 	}	
@@ -63,12 +74,17 @@ int main (int argc, char *argv[]) {
 	font = font_view_new_with_model (argv[1]);
 	g_signal_connect (font, "sized", G_CALLBACK (view_sized), NULL);
 	
+	vbox = glade_xml_get_widget (xml, "vbox1");
+	gtk_box_pack_end_defaults (GTK_BOX(vbox), GTK_WIDGET(font));
+	gtk_widget_show (GTK_WIDGET(font));
+	
+	/*
 	gtk_container_add (GTK_CONTAINER (window), font);
 
 	g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
 	
 	gtk_widget_show_all (window);
-	
+	*/
 	gtk_main();
 
 	return 0;
