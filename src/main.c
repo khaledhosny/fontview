@@ -46,6 +46,14 @@ void view_sized (GtkWidget *w, gdouble size) {
 	g_print ("signal! FontView changed font size to %.2fpt.\n", size);
 }
 
+void render_text_changed (GtkEntry *w, gpointer data) {
+	gchar *text = (gchar *)gtk_entry_get_text (w);
+	
+	g_message ("text_changed: %s", text);
+	
+	font_view_set_text (FONT_VIEW(font), text);
+}
+
 void render_size_changed (GtkSpinButton *w, gpointer data) {
 	gdouble size = gtk_spin_button_get_value (w);
 	
@@ -89,6 +97,7 @@ int main (int argc, char *argv[]) {
 	
 	entry = glade_xml_get_widget (xml, "render_str");
 	gtk_entry_set_text (GTK_ENTRY(entry), font_view_get_text(FONT_VIEW(font)));
+	g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
 	
 	size = glade_xml_get_widget (xml, "render_size");
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(size), font_view_get_pt_size (FONT_VIEW(font)));

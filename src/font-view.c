@@ -178,7 +178,7 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	
 	g_message ("pre rendering at size: %.2fpt - %.2fpx @ %.0fdpi", size, px, priv->dpi);
 	
-	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 3000, 3000);
+	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 3000, 1000);
 
 	cr = cairo_create (buffer);
 	cairo_set_source_rgb (cr, 1.0, 0.3, 0.3);
@@ -454,9 +454,9 @@ void font_view_set_text (FontView *view, gchar *text) {
 	
 	priv = FONT_VIEW_GET_PRIVATE (view);
 	
-	if (priv->render_str == text) return;
-	
-	priv->render_str = text;
+	if (g_strcasecmp (priv->render_str, text) == 0) return;
+
+	priv->render_str = g_strdup(text);
 	cairo_surface_destroy (priv->render);
 	priv->render = _font_view_pre_render_at_size (view, priv->size);
 	
