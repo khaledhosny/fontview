@@ -13,7 +13,7 @@ AC_HEADER_STDC
 AC_LANG_C
 
 
-AM_PATH_GTK_2_0(2.10.0)
+AM_PATH_GTK_2_0(2.8.0)
 AC_CHECK_FT2(9.10.3,,AC_MSG_ERROR(FontView requires FreeType2))
 
 
