@@ -52,6 +52,7 @@ struct _FontViewPrivate {
 	
 	cairo_surface_t *render;
 	
+	gdouble max_ascend;
 	gdouble size;
 
 	gdouble dpi;
@@ -186,15 +187,20 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	cairo_set_font_size (cr, floor(px));
 
 	/* get font extents */
+	/* for the font rendering store we want to display everything,
+	   some fonts have disparative heights between characters, 
+	   so we need to make sure we max out that ascension, and
+	   store it for final rendering. */
 	cairo_font_extents (cr, &extents);
-	cairo_text_extents (cr, "HJKLMTYXi", &t_extents);
-	ascender = t_extents.y_bearing;
+	cairo_text_extents (cr, "ABCDEFGHIJKLMNOPQRSTUVWXYZdfikl", &t_extents);
+	ascender = -t_extents.y_bearing;
+	priv->max_ascend = ascender;
 	
 	/* http://en.wikipedia.org/wiki/Pangram */
 	str = "How quickly daft jumping zebras vex.";
 	cairo_text_extents (cr, str, &t_extents);
-	
-	cairo_move_to (cr, 0, -ascender);
+
+	cairo_move_to (cr, 0, ascender);
 	cairo_show_text (cr, str);
 
 	width = t_extents.width;
@@ -260,6 +266,8 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	/* get ascender */
 	cairo_text_extents (cr, "HJKLMTYXi", &t_extents);
 	ascender = t_extents.y_bearing;
+
+	g_message ("main, ascender: %0.2f", ascender);
 	
 	cairo_set_source_rgb (cr, 0.8, 0.8, 0.8);
 	
@@ -299,7 +307,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	if (priv->text) {
 		//gdk_cairo_set_source_pixbuf (cr, priv->image, (width / 2 * 0.25), y + ascender);
 		//cairo_set_source_surface (cr, priv->ref[priv->curzoom], (width / 2 * 0.25), y + ascender);
-		cairo_set_source_surface (cr, priv->render, x, floor (y + ascender));
+		cairo_set_source_surface (cr, priv->render, x, floor (y + ascender - (ascender + priv->max_ascend)));
 		cairo_paint (cr);
 	
 	}
