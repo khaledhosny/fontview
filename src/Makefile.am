@@ -1,4 +1,3 @@
-AUTOMAKE_OPTIONS = gnu
 
 glade_DATA = mainwindow.glade
 gladedir = $(datadir)/fontview/glade

@@ -33,13 +33,23 @@
  
 #include <gtk/gtk.h>
 #include <glade/glade.h>
+#include <glade/glade-xml.h>
 #include "font-model.h"
 #include "font-view.h"
 
 GladeXML *xml;
+GtkWidget *font;
+
+void render_size_changed (GtkSpinButton *w, gpointer data);
 
 void view_sized (GtkWidget *w, gdouble size) {
 	g_print ("signal! FontView changed font size to %.2fpt.\n", size);
+}
+
+void render_size_changed (GtkSpinButton *w, gpointer data) {
+	gdouble size = gtk_spin_button_get_value (w);
+	
+	font_view_set_pt_size (FONT_VIEW(font), size);
 }
 
 void print_usage ()
@@ -49,8 +59,7 @@ void print_usage ()
 }
 
 int main (int argc, char *argv[]) {
-	GtkWidget *window, *vbox;
-	GtkWidget *font;
+	GtkWidget *window, *vbox, *entry, *size;
 	
 	gtk_init (&argc, &argv);
 	
@@ -72,12 +81,18 @@ int main (int argc, char *argv[]) {
 	}	
 	
 	font = font_view_new_with_model (argv[1]);
-	g_signal_connect (font, "sized", G_CALLBACK (view_sized), NULL);
+	g_signal_connect (font, "sized", G_CALLBACK(view_sized), NULL);
 	
 	vbox = glade_xml_get_widget (xml, "vbox1");
 	gtk_box_pack_end_defaults (GTK_BOX(vbox), GTK_WIDGET(font));
 	gtk_widget_show (GTK_WIDGET(font));
 	
+	entry = glade_xml_get_widget (xml, "render_str");
+	gtk_entry_set_text (GTK_ENTRY(entry), font_view_get_text(FONT_VIEW(font)));
+	
+	size = glade_xml_get_widget (xml, "render_size");
+	gtk_spin_button_set_value (GTK_SPIN_BUTTON(size), font_view_get_pt_size (FONT_VIEW(font)));
+	g_signal_connect (size, "value-changed", G_CALLBACK(render_size_changed), NULL);
 	/*
 	gtk_container_add (GTK_CONTAINER (window), font);
 
@@ -85,6 +100,7 @@ int main (int argc, char *argv[]) {
 	
 	gtk_widget_show_all (window);
 	*/
+	
 	gtk_main();
 
 	return 0;

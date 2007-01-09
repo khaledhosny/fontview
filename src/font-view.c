@@ -432,6 +432,8 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
 	
 	priv = FONT_VIEW_GET_PRIVATE (view);
 	
+	if (priv->size == size) return;
+	
 	priv->size = size;
 	cairo_surface_destroy (priv->render);
 	priv->render = _font_view_pre_render_at_size (view, priv->size);
@@ -440,3 +442,23 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
 	
 }
 
+gchar *font_view_get_text (FontView *view) {
+	FontViewPrivate *priv;
+	
+	priv = FONT_VIEW_GET_PRIVATE (view);
+	return g_strdup(priv->render_str);
+}
+
+void font_view_set_text (FontView *view, gchar *text) {
+	FontViewPrivate *priv;
+	
+	priv = FONT_VIEW_GET_PRIVATE (view);
+	
+	if (priv->render_str == text) return;
+	
+	priv->render_str = text;
+	cairo_surface_destroy (priv->render);
+	priv->render = _font_view_pre_render_at_size (view, priv->size);
+	
+	font_view_redraw (view);
+}

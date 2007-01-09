@@ -133,7 +133,7 @@
 	  </child>
 
 	  <child>
-	    <widget class="GtkSpinButton" id="spinbutton1">
+	    <widget class="GtkSpinButton" id="render_size">
 	      <property name="visible">True</property>
 	      <property name="can_focus">True</property>
 	      <property name="climb_rate">1</property>
@@ -143,6 +143,7 @@
 	      <property name="snap_to_ticks">False</property>
 	      <property name="wrap">False</property>
 	      <property name="adjustment">12 5 300 1 10 10</property>
+	      <signal name="value_changed" handler="render_size_changed" last_modification_time="Tue, 09 Jan 2007 22:37:13 GMT"/>
 	    </widget>
 	    <packing>
 	      <property name="padding">0</property>
