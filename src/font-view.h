@@ -63,7 +63,7 @@ struct _FontViewClass {
 	void (* FontView)(FontView *view);
 	
 	/* signals */
-	void (* sized)(FontView *self, gdouble size);
+	void (* size_changed)(FontView *self, gdouble size);
 };
 
 GtkWidget *font_view_new ();

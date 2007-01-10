@@ -42,7 +42,7 @@ GtkWidget *font;
 
 void render_size_changed (GtkSpinButton *w, gpointer data);
 
-void view_sized (GtkWidget *w, gdouble size) {
+void view_size_changed (GtkWidget *w, gdouble size) {
 	GtkWidget *sizew;
 	g_print ("signal! FontView changed font size to %.2fpt.\n", size);
 	
@@ -104,7 +104,7 @@ int main (int argc, char *argv[]) {
 	glade_xml_signal_autoconnect (xml);
 
 	font = glade_xml_get_widget (xml, "font-view");
-	g_signal_connect (font, "sized", G_CALLBACK(view_sized), NULL);
+	g_signal_connect (font, "size-changed", G_CALLBACK(view_size_changed), NULL);
 	gtk_widget_show (font);
 
 	entry = glade_xml_get_widget (xml, "render_str");

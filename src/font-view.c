@@ -91,9 +91,9 @@ static void font_view_class_init (FontViewClass *klass) {
 	
 	/* signals */
 	font_view_signals[FONT_VIEW_SIZED_SIGNAL] =
-			g_signal_new ("sized", G_TYPE_FROM_CLASS (klass),
+			g_signal_new ("size-changed", G_TYPE_FROM_CLASS (klass),
 							G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-							G_STRUCT_OFFSET (FontViewClass, sized),
+							G_STRUCT_OFFSET (FontViewClass, size_changed),
 							NULL, NULL,
 							g_cclosure_marshal_VOID__DOUBLE, G_TYPE_NONE, 1,
 							G_TYPE_DOUBLE);
@@ -225,7 +225,7 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	font_model_face_destroy (priv->model);
 	
 	/* fire off signal that we changed size */
-	g_signal_emit_by_name (G_OBJECT (view), "sized", priv->size);
+	g_signal_emit_by_name (G_OBJECT (view), "size-changed", priv->size);
 	
 	return render;
 }
