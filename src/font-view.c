@@ -71,7 +71,7 @@ static gboolean font_view_key (GtkWidget *w, GdkEventKey *e);
 cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size);
 
 enum {
-	FONT_VIEW_SIZED_SIGNAL,
+	FONT_VIEW_SIZE_CHANGED_SIGNAL,
 	LAST_SIGNAL
 };
 static guint font_view_signals[LAST_SIGNAL] = { 0 };
@@ -90,7 +90,7 @@ static void font_view_class_init (FontViewClass *klass) {
 	g_type_class_add_private (object_class, sizeof (FontViewPrivate));
 	
 	/* signals */
-	font_view_signals[FONT_VIEW_SIZED_SIGNAL] =
+	font_view_signals[FONT_VIEW_SIZE_CHANGED_SIGNAL] =
 			g_signal_new ("size-changed", G_TYPE_FROM_CLASS (klass),
 							G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
 							G_STRUCT_OFFSET (FontViewClass, size_changed),
