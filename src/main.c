@@ -43,7 +43,11 @@ GtkWidget *font;
 void render_size_changed (GtkSpinButton *w, gpointer data);
 
 void view_sized (GtkWidget *w, gdouble size) {
+	GtkWidget *sizew;
 	g_print ("signal! FontView changed font size to %.2fpt.\n", size);
+	
+	sizew = glade_xml_get_widget (xml, "render_size");
+	gtk_spin_button_set_value (GTK_SPIN_BUTTON(sizew), font_view_get_pt_size (FONT_VIEW(w)));
 }
 
 void render_text_changed (GtkEntry *w, gpointer data) {
@@ -66,11 +70,31 @@ void print_usage ()
     exit(1);
 }
 
+GtkWidget *font_custom_handler (GladeXML *xml, gchar *func, gchar *name, gchar *s1, gchar *s2, gint i1, gint i2, gpointer data) {
+	GtkWidget *w = NULL;
+	
+	g_message ("font custom handler.");
+	
+	if (g_strcasecmp ("font_view_new_with_model", func) == 0) {
+		g_message ("fch: yo! %s", (gchar *)data);
+		w = font_view_new_with_model ((gchar *)data);
+		return w;
+	}
+	
+	return NULL;
+}
+
 int main (int argc, char *argv[]) {
-	GtkWidget *window, *vbox, *entry, *size;
+	GtkWidget *entry, *size;
 	
 	gtk_init (&argc, &argv);
+
+	if (!argv[1]) {
+		print_usage();
+		return 1;
+	}	
 	
+	glade_set_custom_handler (font_custom_handler, argv[1]);
 	xml = glade_xml_new ("mainwindow.glade", NULL, NULL);
 	if (!xml) {
 		xml = glade_xml_new (PACKAGE_DATA_DIR"/mainwindow.glade", NULL, NULL);
@@ -78,38 +102,19 @@ int main (int argc, char *argv[]) {
 	g_return_if_fail (xml);
 	
 	glade_xml_signal_autoconnect (xml);
-	/*
-	window = gtk_window_new (GTK_WINDOW_TOPLEVEL);
-	
-	gtk_window_set_default_size (GTK_WINDOW(window), 490, 200);
-	gtk_window_set_title (GTK_WINDOW(window), "FontView");
-	*/
-	if (!argv[1]) {
-		print_usage();
-	}	
-	
-	font = font_view_new_with_model (argv[1]);
+
+	font = glade_xml_get_widget (xml, "font-view");
 	g_signal_connect (font, "sized", G_CALLBACK(view_sized), NULL);
-	
-	vbox = glade_xml_get_widget (xml, "vbox1");
-	gtk_box_pack_end_defaults (GTK_BOX(vbox), GTK_WIDGET(font));
-	gtk_widget_show (GTK_WIDGET(font));
-	
+	gtk_widget_show (font);
+
 	entry = glade_xml_get_widget (xml, "render_str");
 	gtk_entry_set_text (GTK_ENTRY(entry), font_view_get_text(FONT_VIEW(font)));
 	g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
 	
 	size = glade_xml_get_widget (xml, "render_size");
 	gtk_spin_button_set_value (GTK_SPIN_BUTTON(size), font_view_get_pt_size (FONT_VIEW(font)));
-	g_signal_connect (size, "value-changed", G_CALLBACK(render_size_changed), NULL);
-	/*
-	gtk_container_add (GTK_CONTAINER (window), font);
-
-	g_signal_connect (window, "destroy", G_CALLBACK (gtk_main_quit), NULL);
-	
-	gtk_widget_show_all (window);
-	*/
-	
+	g_signal_connect (size, "value-changed", G_CALLBACK(render_size_changed), font);
+		
 	gtk_main();
 
 	return 0;
