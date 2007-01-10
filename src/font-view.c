@@ -196,18 +196,21 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	   so we need to make sure we max out that ascension, and
 	   store it for final rendering. */
 	cairo_font_extents (cr, &extents);
-	cairo_text_extents (cr, "ABCDEFGHIJKLMNOPQRSTUVWXYZdfikl", &t_extents);
+	cairo_text_extents (cr, "ABCDEFGHIJKLMNOPQRSTUVWXYZdfgijklpq", &t_extents);
 	ascender = -t_extents.y_bearing;
 	priv->max_ascend = ascender;
 	
+	/* get max height now in case string to render has no characters
+	   with descenders. */
+	height = t_extents.height;
+	
 	/* http://en.wikipedia.org/wiki/Pangram */
 	cairo_text_extents (cr, priv->render_str, &t_extents);
+	width = t_extents.width;
 
 	cairo_move_to (cr, 0, ascender);
 	cairo_show_text (cr, priv->render_str);
 
-	width = t_extents.width;
-	height = t_extents.height;
 
 	cairo_destroy (cr);
 	
