@@ -178,13 +178,9 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	
 	g_message ("pre rendering at size: %.2fpt - %.2fpx @ %.0fdpi", size, px, priv->dpi);
 	
-	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 3000, 1000);
+	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
 
 	cr = cairo_create (buffer);
-	cairo_set_source_rgb (cr, 1.0, 0.3, 0.3);
-	//cairo_paint (cr);
-	//cairo_set_source_rgb (cr, 0,0,0);
-	
 	font_model_face_create (priv->model);
 	
 	cairo_set_font_face (cr, priv->model->cr_face);
@@ -208,20 +204,20 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	cairo_text_extents (cr, priv->render_str, &t_extents);
 	width = t_extents.width;
 
-	cairo_move_to (cr, 0, ascender);
-	cairo_show_text (cr, priv->render_str);
-
-
 	cairo_destroy (cr);
-	
+	cairo_surface_destroy (buffer);
+		
 	/* copy buffer contents into correctly sized surface */
 	render = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width + (width * 0.25), height);
 	cr = cairo_create (render);
-	cairo_set_source_surface (cr, buffer, 0, 0);
-	cairo_paint (cr);
+
+	cairo_move_to (cr, 0, ascender);
+	cairo_set_font_face (cr, priv->model->cr_face);
+	cairo_set_font_size (cr, floor(px));
+	cairo_set_source_rgb (cr, 1.0, 0.2, 0.2);
+	cairo_show_text (cr, priv->render_str);
 	
 	cairo_destroy (cr);
-	cairo_surface_destroy (buffer);
 	font_model_face_destroy (priv->model);
 	
 	/* fire off signal that we changed size */
