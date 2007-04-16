@@ -80,7 +80,7 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
 	gtk_label_set_text (GTK_LABEL(style), model->style);
 	gtk_label_set_text (GTK_LABEL(version), model->version);
 	gtk_label_set_text (GTK_LABEL(copyright), model->copyright);
-	gtk_label_set_text (GTK_LABEL(desc), model->desc);
+	gtk_label_set_text (GTK_LABEL(desc), model->description);
 	gtk_label_set_text (GTK_LABEL(file), model->file);
 	
 	result = gtk_dialog_run (GTK_DIALOG (window));
@@ -91,7 +91,6 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
 
 void view_size_changed (GtkWidget *w, gdouble size) {
 	GtkWidget *sizew;
-	g_print ("signal! FontView changed font size to %.2fpt.\n", size);
 	
 	sizew = glade_xml_get_widget (xml, "render_size");
 	//gtk_spin_button_set_value (GTK_SPIN_BUTTON(sizew), font_view_get_pt_size (FONT_VIEW(w)));
@@ -99,8 +98,6 @@ void view_size_changed (GtkWidget *w, gdouble size) {
 
 void render_text_changed (GtkEntry *w, gpointer data) {
 	gchar *text = (gchar *)gtk_entry_get_text (w);
-	
-	g_message ("text_changed: %s", text);
 	
 	font_view_set_text (FONT_VIEW(font), text);
 }
@@ -127,10 +124,7 @@ void print_usage ()
 GtkWidget *font_custom_handler (GladeXML *xml, gchar *func, gchar *name, gchar *s1, gchar *s2, gint i1, gint i2, gpointer data) {
 	GtkWidget *w = NULL;
 	
-	g_message ("font custom handler.");
-	
 	if (g_strcasecmp ("font_view_new_with_model", func) == 0) {
-		g_message ("fch: yo! %s", (gchar *)data);
 		w = font_view_new_with_model ((gchar *)data);
 		return w;
 	}
@@ -139,7 +133,6 @@ GtkWidget *font_custom_handler (GladeXML *xml, gchar *func, gchar *name, gchar *
 }
 
 GtkListStore *fv_init_sizes (GtkListStore *sizes) {
-	GtkTreePath *path;
 	GtkTreeIter iter;
 	gint i;	
 	gint size_array[] = {6, 8, 9, 10, 12, 18, 24, 36, 48, 60, 72, 96, 112, 200};
@@ -186,11 +179,10 @@ int main (int argc, char *argv[]) {
 	
 	w = glade_xml_get_widget (xml, "info_button");
 	g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
-	
+
 	/* Set up the size selection combo box */
-	sizes = gtk_list_store_new (2, G_TYPE_INT, G_TYPE_STRING);
-	sizes = fv_init_sizes (sizes);
-	
+	sizes = fv_init_sizes (gtk_list_store_new (2, G_TYPE_INT, G_TYPE_STRING));
+
 	size = glade_xml_get_widget (xml, "size_combo");
 	g_signal_connect (size, "changed", G_CALLBACK(render_size_changed), NULL);
 
@@ -205,3 +197,4 @@ int main (int argc, char *argv[]) {
 
 	return 0;
 }
+

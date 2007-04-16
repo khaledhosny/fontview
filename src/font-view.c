@@ -176,9 +176,11 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	priv = FONT_VIEW_GET_PRIVATE(view);
 	
 	px = priv->dpi * (size/72);
-	
+
+#ifdef DEBUG
 	g_message ("pre rendering at size: %.2fpt - %.2fpx @ %.0fdpi", size, px, priv->dpi);
-	
+#endif
+
 	style = gtk_rc_get_style (GTK_WIDGET (view));
 	
 	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
@@ -276,8 +278,10 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	cairo_text_extents (cr, "HJKLMTYXi", &t_extents);
 	ascender = t_extents.y_bearing;
 
+#ifdef DEBUG
 	g_message ("main, ascender: %0.2f", ascender);
-	
+#endif 
+
 	cairo_set_source_rgb (cr, 0.8, 0.8, 0.8);
 	
 	/* position text in the center */
