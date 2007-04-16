@@ -1,186 +1,110 @@
-<?xml version="1.0" standalone="no"?> <!--*- mode: xml -*-->
-<!DOCTYPE glade-interface SYSTEM "http://glade.gnome.org/glade-2.0.dtd">
-
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE glade-interface SYSTEM "glade-2.0.dtd">
+<!--*- mode: xml -*-->
 <glade-interface>
-
-<widget class="GtkWindow" id="mainwindow">
-  <property name="width_request">500</property>
-  <property name="height_request">200</property>
-  <property name="visible">True</property>
-  <property name="title" translatable="yes">FontView</property>
-  <property name="type">GTK_WINDOW_TOPLEVEL</property>
-  <property name="window_position">GTK_WIN_POS_CENTER</property>
-  <property name="modal">False</property>
-  <property name="resizable">True</property>
-  <property name="destroy_with_parent">False</property>
-  <property name="icon_name">gtk-info</property>
-  <property name="decorated">True</property>
-  <property name="skip_taskbar_hint">False</property>
-  <property name="skip_pager_hint">False</property>
-  <property name="type_hint">GDK_WINDOW_TYPE_HINT_NORMAL</property>
-  <property name="gravity">GDK_GRAVITY_NORTH_WEST</property>
-  <property name="focus_on_map">True</property>
-  <property name="urgency_hint">False</property>
-  <signal name="delete_event" handler="gtk_main_quit" last_modification_time="Tue, 09 Jan 2007 21:34:56 GMT"/>
-
-  <child>
-    <widget class="GtkVBox" id="vbox1">
-      <property name="visible">True</property>
-      <property name="homogeneous">False</property>
-      <property name="spacing">2</property>
-
-      <child>
-	<widget class="Custom" id="font-view">
-	  <property name="visible">True</property>
-	  <property name="can_focus">True</property>
-	  <property name="has_focus">True</property>
-	  <property name="creation_function">font_view_new_with_model</property>
-	  <property name="int1">0</property>
-	  <property name="int2">0</property>
-	  <property name="last_modification_time">Wed, 10 Jan 2007 15:28:38 GMT</property>
-	</widget>
-	<packing>
-	  <property name="padding">0</property>
-	  <property name="expand">True</property>
-	  <property name="fill">True</property>
-	</packing>
-      </child>
-
-      <child>
-	<widget class="GtkHBox" id="hbox1">
-	  <property name="visible">True</property>
-	  <property name="homogeneous">False</property>
-	  <property name="spacing">3</property>
-
-	  <child>
-	    <widget class="GtkButton" id="open_button">
-	      <property name="visible">True</property>
-	      <property name="tooltip" translatable="yes">Open New Font</property>
-	      <property name="can_focus">True</property>
-	      <property name="relief">GTK_RELIEF_NONE</property>
-	      <property name="focus_on_click">True</property>
-
-	      <child>
-		<widget class="GtkImage" id="image1">
-		  <property name="visible">True</property>
-		  <property name="stock">gtk-open</property>
-		  <property name="icon_size">4</property>
-		  <property name="xalign">0.5</property>
-		  <property name="yalign">0.5</property>
-		  <property name="xpad">0</property>
-		  <property name="ypad">0</property>
-		</widget>
-	      </child>
-	    </widget>
-	    <packing>
-	      <property name="padding">0</property>
-	      <property name="expand">False</property>
-	      <property name="fill">False</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkButton" id="info_button">
-	      <property name="visible">True</property>
-	      <property name="tooltip" translatable="yes">Font Information</property>
-	      <property name="can_focus">True</property>
-	      <property name="relief">GTK_RELIEF_NONE</property>
-	      <property name="focus_on_click">True</property>
-	      <signal name="clicked" handler="on_info_button_clicked" last_modification_time="Tue, 09 Jan 2007 16:52:42 GMT"/>
-
-	      <child>
-		<widget class="GtkImage" id="info-btn">
-		  <property name="visible">True</property>
-		  <property name="stock">gtk-info</property>
-		  <property name="icon_size">4</property>
-		  <property name="xalign">0.5</property>
-		  <property name="yalign">0.5</property>
-		  <property name="xpad">0</property>
-		  <property name="ypad">0</property>
-		</widget>
-	      </child>
-	    </widget>
-	    <packing>
-	      <property name="padding">0</property>
-	      <property name="expand">False</property>
-	      <property name="fill">False</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkEntry" id="render_str">
-	      <property name="visible">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="has_focus">True</property>
-	      <property name="editable">True</property>
-	      <property name="visibility">True</property>
-	      <property name="max_length">0</property>
-	      <property name="text" translatable="yes"></property>
-	      <property name="has_frame">True</property>
-	      <property name="invisible_char">*</property>
-	      <property name="activates_default">False</property>
-	      <signal name="key_release_event" handler="on_render_str_key_release" last_modification_time="Tue, 09 Jan 2007 16:55:43 GMT"/>
-	    </widget>
-	    <packing>
-	      <property name="padding">0</property>
-	      <property name="expand">True</property>
-	      <property name="fill">True</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkLabel" id="label2">
-	      <property name="visible">True</property>
-	      <property name="label" translatable="yes"> Size:</property>
-	      <property name="use_underline">False</property>
-	      <property name="use_markup">False</property>
-	      <property name="justify">GTK_JUSTIFY_RIGHT</property>
-	      <property name="wrap">False</property>
-	      <property name="selectable">False</property>
-	      <property name="xalign">0.5</property>
-	      <property name="yalign">0.5</property>
-	      <property name="xpad">0</property>
-	      <property name="ypad">0</property>
-	      <property name="ellipsize">PANGO_ELLIPSIZE_NONE</property>
-	      <property name="width_chars">-1</property>
-	      <property name="single_line_mode">False</property>
-	      <property name="angle">0</property>
-	    </widget>
-	    <packing>
-	      <property name="padding">0</property>
-	      <property name="expand">False</property>
-	      <property name="fill">False</property>
-	    </packing>
-	  </child>
-
-	  <child>
-	    <widget class="GtkSpinButton" id="render_size">
-	      <property name="visible">True</property>
-	      <property name="can_focus">True</property>
-	      <property name="climb_rate">1</property>
-	      <property name="digits">0</property>
-	      <property name="numeric">False</property>
-	      <property name="update_policy">GTK_UPDATE_ALWAYS</property>
-	      <property name="snap_to_ticks">False</property>
-	      <property name="wrap">False</property>
-	      <property name="adjustment">12 5 300 1 10 10</property>
-	      <signal name="value_changed" handler="render_size_changed" last_modification_time="Tue, 09 Jan 2007 22:37:13 GMT"/>
-	    </widget>
-	    <packing>
-	      <property name="padding">5</property>
-	      <property name="expand">False</property>
-	      <property name="fill">False</property>
-	    </packing>
-	  </child>
-	</widget>
-	<packing>
-	  <property name="padding">0</property>
-	  <property name="expand">False</property>
-	  <property name="fill">False</property>
-	</packing>
-      </child>
-    </widget>
-  </child>
-</widget>
-
+  <widget class="GtkWindow" id="mainwindow">
+    <property name="width_request">500</property>
+    <property name="height_request">200</property>
+    <property name="visible">True</property>
+    <property name="title" translatable="yes">FontView</property>
+    <property name="icon_name">gtk-info</property>
+    <signal name="delete_event" handler="gtk_main_quit"/>
+    <child>
+      <widget class="GtkVBox" id="vbox1">
+        <property name="visible">True</property>
+        <property name="spacing">2</property>
+        <child>
+          <widget class="Custom" id="font-view">
+            <property name="visible">True</property>
+            <property name="sensitive">False</property>
+            <property name="creation_function">font_view_new_with_model</property>
+          </widget>
+        </child>
+        <child>
+          <widget class="GtkHBox" id="hbox1">
+            <property name="visible">True</property>
+            <property name="spacing">3</property>
+            <child>
+              <widget class="GtkButton" id="open_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="tooltip" translatable="yes">Open New Font</property>
+                <property name="relief">GTK_RELIEF_NONE</property>
+                <child>
+                  <widget class="GtkImage" id="image1">
+                    <property name="visible">True</property>
+                    <property name="stock">gtk-open</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkButton" id="info_button">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="tooltip" translatable="yes">Font Information</property>
+                <property name="relief">GTK_RELIEF_NONE</property>
+                <signal name="clicked" handler="on_info_button_clicked"/>
+                <child>
+                  <widget class="GtkImage" id="info-btn">
+                    <property name="visible">True</property>
+                    <property name="stock">gtk-info</property>
+                  </widget>
+                </child>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">1</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkEntry" id="render_str">
+                <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="has_focus">True</property>
+                <property name="invisible_char">*</property>
+                <signal name="key_release_event" handler="on_render_str_key_release"/>
+              </widget>
+              <packing>
+                <property name="position">2</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkLabel" id="label2">
+                <property name="visible">True</property>
+                <property name="label" translatable="yes"> Size:</property>
+                <property name="justify">GTK_JUSTIFY_RIGHT</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="fill">False</property>
+                <property name="position">3</property>
+              </packing>
+            </child>
+            <child>
+              <widget class="GtkComboBox" id="size_combo">
+                <property name="visible">True</property>
+                <property name="events">GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK | GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK</property>
+                <property name="active">1</property>
+              </widget>
+              <packing>
+                <property name="expand">False</property>
+                <property name="position">4</property>
+              </packing>
+            </child>
+          </widget>
+          <packing>
+            <property name="expand">False</property>
+            <property name="fill">False</property>
+            <property name="position">1</property>
+          </packing>
+        </child>
+      </widget>
+    </child>
+  </widget>
 </glade-interface>

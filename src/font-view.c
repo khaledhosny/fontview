@@ -205,6 +205,7 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	width = t_extents.width;
 
 	cairo_destroy (cr);
+	cairo_surface_finish (buffer);
 	cairo_surface_destroy (buffer);
 		
 	/* copy buffer contents into correctly sized surface */
@@ -434,6 +435,7 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
 	if (priv->size == size) return;
 	
 	priv->size = size;
+	cairo_surface_finish (priv->render);
 	cairo_surface_destroy (priv->render);
 	priv->render = _font_view_pre_render_at_size (view, priv->size);
 	
@@ -456,6 +458,7 @@ void font_view_set_text (FontView *view, gchar *text) {
 	if (g_strcasecmp (priv->render_str, text) == 0) return;
 
 	priv->render_str = g_strdup(text);
+	cairo_surface_finish (priv->render);
 	cairo_surface_destroy (priv->render);
 	priv->render = _font_view_pre_render_at_size (view, priv->size);
 	
