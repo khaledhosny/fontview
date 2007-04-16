@@ -30,7 +30,8 @@
  * 
  */
  
- 
+#include "config.h"
+
 #include <gtk/gtk.h>
 #include <glade/glade.h>
 #include <glade/glade-xml.h>
@@ -48,9 +49,18 @@ enum {
 
 void render_size_changed (GtkComboBox *w, gpointer data);
 
+void font_view_about (GtkWidget *w, gpointer data) {
+	gtk_show_about_dialog (NULL, 
+		"name", "Font View", 
+		"version", VERSION, 
+		"copyright", "Copyright © 2007, Alex Roberts", 
+		"comments", "A font viewing utility.\nPart of the Serif font management project.",
+		"license", "GNU General Public License 2.0\n\nSee COPYING for more information.", 
+		NULL);
+}
 
 void font_view_info_window (GtkWidget *w, gpointer data) {
-	GtkWidget *window, *close;
+	GtkWidget *window, *close, *about;
 	GtkWidget *name, *style, *version, *copyright, *desc, *file;
 	GladeXML *infowindow;
 	FontModel *model;
@@ -64,8 +74,8 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
 	
 	window = glade_xml_get_widget (infowindow, "infowindow");
 	
-	close = glade_xml_get_widget (infowindow, "close_button");
-	
+	about = glade_xml_get_widget (infowindow, "about_button");
+	g_signal_connect (about, "clicked", G_CALLBACK(font_view_about), NULL);
 	
 	model = font_view_get_model (FONT_VIEW (font));
 	
@@ -84,6 +94,7 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
 	gtk_label_set_text (GTK_LABEL(file), model->file);
 	
 	result = gtk_dialog_run (GTK_DIALOG (window));
+		
 	gtk_widget_destroy (window);
 	
 }
