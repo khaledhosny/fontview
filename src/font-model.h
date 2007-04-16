@@ -60,6 +60,9 @@ struct _FontModel {
 	gchar *family;
 	gchar *style;
 	
+	gchar *version;
+	gchar *copyright;
+	gchar *description;
 };
 
 struct _FontModelClass {

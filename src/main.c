@@ -48,6 +48,47 @@ enum {
 
 void render_size_changed (GtkComboBox *w, gpointer data);
 
+
+void font_view_info_window (GtkWidget *w, gpointer data) {
+	GtkWidget *window, *close;
+	GtkWidget *name, *style, *version, *copyright, *desc, *file;
+	GladeXML *infowindow;
+	FontModel *model;
+	gint result;
+	
+	infowindow = glade_xml_new ("mainwindow.glade", "infowindow", NULL);
+	if (!xml) {
+		infowindow = glade_xml_new (PACKAGE_DATA_DIR"/mainwindow.glade", "infowindow", NULL);
+	}
+	g_return_if_fail (infowindow);
+	
+	window = glade_xml_get_widget (infowindow, "infowindow");
+	
+	close = glade_xml_get_widget (infowindow, "close_button");
+	
+	
+	model = font_view_get_model (FONT_VIEW (font));
+	
+	name = glade_xml_get_widget (infowindow, "name_label");
+	style = glade_xml_get_widget (infowindow, "style_label");
+	version = glade_xml_get_widget (infowindow, "version_label");
+	copyright = glade_xml_get_widget (infowindow, "copyright_label");
+	desc = glade_xml_get_widget (infowindow, "descr_label");
+	file = glade_xml_get_widget (infowindow, "file_label");
+	
+	gtk_label_set_text (GTK_LABEL(name), model->family);
+	gtk_label_set_text (GTK_LABEL(style), model->style);
+	gtk_label_set_text (GTK_LABEL(version), model->version);
+	gtk_label_set_text (GTK_LABEL(copyright), model->copyright);
+	gtk_label_set_text (GTK_LABEL(desc), model->desc);
+	gtk_label_set_text (GTK_LABEL(file), model->file);
+	
+	result = gtk_dialog_run (GTK_DIALOG (window));
+	gtk_widget_destroy (window);
+	
+}
+
+
 void view_size_changed (GtkWidget *w, gdouble size) {
 	GtkWidget *sizew;
 	g_print ("signal! FontView changed font size to %.2fpt.\n", size);
@@ -115,7 +156,7 @@ GtkListStore *fv_init_sizes (GtkListStore *sizes) {
 }
 
 int main (int argc, char *argv[]) {
-	GtkWidget *entry, *size;
+	GtkWidget *w, *entry, *size;
 	GtkListStore *sizes;
 	GtkCellRenderer *renderer = NULL;
 	
@@ -127,9 +168,9 @@ int main (int argc, char *argv[]) {
 	}	
 	
 	glade_set_custom_handler (font_custom_handler, argv[1]);
-	xml = glade_xml_new ("mainwindow.glade", NULL, NULL);
+	xml = glade_xml_new ("mainwindow.glade", "mainwindow", NULL);
 	if (!xml) {
-		xml = glade_xml_new (PACKAGE_DATA_DIR"/mainwindow.glade", NULL, NULL);
+		xml = glade_xml_new (PACKAGE_DATA_DIR"/mainwindow.glade", "mainwindow", NULL);
 	}
 	g_return_if_fail (xml);
 	
@@ -143,6 +184,8 @@ int main (int argc, char *argv[]) {
 	gtk_entry_set_text (GTK_ENTRY(entry), font_view_get_text(FONT_VIEW(font)));
 	g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
 	
+	w = glade_xml_get_widget (xml, "info_button");
+	g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
 	
 	/* Set up the size selection combo box */
 	sizes = gtk_list_store_new (2, G_TYPE_INT, G_TYPE_STRING);

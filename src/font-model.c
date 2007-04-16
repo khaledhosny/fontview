@@ -126,7 +126,26 @@ GObject *font_model_new (gchar *fontfile) {
 				continue;
 			}
 			
+			switch (sfname.name_id) {
+	    		case TT_NAME_ID_COPYRIGHT:
+					model->copyright = g_locale_to_utf8 (sfname.string, sfname.string_len,
+						NULL, NULL, NULL);
+					break;
+			    case TT_NAME_ID_VERSION_STRING:
+					model->version = g_locale_to_utf8 (sfname.string, sfname.string_len,
+						NULL, NULL, NULL);
+					break;
+			    case TT_NAME_ID_DESCRIPTION:
+					model->description = g_locale_to_utf8 (sfname.string, sfname.string_len,
+						NULL, NULL, NULL);
+					break;
+			    default:
+					break;
+		    }
+			
 			g_message ("sfname: (%d) %d: %s", sfname.platform_id, sfname.name_id, sfname.string);
+			
+			
 			
 		}
 	}
