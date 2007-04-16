@@ -163,6 +163,7 @@ FontModel *font_view_get_model (FontView *view) {
 
 /* pre render the text */
 cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
+	GtkStyle *style;
 	cairo_surface_t *buffer, *render;
 	gint width, height;
 	cairo_font_extents_t extents;
@@ -177,6 +178,8 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	px = priv->dpi * (size/72);
 	
 	g_message ("pre rendering at size: %.2fpt - %.2fpx @ %.0fdpi", size, px, priv->dpi);
+	
+	style = gtk_rc_get_style (GTK_WIDGET (view));
 	
 	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
 
@@ -215,12 +218,12 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	cairo_move_to (cr, 0, ascender);
 	cairo_set_font_face (cr, priv->model->cr_face);
 	cairo_set_font_size (cr, floor(px));
-	cairo_set_source_rgb (cr, 1.0, 0.2, 0.2);
+	gdk_cairo_set_source_color (cr, style->dark);
 	cairo_show_text (cr, priv->render_str);
 	
 	cairo_destroy (cr);
 	font_model_face_destroy (priv->model);
-	
+		
 	/* fire off signal that we changed size */
 	g_signal_emit_by_name (G_OBJECT (view), "size-changed", priv->size);
 	
@@ -229,6 +232,7 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 
 
 static void render (GtkWidget *w, cairo_t *cr) {
+	GtkStyle *style;
 	gint width, height;
 	cairo_font_extents_t extents;
 	cairo_text_extents_t t_extents;
@@ -243,7 +247,9 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	
 	width = w->allocation.width;
 	height = w->allocation.height + 8;
-
+	
+	style = gtk_rc_get_style (GTK_WIDGET (w));
+	
 	cairo_rectangle (cr, 0, 0, width, height);
 	cairo_set_source_rgb (cr, 1, 1, 1);
 	cairo_paint (cr);
@@ -325,10 +331,10 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	cairo_text_extents (cr, title, &t_extents);
 	cairo_font_extents (cr, &extents);
 	cairo_rectangle (cr, 0, 0, width, t_extents.height + extents.descent + 1);
-	cairo_set_source_rgb (cr, 0.2, 0.2, 0.2);
+	gdk_cairo_set_source_color (cr, style->bg);
 	cairo_fill (cr);
-
-	cairo_set_source_rgb (cr, 1, 1, 1);
+	
+	gdk_cairo_set_source_color (cr, style->fg);
 	cairo_move_to (cr, 5, t_extents.height);
 	cairo_show_text (cr, title);
 	g_free (title);
