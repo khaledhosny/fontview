@@ -76,4 +76,6 @@ GObject *font_model_new (gchar *font);
 void font_model_face_create (FontModel *model);
 void font_model_face_destroy (FontModel *model);
 
+gchar *font_model_desc_for_size (FontModel *model, gint size);
+
 #endif /* __FONT_MODEL_H__ */

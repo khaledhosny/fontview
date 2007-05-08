@@ -37,6 +37,8 @@
 #include FT_TRUETYPE_IDS_H
 #include <pango/pango.h>
 #include <pango/pangofc-fontmap.h>
+#include <fontconfig/fontconfig.h>
+
 
 static GObjectClass *parent_class = NULL;
 
@@ -77,8 +79,37 @@ GObject *font_model_new (gchar *fontfile) {
 	FT_Library library;
 	FT_SfntName sfname;
 	gint len, i;
+	FcChar8 *s;
+	FcResult result;
+
+	//FcConfig *config = ;
+	FcFontSet *fonts;
 	
+	/*if (!config) {
+		g_error ("Failed to create FcConfig!");
+		exit;
+	}
+	
+	if (!FcConfigBuildFonts (config)) {
+		g_error ("Error building font set!");
+		exit;
+	}
+	
+	if (!FcConfigSetCurrent (config)) {
+		g_error ("Error setting current font config.");
+		exit;
+	}
+	*/
 	g_return_val_if_fail (fontfile, NULL);
+	if (FcConfigAppFontAddFile (FcConfigGetCurrent(), fontfile)) {
+		g_message ("Loaded application specific font.");
+	} else {
+		g_error ("Failed to load app font.");
+		exit;
+	}
+	
+	fonts = FcConfigGetFonts (FcConfigGetCurrent(), FcSetApplication);
+	FcPatternPrint (fonts->fonts[0]);
 	
 	FT_Init_FreeType(&library);
 
@@ -94,9 +125,23 @@ GObject *font_model_new (gchar *fontfile) {
 
     // TODO: Need to check if font exists before opening it
 
-	model->file = fontfile;
+	model->file = g_strdup (fontfile);
 	model->family = model->ft_face->family_name;
 	model->style = model->ft_face->style_name;
+	
+	/*
+	result = FcPatternGetString (fonts->fonts[0], FC_FAMILY, 0, &s);
+	if (result == FcResultMatch) 
+		model->family = g_strdup (s);
+		
+	result = FcPatternGetString (fonts->fonts[0], FC_STYLE, 0, &s);
+	if (result == FcResultMatch) 
+		model->style = g_strdup (s);
+		
+	result = FcPatternGetInteger (fonts->fonts[0], FC_WEIGHT, 0, &i);
+	if (result == FcResultMatch) 
+		g_message ("Weight: %d", i);
+		*/
 
 #ifdef DEBUG
 	g_message ("FontModel instantiated.\nFont File: %s\nFont Family: %s\nFont Style: %s\n", 
@@ -150,4 +195,22 @@ void font_model_face_create (FontModel *model) {
 
 void font_model_face_destroy (FontModel *model) {
 	cairo_font_face_destroy (model->cr_face);
+}
+
+gchar *font_model_desc_for_size (FontModel *model, gint size) {
+	gchar *desc;
+	
+	// font display fails if any of these are included in
+	// the pango description
+	if (!strcasecmp (model->style, "regular") ||
+	    !strcasecmp (model->style, "roman") ||
+	    !strcasecmp (model->style, "normal")) {
+		
+		desc = g_strdup_printf ("%s %dpx", model->family, size);
+	} else {
+		desc = g_strdup_printf ("%s %s %dpx", model->family, model->style, size);
+	}
+	
+	g_message ("font desc: %s", desc);
+	return desc;
 }
