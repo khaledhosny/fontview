@@ -108,9 +108,11 @@ void view_size_changed (GtkWidget *w, gdouble size) {
 }
 
 void render_text_changed (GtkEntry *w, gpointer data) {
-	gchar *text = (gchar *)gtk_entry_get_text (w);
-	
+	gchar *text = g_strdup ((gchar *)gtk_entry_get_text (w));
+		
 	font_view_set_text (FONT_VIEW(font), text);
+	
+	g_free (text);
 }
 
 void render_size_changed (GtkComboBox *w, gpointer data) {
