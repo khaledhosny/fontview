@@ -200,16 +200,7 @@ void font_model_face_destroy (FontModel *model) {
 gchar *font_model_desc_for_size (FontModel *model, gint size) {
 	gchar *desc;
 	
-	// font display fails if any of these are included in
-	// the pango description
-	if (!strcasecmp (model->style, "regular") ||
-	    !strcasecmp (model->style, "roman") ||
-	    !strcasecmp (model->style, "normal")) {
-		
-		desc = g_strdup_printf ("%s %dpx", model->family, size);
-	} else {
-		desc = g_strdup_printf ("%s %s %dpx", model->family, model->style, size);
-	}
+	desc = g_strdup_printf ("%s, %s %dpx", model->family, model->style, size);
 	
 	g_message ("font desc: %s", desc);
 	return desc;
