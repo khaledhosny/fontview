@@ -145,14 +145,9 @@ GObject *font_model_new (gchar *fontfile) {
 	return G_OBJECT (model);
 }
 
-void font_model_face_create (FontModel *model) {
-	model->cr_face = cairo_ft_font_face_create_for_ft_face (model->ft_face, FT_LOAD_NO_AUTOHINT);
+cairo_font_face_t *font_model_face_create (FontModel *model) {
+	return cairo_ft_font_face_create_for_ft_face (model->ft_face, FT_LOAD_NO_AUTOHINT);
 
-}
-
-
-void font_model_face_destroy (FontModel *model) {
-	cairo_font_face_destroy (model->cr_face);
 }
 
 gchar *font_model_desc_for_size (FontModel *model, gint size) {

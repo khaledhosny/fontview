@@ -41,17 +41,27 @@ G_DEFINE_TYPE (FontView, font_view, GTK_TYPE_DRAWING_AREA);
 
 #define ZOOM_LEVELS 30
 
+enum {
+	BASELINE,
+	ASCENDER,
+	DESCENDER,
+	XHEIGHT,
+	TEXT,
+	N_EXTENTS
+};
+
 typedef struct _FontViewPrivate FontViewPrivate;
 
 struct _FontViewPrivate {
-	gboolean baseline;
-	gboolean ascender;
-	gboolean descender;
-	gboolean xheight;
-	gboolean text;
+	gboolean extents[N_EXTENTS];
 	
 	cairo_surface_t *render;
 	
+	gdouble ascender;
+	gdouble descender;
+	gdouble xheight;
+	
+	gdouble height;
 	gdouble max_ascend;
 	gdouble size;
 
@@ -101,15 +111,13 @@ static void font_view_class_init (FontViewClass *klass) {
 
 static void font_view_init (FontView *view) {
 	FontViewPrivate *priv;
-	
+	gint i;
 	priv = FONT_VIEW_GET_PRIVATE(view);
 	
-	priv->baseline = FALSE;
-	priv->ascender = FALSE;
-	priv->descender = FALSE;
-	priv->xheight = FALSE;
-	priv->text = TRUE;
-	
+	for (i = 0; i < G_N_ELEMENTS(priv->extents); i++) {
+		priv->extents[i] = FALSE;
+	}
+	priv->extents[TEXT] = TRUE;
 	priv->size = 50;
 
 	/* until a better way to get the X11 dpi appears, 
@@ -161,6 +169,43 @@ FontModel *font_view_get_model (FontView *view) {
 	return priv->model;
 }
 
+void _font_view_get_extents (FontView *view) {
+	cairo_t *cr;
+	cairo_font_face_t *cr_face;
+	cairo_font_extents_t extents;
+	cairo_text_extents_t t_extents;
+	gint px;
+	FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
+	
+	px = priv->dpi * (priv->size/72);
+
+	//cr = cairo_create (cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1));
+	cr = cairo_create (cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1));
+	
+	cr_face = font_model_face_create (priv->model);
+	cairo_set_font_face (cr, cr_face);
+	cairo_set_font_size (cr, px);
+	
+	/* get font extents - for calculating descender...*/
+	cairo_font_extents (cr, &extents);
+	
+	/* get x-height */
+	cairo_text_extents (cr, "x", &t_extents);
+	priv->xheight = t_extents.y_bearing;
+	
+	/* get ascender */
+	cairo_text_extents (cr, "HJKLMTYXi", &t_extents);
+	priv->ascender = t_extents.y_bearing;
+	
+	/* get descender */
+	priv->descender = extents.descent;
+	
+	priv->height = t_extents.height;
+	
+	cairo_font_face_destroy (cr_face);
+	cairo_destroy (cr);
+}
+
 /* pre render the text */
 cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	GtkStyle *style;
@@ -179,7 +224,6 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	
 	px = priv->dpi * (size/72);
 
-
 #ifdef DEBUG
 	g_message ("pre rendering at size: %.2fpt - %.2fpx @ %.0fdpi", size, px, priv->dpi);
 #endif
@@ -189,14 +233,12 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
 
 	cr = cairo_create (buffer);
-	font_model_face_create (priv->model);
 	
 	layout = pango_cairo_create_layout (cr);
 	pango_layout_set_text (layout, priv->render_str, -1);
 
 	desc = pango_font_description_from_string (font_model_desc_for_size (priv->model, size));
 	pango_layout_set_font_description (layout, desc);
-	pango_layout_set_spacing (layout, size * PANGO_SCALE);
 	pango_font_description_free (desc);
 	
 	
@@ -216,7 +258,6 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	
 	g_object_unref (layout);
 	cairo_destroy (cr);
-	font_model_face_destroy (priv->model);
 		
 	/* fire off signal that we changed size */
 	g_signal_emit_by_name (G_OBJECT (view), "size-changed", priv->size);
@@ -230,6 +271,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	gint width, height;
 	cairo_font_extents_t extents;
 	cairo_text_extents_t t_extents;
+	cairo_font_face_t *cr_face;
 	gdouble xheight, ascender, y, x;
 	FontViewPrivate *priv;
 	gdouble px;
@@ -253,24 +295,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	cairo_set_source_rgb (cr, 1, 0.3, 0.3);
 	cairo_set_line_width (cr, 1.0);
 
-	
-	font_model_face_create (priv->model);
-	
-	//cairo_select_font_face (cr, "Verdana", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-	cairo_set_font_face (cr, priv->model->cr_face);
-	cairo_set_font_size (cr, px);
-	
-	/* get font extents - for calculating descender...*/
-	cairo_font_extents (cr, &extents);
-	
-	/* get x-height */
-	cairo_text_extents (cr, "x", &t_extents);
-	xheight = t_extents.y_bearing;
-	
-	/* get ascender */
-	cairo_text_extents (cr, "HJKLMTYXi", &t_extents);
-	ascender = t_extents.y_bearing;
-
 #ifdef DEBUG
 	g_message ("main, ascender: %0.2f", ascender);
 #endif 
@@ -278,46 +302,43 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	cairo_set_source_rgb (cr, 0.8, 0.8, 0.8);
 	
 	/* position text in the center */
-	y = floor ((height / 2) + (t_extents.height / 2) - (extents.descent / 2)) + 0.5;
+	y = floor ((height / 2) + (priv->height / 2) - (priv->descender / 2)) + 0.5;
 	x = floor (width /2 * 0.1);
 	
 	/* baseline */
-	if (priv->baseline) {
+	if (priv->extents[BASELINE]) {
 		cairo_move_to (cr, x, y);
 		cairo_line_to (cr, width - x, y);
 		cairo_stroke (cr);
 	}
 	
 	/* descender height */
-	if (priv->descender) {
-		cairo_move_to (cr, x, y + extents.descent);
-		cairo_line_to (cr, width - x, y + extents.descent);
+	if (priv->extents[DESCENDER]) {
+		cairo_move_to (cr, x, y + priv->descender);
+		cairo_line_to (cr, width - x, y + priv->descender);
 		cairo_stroke (cr);
 	}
 
 	/* ascender height */
-	if (priv->ascender) {
-		cairo_move_to (cr, x, y + ascender);
-		cairo_line_to (cr, width - x, y + ascender);
+	if (priv->extents[ASCENDER]) {
+		cairo_move_to (cr, x, y + priv->ascender);
+		cairo_line_to (cr, width - x, y + priv->ascender);
 		cairo_stroke (cr);
 	}
 
 	/* x-height */
-	if (priv->xheight) {
-		cairo_move_to (cr, x, y + xheight);
-		cairo_line_to (cr, width - x, y + xheight);
+	if (priv->extents[XHEIGHT]) {
+		cairo_move_to (cr, x, y + priv->xheight);
+		cairo_line_to (cr, width - x, y + priv->xheight);
 		cairo_stroke (cr);
 	}
 
 	/* display sample text */
-	if (priv->text) {
-		//gdk_cairo_set_source_pixbuf (cr, priv->image, (width / 2 * 0.25), y + ascender);
-		//cairo_set_source_surface (cr, priv->ref[priv->curzoom], (width / 2 * 0.25), y + ascender);
+	if (priv->extents[TEXT]) {
 		sheight = cairo_image_surface_get_height (priv->render);
-		g_message ("%f, %d", floor(y + ascender), sheight);
-		cairo_set_source_surface (cr, priv->render, x, floor (y + extents.descent /* + ascender - (ascender + priv->max_ascend)*/ ) - sheight);
-		cairo_paint (cr);
-	
+		g_message ("%f, %d", floor(y + priv->ascender), sheight);
+		cairo_set_source_surface (cr, priv->render, x, floor (y + priv->descender) - sheight);
+		cairo_paint (cr);	
 	}
 	
 	
@@ -338,7 +359,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	cairo_show_text (cr, title);
 	g_free (title);
 	
-	font_model_face_destroy (priv->model);
 }
 
 
@@ -361,10 +381,10 @@ static gboolean font_view_clicked (GtkWidget *w, GdkEventButton *e) {
 	
 	priv = FONT_VIEW_GET_PRIVATE (w);
 	
-	priv->baseline = !priv->baseline;
-	priv->ascender = !priv->ascender;
-	priv->descender = !priv->descender;
-	priv->xheight = !priv->xheight;
+	priv->extents[BASELINE] = !priv->extents[BASELINE];
+	priv->extents[ASCENDER] = !priv->extents[ASCENDER];
+	priv->extents[DESCENDER] = !priv->extents[DESCENDER];
+	priv->extents[XHEIGHT] = !priv->extents[XHEIGHT];
 	
 	font_view_redraw (FONT_VIEW(w));
 	
@@ -399,7 +419,7 @@ static gboolean font_view_key (GtkWidget *w, GdkEventKey *e) {
 	}
 	
 	if (e->keyval == GDK_v) {
-		priv->text = !priv->text;
+		priv->extents[TEXT] = !priv->extents[TEXT];
 		font_view_redraw (FONT_VIEW (w));
 	}
 	
@@ -442,6 +462,7 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
 	priv->size = size;
 	cairo_surface_finish (priv->render);
 	cairo_surface_destroy (priv->render);
+	_font_view_get_extents (view);
 	priv->render = _font_view_pre_render_at_size (view, priv->size);
 	
 	font_view_redraw (view);

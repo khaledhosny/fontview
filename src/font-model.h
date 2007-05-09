@@ -53,7 +53,6 @@ struct _FontModel {
 	
 	/* use priv in future */
 	FT_Face ft_face;
-	cairo_font_face_t *cr_face;
 	PangoFontDescription *desc;
 		
 	gchar *file;
@@ -73,8 +72,7 @@ GType font_model_get_type (void);
 
 GObject *font_model_new (gchar *font);
 
-void font_model_face_create (FontModel *model);
-void font_model_face_destroy (FontModel *model);
+cairo_font_face_t *font_model_face_create (FontModel *model);
 
 gchar *font_model_desc_for_size (FontModel *model, gint size);
 
