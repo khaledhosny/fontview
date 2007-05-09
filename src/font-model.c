@@ -82,25 +82,10 @@ GObject *font_model_new (gchar *fontfile) {
 	FcChar8 *s;
 	FcResult result;
 
-	//FcConfig *config = ;
 	FcFontSet *fonts;
-	
-	/*if (!config) {
-		g_error ("Failed to create FcConfig!");
-		exit;
-	}
-	
-	if (!FcConfigBuildFonts (config)) {
-		g_error ("Error building font set!");
-		exit;
-	}
-	
-	if (!FcConfigSetCurrent (config)) {
-		g_error ("Error setting current font config.");
-		exit;
-	}
-	*/
+
 	g_return_val_if_fail (fontfile, NULL);
+
 	if (FcConfigAppFontAddFile (FcConfigGetCurrent(), fontfile)) {
 		g_message ("Loaded application specific font.");
 	} else {
@@ -116,38 +101,11 @@ GObject *font_model_new (gchar *fontfile) {
 	model = g_object_new (FONT_MODEL_TYPE, NULL);
 	FT_New_Face (library, fontfile, 0, &model->ft_face);	
 	
-/*	pattern = FcPatternCreate();
-	pattern = FcPatternBuild(0, FC_FT_FACE, FcTypeFTFace, model->ft_face, NULL);
-	FcPatternAddString (pattern, FC_FAMILY, model->ft_face->family_name);
-	FcPatternPrint (pattern);
-	model->desc = pango_fc_font_description_from_pattern (pattern, FALSE);
-	*/
-
-    // TODO: Need to check if font exists before opening it
-
 	model->file = g_strdup (fontfile);
 	model->family = model->ft_face->family_name;
 	model->style = model->ft_face->style_name;
-	
-	/*
-	result = FcPatternGetString (fonts->fonts[0], FC_FAMILY, 0, &s);
-	if (result == FcResultMatch) 
-		model->family = g_strdup (s);
-		
-	result = FcPatternGetString (fonts->fonts[0], FC_STYLE, 0, &s);
-	if (result == FcResultMatch) 
-		model->style = g_strdup (s);
-		
-	result = FcPatternGetInteger (fonts->fonts[0], FC_WEIGHT, 0, &i);
-	if (result == FcResultMatch) 
-		g_message ("Weight: %d", i);
-		*/
 
-#ifdef DEBUG
-	g_message ("FontModel instantiated.\nFont File: %s\nFont Family: %s\nFont Style: %s\n", 
-				model->file, model->family, model->style);
-#endif
-
+	// Get font metadata if available/applicable
 	if (FT_IS_SFNT(model->ft_face)) {
 		len = FT_Get_Sfnt_Name_Count (model->ft_face);
 		
@@ -160,26 +118,26 @@ GObject *font_model_new (gchar *fontfile) {
 			
 			switch (sfname.name_id) {
 	    		case TT_NAME_ID_COPYRIGHT:
-					model->copyright = g_locale_to_utf8 (sfname.string, sfname.string_len,
+					model->copyright = g_locale_to_utf8 (sfname.string,
+						sfname.string_len,
 						NULL, NULL, NULL);
 					break;
 			    case TT_NAME_ID_VERSION_STRING:
-					model->version = g_locale_to_utf8 (sfname.string, sfname.string_len,
+					model->version = g_locale_to_utf8 (sfname.string,
+						sfname.string_len,
 						NULL, NULL, NULL);
 					break;
 			    case TT_NAME_ID_DESCRIPTION:
-					model->description = g_locale_to_utf8 (sfname.string, sfname.string_len,
+					model->description = g_locale_to_utf8 (sfname.string,
+						sfname.string_len,
 						NULL, NULL, NULL);
 					break;
 			    default:
 					break;
 		    }
-
 #ifdef DEBUG			
 			g_message ("sfname: (%d) %d: %s", sfname.platform_id, sfname.name_id, sfname.string);
-#endif
-			
-			
+#endif			
 		}
 	}
 	
@@ -205,3 +163,4 @@ gchar *font_model_desc_for_size (FontModel *model, gint size) {
 	g_message ("font desc: %s", desc);
 	return desc;
 }
+
