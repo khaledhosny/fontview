@@ -169,20 +169,16 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	cairo_font_extents_t extents;
 	cairo_text_extents_t t_extents;
 	gdouble ascender;
-    cairo_t *cr;
-    gdouble px;
+    	cairo_t *cr;
+    	gdouble px;
 	
 	PangoLayout *layout;
 	PangoFontDescription *desc;
 	
-	FontViewPrivate *priv;
-	priv = FONT_VIEW_GET_PRIVATE(view);
+	FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
 	
 	px = priv->dpi * (size/72);
 
-
-	width = GTK_WIDGET(view)->allocation.width;
-	height = GTK_WIDGET(view)->allocation.height + 8;
 
 #ifdef DEBUG
 	g_message ("pre rendering at size: %.2fpt - %.2fpx @ %.0fdpi", size, px, priv->dpi);
@@ -197,57 +193,25 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	
 	layout = pango_cairo_create_layout (cr);
 	pango_layout_set_text (layout, priv->render_str, -1);
+
 	desc = pango_font_description_from_string (font_model_desc_for_size (priv->model, size));
 	pango_layout_set_font_description (layout, desc);
+	pango_layout_set_spacing (layout, size * PANGO_SCALE);
 	pango_font_description_free (desc);
 	
-	/*
-	cairo_set_font_face (cr, priv->model->cr_face);
-	cairo_set_font_size (cr, floor(px));
-	*/
-	/* get font extents */
-	/* for the font rendering store we want to display everything,
-	   some fonts have disparative heights between characters, 
-	   so we need to make sure we max out that ascension, and
-	   store it for final rendering. */
-	/*
-	cairo_font_extents (cr, &extents);
-	cairo_text_extents (cr, "ABCDEFGHIJKLMNOPQRSTUVWXYZdfgijklpq", &t_extents);
-	ascender = -t_extents.y_bearing;
-	priv->max_ascend = ascender;
-	*/
-	/* get max height now in case string to render has no characters
-	   with descenders. */
-	/*
-	height = t_extents.height;
-	*/
-	/* http://en.wikipedia.org/wiki/Pangram */
-	/*
-	cairo_text_extents (cr, priv->render_str, &t_extents);
-	width = t_extents.width;
-
-	cairo_destroy (cr);
-	cairo_surface_finish (buffer);
-	cairo_surface_destroy (buffer);
-	*/
 	
 	pango_layout_get_pixel_size (layout, &width, &height);
 	/* copy buffer contents into correctly sized surface */
-	//render = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width + (width * 0.25), 500);
-	render = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width, height);
+	render = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width + (width * 0.25), height);
 	cr = cairo_create (render);
 	
 	pango_cairo_update_layout (cr, layout);
 
-//	cairo_set_source_rgba (cr, 1, 0, 1, 0.5);
-//	cairo_paint (cr);
+	//cairo_set_source_rgba (cr, 1, 0, 1, 0.5);
+	//cairo_paint (cr);
 
 	cairo_move_to (cr, 0, 0);
-	//cairo_set_font_face (cr, priv->model->cr_face);
-	//cairo_set_font_size (cr, floor(px));
-	gdk_cairo_set_source_color (cr, style->dark);
-	//cairo_show_text (cr, priv->render_str);
-	
+	gdk_cairo_set_source_color (cr, style->dark);	
 	pango_cairo_show_layout (cr, layout);
 	
 	g_object_unref (layout);
@@ -296,7 +260,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	cairo_set_font_face (cr, priv->model->cr_face);
 	cairo_set_font_size (cr, px);
 	
-	/* get font extents */
+	/* get font extents - for calculating descender...*/
 	cairo_font_extents (cr, &extents);
 	
 	/* get x-height */
@@ -505,3 +469,4 @@ void font_view_set_text (FontView *view, gchar *text) {
 	
 	font_view_redraw (view);
 }
+
