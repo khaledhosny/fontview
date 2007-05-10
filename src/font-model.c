@@ -134,10 +134,7 @@ GObject *font_model_new (gchar *fontfile) {
 					break;
 			    default:
 					break;
-		    }
-#ifdef DEBUG			
-			g_message ("sfname: (%d) %d: %s", sfname.platform_id, sfname.name_id, sfname.string);
-#endif			
+		    }			
 		}
 	}
 	
@@ -155,7 +152,6 @@ gchar *font_model_desc_for_size (FontModel *model, gint size) {
 	
 	desc = g_strdup_printf ("%s, %s %dpx", model->family, model->style, size);
 	
-	g_message ("font desc: %s", desc);
 	return desc;
 }
 
