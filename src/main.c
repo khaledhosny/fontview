@@ -165,6 +165,7 @@ int main (int argc, char *argv[]) {
 	GtkWidget *w, *entry, *size;
 	GtkListStore *sizes;
 	GtkCellRenderer *renderer = NULL;
+	gchar *str;
 	
 	gtk_init (&argc, &argv);
 
@@ -187,7 +188,9 @@ int main (int argc, char *argv[]) {
 	gtk_widget_show (font);
 
 	entry = glade_xml_get_widget (xml, "render_str");
-	gtk_entry_set_text (GTK_ENTRY(entry), font_view_get_text(FONT_VIEW(font)));
+	str = font_view_get_text(FONT_VIEW(font));
+	gtk_entry_set_text (GTK_ENTRY(entry), str);
+	g_free (str);
 	g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
 	
 	w = glade_xml_get_widget (xml, "info_button");

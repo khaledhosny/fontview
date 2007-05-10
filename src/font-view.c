@@ -77,7 +77,7 @@ static gboolean font_view_expose (GtkWidget *view, GdkEventExpose *event);
 static gboolean font_view_clicked (GtkWidget *w, GdkEventButton *e);
 static gboolean font_view_key (GtkWidget *w, GdkEventKey *e);
 
-cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size);
+static void _font_view_pre_render (FontView *view);
 
 enum {
 	FONT_VIEW_SIZE_CHANGED_SIGNAL,
@@ -160,7 +160,7 @@ GtkWidget *font_view_new_with_model (gchar *font) {
 		
 	priv->model = FONT_MODEL(font_model_new (font));
 	
-	_font_view_pre_render_at_size (view, priv->size);
+	_font_view_pre_render (view);
 	
 	return GTK_WIDGET(view);
 }
@@ -223,34 +223,28 @@ void _font_view_get_extents (FontView *view) {
 }
 
 /* pre render the text */
-cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
-    gdouble px;
+static void _font_view_pre_render (FontView *view) {
 	PangoFontDescription *desc;
 	
 	FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
 
 	if ((strlen (priv->render_str) < 1)) {
 		priv->extents[TEXT] = FALSE;
-		return NULL;
+		return;
 	} else {
 		priv->extents[TEXT] = TRUE;
 	}
 
-	
-	px = priv->dpi * (size/72);
-
-	//layout = pango_cairo_create_layout (cr);
 	pango_layout_set_text (priv->layout, priv->render_str, strlen (priv->render_str));
 	//pango_layout_set_text (priv->layout, "Foo", 3);
 
-	desc = pango_font_description_from_string (font_model_desc_for_size (priv->model, size));
+	desc = pango_font_description_from_string (font_model_desc_for_size (priv->model, priv->size));
 	pango_layout_set_font_description (priv->layout, desc);
 	pango_font_description_free (desc);
 		
 	/* fire off signal that we changed size */
 	g_signal_emit_by_name (G_OBJECT (view), "size-changed", priv->size);
-	
-	return NULL;
+
 }
 
 
@@ -396,7 +390,7 @@ static gboolean font_view_key (GtkWidget *w, GdkEventKey *e) {
 		} else if (priv->size > ZOOM_LEVELS * 10) {
 			priv->size = ZOOM_LEVELS * 10;
 		} else {	
-			_font_view_pre_render_at_size (FONT_VIEW(w), priv->size);
+			_font_view_pre_render (FONT_VIEW(w));
 		}
 	
 		font_view_redraw (FONT_VIEW (w));
@@ -445,7 +439,7 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
 	
 	priv->size = size;
 	_font_view_get_extents (view);
-	_font_view_pre_render_at_size (view, priv->size);
+	_font_view_pre_render (view);
 	
 	font_view_redraw (view);
 	
@@ -468,7 +462,7 @@ void font_view_set_text (FontView *view, gchar *text) {
 	priv->render_str = NULL;
 
 	priv->render_str = g_strdup(text);
-	_font_view_pre_render_at_size (view, priv->size);
+	_font_view_pre_render (view);
 	
 	font_view_redraw (view);
 }
