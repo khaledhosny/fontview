@@ -55,8 +55,6 @@ typedef struct _FontViewPrivate FontViewPrivate;
 struct _FontViewPrivate {
 	gboolean extents[N_EXTENTS];
 	
-	cairo_surface_t *render;
-	
 	gdouble ascender;
 	gdouble descender;
 	gdouble xheight;
@@ -137,7 +135,8 @@ static void font_view_init (FontView *view) {
 	
 	priv->layout = pango_cairo_create_layout (cr);
 	
-	
+	cairo_destroy (cr);
+	cr = NULL;
 	
 	gtk_widget_add_events (GTK_WIDGET (view),
 			GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK |
@@ -161,7 +160,7 @@ GtkWidget *font_view_new_with_model (gchar *font) {
 		
 	priv->model = FONT_MODEL(font_model_new (font));
 	
-	priv->render = _font_view_pre_render_at_size (view, priv->size);
+	_font_view_pre_render_at_size (view, priv->size);
 	
 	return GTK_WIDGET(view);
 }
@@ -225,16 +224,7 @@ void _font_view_get_extents (FontView *view) {
 
 /* pre render the text */
 cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
-	GtkStyle *style;
-	cairo_surface_t *buffer, *render;
-	gint width, height;
-	cairo_font_extents_t extents;
-	cairo_text_extents_t t_extents;
-	gdouble ascender;
-    cairo_t *cr;
     gdouble px;
-	
-	PangoLayout *layout;
 	PangoFontDescription *desc;
 	
 	FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
@@ -249,47 +239,17 @@ cairo_surface_t *_font_view_pre_render_at_size (FontView *view, gdouble size) {
 	
 	px = priv->dpi * (size/72);
 
-#ifdef DEBUG
-	g_message ("pre rendering at size: %.2fpt - %.2fpx @ %.0fdpi", size, px, priv->dpi);
-#endif
-
-	style = gtk_rc_get_style (GTK_WIDGET (view));
-	
-	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
-
-	cr = cairo_create (buffer);
-	cairo_surface_destroy (buffer);
-	buffer = NULL;
-	
 	//layout = pango_cairo_create_layout (cr);
-	pango_layout_set_text (priv->layout, priv->render_str, -1);
+	pango_layout_set_text (priv->layout, priv->render_str, strlen (priv->render_str));
+	//pango_layout_set_text (priv->layout, "Foo", 3);
 
 	desc = pango_font_description_from_string (font_model_desc_for_size (priv->model, size));
 	pango_layout_set_font_description (priv->layout, desc);
 	pango_font_description_free (desc);
-	/*
-	
-	pango_layout_get_pixel_size (priv->layout, &width, &height);
-	/* copy buffer contents into correctly sized surface 
-	render = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, width + (width * 0.25), height);
-	cr = cairo_create (render);
-	
-	pango_cairo_update_layout (cr, priv->layout);
-
-	//cairo_set_source_rgba (cr, 1, 0, 1, 0.5);
-	//cairo_paint (cr);
-
-	cairo_move_to (cr, 0, 0);
-	gdk_cairo_set_source_color (cr, style->dark);	
-	pango_cairo_show_layout (cr, priv->layout);
-	
-	//g_object_unref (layout);
-	cairo_destroy (cr);
 		
-	/* fire off signal that we changed size 
+	/* fire off signal that we changed size */
 	g_signal_emit_by_name (G_OBJECT (view), "size-changed", priv->size);
 	
-	return render;*/
 	return NULL;
 }
 
@@ -304,14 +264,15 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	FontViewPrivate *priv;
 	gdouble px;
 	gchar *title;
-	gint sheight;
+	gint p_height;
+	PangoLayout *layout;
 	
 	priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 	
 	px = priv->dpi * (priv->size/72);
 	
 	width = w->allocation.width;
-	height = w->allocation.height + 8;
+	height = w->allocation.height;
 	
 	style = gtk_rc_get_style (GTK_WIDGET (w));
 	
@@ -322,10 +283,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	
 	cairo_set_source_rgb (cr, 1, 0.3, 0.3);
 	cairo_set_line_width (cr, 1.0);
-
-#ifdef DEBUG
-	g_message ("main, ascender: %0.2f", ascender);
-#endif 
 
 	cairo_set_source_rgb (cr, 0.8, 0.8, 0.8);
 	
@@ -363,40 +320,29 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
 	/* display sample text */
 	if (priv->extents[TEXT]) {
-//		sheight = cairo_image_surface_get_height (priv->render);
-//		g_message ("%f, %d", floor(y + priv->ascender), sheight);
-//		cairo_set_source_surface (cr, priv->render, x, floor (y + priv->descender) - sheight);
-//		cairo_paint (cr);	
-		
-		
 		pango_cairo_update_layout (cr, priv->layout);
-		cairo_set_source_rgb (cr, 1, 1, 1);
+		pango_layout_get_pixel_size (priv->layout, NULL, &p_height);
 
-		cairo_move_to (cr, x, floor (y + priv->descender));
+		cairo_move_to (cr, x, floor (y + priv->descender) - p_height);
 		gdk_cairo_set_source_color (cr, style->dark);	
 		pango_cairo_show_layout (cr, priv->layout);
-		
-		
 	}
 	
 	
 	/* draw header bar */
-	cairo_select_font_face (cr, "Sans", CAIRO_FONT_SLANT_NORMAL, CAIRO_FONT_WEIGHT_NORMAL);
-	cairo_set_font_size (cr, 10);
-	
 	title = g_strdup_printf ("%s %s - %.0fpt", priv->model->family, priv->model->style, priv->size);
-
-	cairo_text_extents (cr, title, &t_extents);
-	cairo_font_extents (cr, &extents);
-	cairo_rectangle (cr, 0, 0, width, t_extents.height + extents.descent + 1);
+	layout = gtk_widget_create_pango_layout (w, title);
+	g_free (title);
+	
+	pango_layout_get_pixel_size (layout, NULL, &p_height);
+	cairo_rectangle (cr, 0, 0, width, p_height + 1);
 	gdk_cairo_set_source_color (cr, style->bg);
 	cairo_fill (cr);
 	
 	gdk_cairo_set_source_color (cr, style->fg);
-	cairo_move_to (cr, 5, t_extents.height);
-	cairo_show_text (cr, title);
-	g_free (title);
-	
+	cairo_move_to (cr, 5, 1);
+	pango_cairo_show_layout (cr, layout);
+
 }
 
 
@@ -410,7 +356,8 @@ static gboolean font_view_expose (GtkWidget *w, GdkEventExpose *event) {
 	render (w, cr);
 	
 	cairo_destroy (cr);
-	
+	cr = NULL;
+
 	return FALSE;
 }
 
@@ -449,8 +396,7 @@ static gboolean font_view_key (GtkWidget *w, GdkEventKey *e) {
 		} else if (priv->size > ZOOM_LEVELS * 10) {
 			priv->size = ZOOM_LEVELS * 10;
 		} else {	
-			cairo_surface_destroy (priv->render);
-			priv->render = _font_view_pre_render_at_size (FONT_VIEW(w), priv->size);
+			_font_view_pre_render_at_size (FONT_VIEW(w), priv->size);
 		}
 	
 		font_view_redraw (FONT_VIEW (w));
@@ -471,7 +417,7 @@ static gboolean font_view_key (GtkWidget *w, GdkEventKey *e) {
 static void font_view_redraw (FontView *view) {
 	GtkWidget *widget;
 	GdkRegion *region;
-	
+
 	widget = GTK_WIDGET (view);
 	
 	if (!widget->window) return;
@@ -498,10 +444,8 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
 	if (priv->size == size) return;
 	
 	priv->size = size;
-	cairo_surface_finish (priv->render);
-	cairo_surface_destroy (priv->render);
 	_font_view_get_extents (view);
-	priv->render = _font_view_pre_render_at_size (view, priv->size);
+	_font_view_pre_render_at_size (view, priv->size);
 	
 	font_view_redraw (view);
 	
@@ -521,10 +465,10 @@ void font_view_set_text (FontView *view, gchar *text) {
 	
 	if (g_strcasecmp (priv->render_str, text) == 0) return;
 
+	priv->render_str = NULL;
+
 	priv->render_str = g_strdup(text);
-	cairo_surface_finish (priv->render);
-	cairo_surface_destroy (priv->render);
-	priv->render = _font_view_pre_render_at_size (view, priv->size);
+	_font_view_pre_render_at_size (view, priv->size);
 	
 	font_view_redraw (view);
 }
