@@ -318,7 +318,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 		pango_layout_get_pixel_size (priv->layout, NULL, &p_height);
 
 		cairo_move_to (cr, x, floor (y + priv->descender) - p_height);
-		gdk_cairo_set_source_color (cr, style->dark);	
+		gdk_cairo_set_source_color (cr, style->fg);
 		pango_cairo_show_layout (cr, priv->layout);
 	}
 	
