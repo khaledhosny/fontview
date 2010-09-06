@@ -70,8 +70,13 @@
               </packing>
             </child>
             <child>
-              <widget class="GtkComboBox" id="size_combo">
+              <widget class="GtkSpinButton" id="size_spin">
                 <property name="visible">True</property>
+                <property name="can_focus">True</property>
+                <property name="caps_lock_warning">False</property>
+                <property name="adjustment">100 6 1200 2 20 0</property>
+                <property name="numeric">True</property>
+                <property name="update_policy">if-valid</property>
               </widget>
               <packing>
                 <property name="expand">False</property>

@@ -47,7 +47,7 @@ enum {
 	N_COLUMNS
 };
 
-void render_size_changed (GtkComboBox *w, gpointer data);
+void render_size_changed (GtkSpinButton *w, gpointer data);
 
 void font_view_about (GtkWidget *w, gpointer data) {
 	gtk_show_about_dialog (NULL, 
@@ -115,17 +115,10 @@ void render_text_changed (GtkEntry *w, gpointer data) {
 	g_free (text);
 }
 
-void render_size_changed (GtkComboBox *w, gpointer data) {
-	GtkTreeModel *sizes;
-	GtkTreeIter iter;
-	gint size;
-	
-	if (gtk_combo_box_get_active_iter (GTK_COMBO_BOX (w), &iter)) {
-		sizes = gtk_combo_box_get_model (GTK_COMBO_BOX (w));
-		gtk_tree_model_get (sizes, &iter, COLUMN_INT, &size, -1);
-		font_view_set_pt_size (FONT_VIEW(font), size);
-	}
-	
+void render_size_changed (GtkSpinButton *w, gpointer data) {
+	gint size = gtk_spin_button_get_value_as_int (w);
+
+	font_view_set_pt_size (FONT_VIEW(font), size);
 }
 
 void print_usage ()
@@ -145,27 +138,10 @@ GtkWidget *font_custom_handler (GladeXML *xml, gchar *func, gchar *name, gchar *
 	return NULL;
 }
 
-GtkListStore *fv_init_sizes (GtkListStore *sizes) {
-	GtkTreeIter iter;
-	gint i;	
-	gint size_array[] = {6, 8, 9, 10, 12, 18, 24, 36, 48, 60, 72, 96, 112, 200};
-	
-	for (i = 0; i < G_N_ELEMENTS(size_array); i++) {
-		gtk_list_store_append (sizes, &iter);
-		gtk_list_store_set (sizes, &iter, 
-					COLUMN_INT, size_array[i], 
-					COLUMN_STRING, g_strdup_printf ("  %dpt", size_array[i]), 
-					-1);
-	}
-	
-	return sizes;
-}
-
 int main (int argc, char *argv[]) {
-	GtkWidget *w, *entry, *size;
-	GtkListStore *sizes;
-	GtkCellRenderer *renderer = NULL;
+	GtkWidget *w, *entry, *sizew;
 	gchar *str;
+	gint size;
 	
 	gtk_init (&argc, &argv);
 
@@ -196,19 +172,12 @@ int main (int argc, char *argv[]) {
 	w = glade_xml_get_widget (xml, "info_button");
 	g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
 
-	/* Set up the size selection combo box */
-	sizes = fv_init_sizes (gtk_list_store_new (2, G_TYPE_INT, G_TYPE_STRING));
+	sizew = glade_xml_get_widget (xml, "size_spin");
+	g_signal_connect (sizew, "value-changed", G_CALLBACK(render_size_changed), NULL);
 
-	size = glade_xml_get_widget (xml, "size_combo");
-	g_signal_connect (size, "changed", G_CALLBACK(render_size_changed), NULL);
+	size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (sizew));
+	font_view_set_pt_size (FONT_VIEW (font), size);
 
-	renderer = gtk_cell_renderer_text_new ();
-	gtk_cell_layout_pack_start (GTK_CELL_LAYOUT (size), renderer, FALSE);
-	gtk_cell_layout_add_attribute (GTK_CELL_LAYOUT (size), renderer, "text", 1);
-
-	gtk_combo_box_set_model (GTK_COMBO_BOX (size), GTK_TREE_MODEL (sizes));
-	gtk_combo_box_set_active (GTK_COMBO_BOX (size), 8);
-	
 	gtk_main();
 
 	return 0;
