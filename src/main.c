@@ -104,7 +104,6 @@ void view_size_changed (GtkWidget *w, gdouble size) {
 	GtkWidget *sizew;
 	
 	sizew = glade_xml_get_widget (xml, "render_size");
-	//gtk_spin_button_set_value (GTK_SPIN_BUTTON(sizew), font_view_get_pt_size (FONT_VIEW(w)));
 }
 
 void render_text_changed (GtkEntry *w, gpointer data) {

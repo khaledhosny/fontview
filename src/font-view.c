@@ -191,7 +191,6 @@ void _font_view_get_extents (FontView *view) {
 	
 	px = priv->dpi * (priv->size/72);
 
-	//cr = cairo_create (cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1));
 	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
 	cr = cairo_create (buffer);
 	cairo_surface_destroy (buffer);
@@ -236,7 +235,6 @@ static void _font_view_pre_render (FontView *view) {
 	}
 
 	pango_layout_set_text (priv->layout, priv->render_str, strlen (priv->render_str));
-	//pango_layout_set_text (priv->layout, "Foo", 3);
 
 	desc = pango_font_description_from_string (font_model_desc_for_size (priv->model, priv->size));
 	pango_layout_set_font_description (priv->layout, desc);

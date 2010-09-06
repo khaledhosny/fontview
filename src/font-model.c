@@ -105,7 +105,7 @@ GObject *font_model_new (gchar *fontfile) {
 	model->family = model->ft_face->family_name;
 	model->style = model->ft_face->style_name;
 
-	// Get font metadata if available/applicable
+	/* Get font metadata if available/applicable */
 	if (FT_IS_SFNT(model->ft_face)) {
 		len = FT_Get_Sfnt_Name_Count (model->ft_face);
 		
