@@ -34,6 +34,7 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
+#include <glib/gi18n.h>
 #include "font-model.h"
 #include "font-view.h"
 
@@ -53,12 +54,12 @@ enum {
 void render_size_changed (GtkSpinButton *w, gpointer data);
 
 void font_view_about (GtkWidget *w, gpointer data) {
-	gtk_show_about_dialog (NULL, 
-		"name", "Font View", 
-		"version", VERSION, 
-		"copyright", "Copyright © 2007, Alex Roberts", 
-		"comments", "A font viewing utility.\nPart of the Serif font management project.",
-		"license", "GNU General Public License 2.0\n\nSee COPYING for more information.", 
+	gtk_show_about_dialog (NULL,
+		"name", _("Font View"),
+		"version", VERSION,
+		"copyright", _("Copyright © 2007, Alex Roberts"),
+		"comments", _("A font viewing utility.\nPart of the Serif font management project."),
+		"license", _("GNU General Public License 2.0\n\nSee COPYING for more information."), 
 		NULL);
 }
 
@@ -139,6 +140,9 @@ int main (int argc, char *argv[]) {
 	gint size;
 	GError* error = NULL;
 	
+	bindtextdomain (PACKAGE, LOCALEDIR);
+	textdomain (PACKAGE);
+
 	gtk_init (&argc, &argv);
 
 	if (!argv[1]) {

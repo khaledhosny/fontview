@@ -1,6 +1,8 @@
 AC_PREREQ(2.53)
 AC_INIT(src/main.c)
-AM_INIT_AUTOMAKE(fv,0.9)
+PACKAGE=fv
+VERSION=0.9
+AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AM_CONFIG_HEADER(config.h)
 
 CFLAGS=
@@ -20,5 +22,11 @@ AC_SUBST(CFLAGS)
 PKG_CHECK_MODULES(FONTVIEW, freetype2 >= 9.10.0)
 AC_C_CONST
 
+IT_PROG_INTLTOOL(0.41)
+AM_GLIB_GNU_GETTEXT
 
-AC_OUTPUT(Makefile src/Makefile)
+AC_OUTPUT(
+	  Makefile
+	  src/Makefile
+	  po/Makefile.in
+	  )
