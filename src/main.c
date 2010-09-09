@@ -52,6 +52,7 @@ enum {
 };
 
 void render_size_changed (GtkSpinButton *w, gpointer data);
+void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data);
 
 void font_view_about (GtkWidget *w, gpointer data) {
 	gtk_show_about_dialog (NULL,
@@ -128,6 +129,13 @@ void render_size_changed (GtkSpinButton *w, gpointer data) {
 	font_view_set_pt_size (FONT_VIEW(font), size);
 }
 
+void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data) {
+	gchar *str;
+	if (event == G_FILE_MONITOR_EVENT_CHANGED)
+		g_print ("file changed\n");
+		font_view_rerender (FONT_VIEW(font));
+}
+
 void print_usage ()
 {
     g_print ("\nUsage:\n\tfv <path_to_font>\n\n");
@@ -139,6 +147,9 @@ int main (int argc, char *argv[]) {
 	gchar *str;
 	gint size;
 	GError* error = NULL;
+	GFile *file;
+	GFileMonitor *monitor;
+
 	
 	bindtextdomain (PACKAGE, LOCALEDIR);
 	textdomain (PACKAGE);
@@ -180,6 +191,10 @@ int main (int argc, char *argv[]) {
 
 	size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (sizew));
 	font_view_set_pt_size (FONT_VIEW (font), size);
+
+	file = g_file_new_for_path(argv[1]);
+	monitor = g_file_monitor_file (file, 0, NULL, NULL);
+	g_signal_connect (monitor, "changed", G_CALLBACK(render_file_changed), NULL);
 
 	gtk_main();
 

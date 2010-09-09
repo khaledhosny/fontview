@@ -78,6 +78,8 @@ void font_view_set_pt_size (FontView *view, gdouble size);
 gchar *font_view_get_text (FontView *view);
 void font_view_set_text (FontView *view, gchar *text);
 
+void font_view_rerender (FontView *view);
+
 G_END_DECLS
 
 #endif

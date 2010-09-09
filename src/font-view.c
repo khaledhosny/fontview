@@ -465,3 +465,8 @@ void font_view_set_text (FontView *view, gchar *text) {
 	font_view_redraw (view);
 }
 
+void font_view_rerender (FontView *view) {
+	_font_view_pre_render (view);
+	font_view_redraw (view);
+}
+
