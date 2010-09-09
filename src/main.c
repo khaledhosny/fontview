@@ -45,12 +45,6 @@
 GtkBuilder *mainwindow;
 GtkWidget *font;
 
-enum {
-	COLUMN_INT,
-	COLUMN_STRING,
-	N_COLUMNS
-};
-
 void render_size_changed (GtkSpinButton *w, gpointer data);
 void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data);
 
@@ -85,7 +79,7 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
 	
 	about = GET_GBOPJECT (infowindow, "about_button");
 	g_signal_connect (about, "clicked", G_CALLBACK(font_view_about), NULL);
-	
+
 	model = font_view_get_model (FONT_VIEW (font));
 	
 	name = GET_GBOPJECT (infowindow, "name_label");
@@ -109,12 +103,6 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
 }
 
 
-void view_size_changed (GtkWidget *w, gdouble size) {
-	GtkWidget *sizew;
-	
-	sizew = GET_GBOPJECT (mainwindow, "render_size");
-}
-
 void render_text_changed (GtkEntry *w, gpointer data) {
 	gchar *text = g_strdup ((gchar *)gtk_entry_get_text (w));
 		
@@ -130,9 +118,7 @@ void render_size_changed (GtkSpinButton *w, gpointer data) {
 }
 
 void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data) {
-	gchar *str;
 	if (event == G_FILE_MONITOR_EVENT_CHANGED)
-		g_print ("file changed\n");
 		font_view_rerender (FONT_VIEW(font));
 }
 
@@ -173,7 +159,7 @@ int main (int argc, char *argv[]) {
 	font = font_view_new_with_model (argv[1]);
 	container = GET_GBOPJECT (mainwindow, "font-view");
 	gtk_container_add (GTK_CONTAINER (container), font);
-	g_signal_connect (font, "size-changed", G_CALLBACK(view_size_changed), NULL);
+
 	gtk_widget_show (font);
 	gtk_widget_show (container);
 

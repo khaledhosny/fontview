@@ -79,12 +79,6 @@ static gboolean font_view_key (GtkWidget *w, GdkEventKey *e);
 
 static void _font_view_pre_render (FontView *view);
 
-enum {
-	FONT_VIEW_SIZE_CHANGED_SIGNAL,
-	LAST_SIGNAL
-};
-static guint font_view_signals[LAST_SIGNAL] = { 0 };
-
 static void font_view_class_init (FontViewClass *klass) {
 	GObjectClass *object_class;
 	GtkWidgetClass *widget_class;
@@ -97,15 +91,6 @@ static void font_view_class_init (FontViewClass *klass) {
 	widget_class->key_press_event = font_view_key;
 	
 	g_type_class_add_private (object_class, sizeof (FontViewPrivate));
-	
-	/* signals */
-	font_view_signals[FONT_VIEW_SIZE_CHANGED_SIGNAL] =
-			g_signal_new ("size-changed", G_TYPE_FROM_CLASS (klass),
-							G_SIGNAL_RUN_FIRST | G_SIGNAL_ACTION,
-							G_STRUCT_OFFSET (FontViewClass, size_changed),
-							NULL, NULL,
-							g_cclosure_marshal_VOID__DOUBLE, G_TYPE_NONE, 1,
-							G_TYPE_DOUBLE);
 }
 
 static void font_view_init (FontView *view) {
@@ -239,10 +224,6 @@ static void _font_view_pre_render (FontView *view) {
 	desc = pango_font_description_from_string (font_model_desc_for_size (priv->model, priv->size));
 	pango_layout_set_font_description (priv->layout, desc);
 	pango_font_description_free (desc);
-		
-	/* fire off signal that we changed size */
-	g_signal_emit_by_name (G_OBJECT (view), "size-changed", priv->size);
-
 }
 
 
