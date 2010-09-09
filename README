@@ -1,14 +1,15 @@
 FontView
 (c) 2006, Alex Roberts <alex AT redprocess DOT com>
 (c) 2006, Jon Phillips <jon AT rejon DOT org>
+(c) 2010, Khaled Hosny <khaledhosnt AT eglug DOT org>
 
-Highly experimental testing code for future font handling widget.
+A simple font viewer
 
 
 BUILDING
 ========
 
-Requires Gtk+ 2.10+, Cairo, Pango, Freetype2.
+Requires Gtk+ 2.16+, Cairo, Pango, Freetype2.
 
 To build:
 
