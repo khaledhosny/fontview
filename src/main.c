@@ -37,10 +37,11 @@
 #include "font-model.h"
 #include "font-view.h"
 
-#define UI_FILE PACKAGE_DATA_DIR"/font-view.ui"
+#define MAIN_UI_FILE PACKAGE_DATA_DIR"/mainwindow.ui"
+#define INFO_UI_FILE PACKAGE_DATA_DIR"/infowindow.ui"
 #define GET_GBOPJECT(A,B) GTK_WIDGET(gtk_builder_get_object(A,B));
 
-GtkBuilder *xml;
+GtkBuilder *mainwindow;
 GtkWidget *font;
 
 enum {
@@ -70,11 +71,13 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
 	GError* error = NULL;
 	
 	infowindow = gtk_builder_new ();
-	gtk_builder_add_from_file (infowindow, UI_FILE, &error);
+	gtk_builder_add_from_file (infowindow, INFO_UI_FILE, &error);
 	if (error) {
 		g_warning ("Couldn't load builder file: %s", error->message);
 		g_error_free (error);
 	}
+
+	gtk_builder_connect_signals (infowindow, NULL);
 	
 	window = GET_GBOPJECT (infowindow, "infowindow");
 	
@@ -107,7 +110,7 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
 void view_size_changed (GtkWidget *w, gdouble size) {
 	GtkWidget *sizew;
 	
-	sizew = GET_GBOPJECT (xml, "render_size");
+	sizew = GET_GBOPJECT (mainwindow, "render_size");
 }
 
 void render_text_changed (GtkEntry *w, gpointer data) {
@@ -143,32 +146,32 @@ int main (int argc, char *argv[]) {
 		return 1;
 	}	
 	
-	xml = gtk_builder_new ();
-	gtk_builder_add_from_file (xml, UI_FILE, &error);
+	mainwindow = gtk_builder_new ();
+	gtk_builder_add_from_file (mainwindow, MAIN_UI_FILE, &error);
 	if (error) {
 		g_warning ("Couldn't load builder file: %s", error->message);
 		g_error_free (error);
 	}
 
-	gtk_builder_connect_signals (xml, NULL);
+	gtk_builder_connect_signals (mainwindow, NULL);
 
 	font = font_view_new_with_model (argv[1]);
-	container = GET_GBOPJECT (xml, "font-view");
+	container = GET_GBOPJECT (mainwindow, "font-view");
 	gtk_container_add (GTK_CONTAINER (container), font);
 	g_signal_connect (font, "size-changed", G_CALLBACK(view_size_changed), NULL);
 	gtk_widget_show (font);
 	gtk_widget_show (container);
 
-	entry = GET_GBOPJECT (xml, "render_str");
+	entry = GET_GBOPJECT (mainwindow, "render_str");
 	str = font_view_get_text(FONT_VIEW(font));
 	gtk_entry_set_text (GTK_ENTRY(entry), str);
 	g_free (str);
 	g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
 	
-	w = GET_GBOPJECT (xml, "info_button");
+	w = GET_GBOPJECT (mainwindow, "info_button");
 	g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
 
-	sizew = GET_GBOPJECT (xml, "size_spin");
+	sizew = GET_GBOPJECT (mainwindow, "size_spin");
 	g_signal_connect (sizew, "value-changed", G_CALLBACK(render_size_changed), NULL);
 
 	size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (sizew));

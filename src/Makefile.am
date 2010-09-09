@@ -1,5 +1,5 @@
 
-ui_DATA = font-view.ui
+ui_DATA = mainwindow.ui infowindow.ui
 uidir = $(datadir)/fontview/ui
 
 fv_LDADD =	@FONTVIEW_LIBS@ @GTK_LIBS@
