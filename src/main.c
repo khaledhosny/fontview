@@ -33,12 +33,13 @@
 #include "config.h"
 
 #include <gtk/gtk.h>
-#include <glade/glade.h>
-#include <glade/glade-xml.h>
 #include "font-model.h"
 #include "font-view.h"
 
-GladeXML *xml;
+#define UI_FILE PACKAGE_DATA_DIR"/font-view.ui"
+#define GET_GBOPJECT(A,B) GTK_WIDGET(gtk_builder_get_object(A,B));
+
+GtkBuilder *xml;
 GtkWidget *font;
 
 enum {
@@ -62,29 +63,31 @@ void font_view_about (GtkWidget *w, gpointer data) {
 void font_view_info_window (GtkWidget *w, gpointer data) {
 	GtkWidget *window, *close, *about;
 	GtkWidget *name, *style, *version, *copyright, *desc, *file;
-	GladeXML *infowindow;
+	GtkBuilder *infowindow;
 	FontModel *model;
 	gint result;
+	GError* error = NULL;
 	
-	infowindow = glade_xml_new ("mainwindow.glade", "infowindow", NULL);
-	if (!xml) {
-		infowindow = glade_xml_new (PACKAGE_DATA_DIR"/mainwindow.glade", "infowindow", NULL);
+	infowindow = gtk_builder_new ();
+	gtk_builder_add_from_file (infowindow, UI_FILE, &error);
+	if (error) {
+		g_warning ("Couldn't load builder file: %s", error->message);
+		g_error_free (error);
 	}
-	g_return_if_fail (infowindow);
 	
-	window = glade_xml_get_widget (infowindow, "infowindow");
+	window = GET_GBOPJECT (infowindow, "infowindow");
 	
-	about = glade_xml_get_widget (infowindow, "about_button");
+	about = GET_GBOPJECT (infowindow, "about_button");
 	g_signal_connect (about, "clicked", G_CALLBACK(font_view_about), NULL);
 	
 	model = font_view_get_model (FONT_VIEW (font));
 	
-	name = glade_xml_get_widget (infowindow, "name_label");
-	style = glade_xml_get_widget (infowindow, "style_label");
-	version = glade_xml_get_widget (infowindow, "version_label");
-	copyright = glade_xml_get_widget (infowindow, "copyright_label");
-	desc = glade_xml_get_widget (infowindow, "descr_label");
-	file = glade_xml_get_widget (infowindow, "file_label");
+	name = GET_GBOPJECT (infowindow, "name_label");
+	style = GET_GBOPJECT (infowindow, "style_label");
+	version = GET_GBOPJECT (infowindow, "version_label");
+	copyright = GET_GBOPJECT (infowindow, "copyright_label");
+	desc = GET_GBOPJECT (infowindow, "descr_label");
+	file = GET_GBOPJECT (infowindow, "file_label");
 	
 	gtk_label_set_text (GTK_LABEL(name), model->family);
 	gtk_label_set_text (GTK_LABEL(style), model->style);
@@ -103,7 +106,7 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
 void view_size_changed (GtkWidget *w, gdouble size) {
 	GtkWidget *sizew;
 	
-	sizew = glade_xml_get_widget (xml, "render_size");
+	sizew = GET_GBOPJECT (xml, "render_size");
 }
 
 void render_text_changed (GtkEntry *w, gpointer data) {
@@ -126,21 +129,11 @@ void print_usage ()
     exit(1);
 }
 
-GtkWidget *font_custom_handler (GladeXML *xml, gchar *func, gchar *name, gchar *s1, gchar *s2, gint i1, gint i2, gpointer data) {
-	GtkWidget *w = NULL;
-	
-	if (g_strcasecmp ("font_view_new_with_model", func) == 0) {
-		w = font_view_new_with_model ((gchar *)data);
-		return w;
-	}
-	
-	return NULL;
-}
-
 int main (int argc, char *argv[]) {
-	GtkWidget *w, *entry, *sizew;
+	GtkWidget *w, *entry, *sizew, *container;
 	gchar *str;
 	gint size;
+	GError* error = NULL;
 	
 	gtk_init (&argc, &argv);
 
@@ -149,29 +142,32 @@ int main (int argc, char *argv[]) {
 		return 1;
 	}	
 	
-	glade_set_custom_handler (font_custom_handler, argv[1]);
-	xml = glade_xml_new ("mainwindow.glade", "mainwindow", NULL);
-	if (!xml) {
-		xml = glade_xml_new (PACKAGE_DATA_DIR"/mainwindow.glade", "mainwindow", NULL);
+	xml = gtk_builder_new ();
+	gtk_builder_add_from_file (xml, UI_FILE, &error);
+	if (error) {
+		g_warning ("Couldn't load builder file: %s", error->message);
+		g_error_free (error);
 	}
-	g_return_if_fail (xml);
-	
-	glade_xml_signal_autoconnect (xml);
 
-	font = glade_xml_get_widget (xml, "font-view");
+	gtk_builder_connect_signals (xml, NULL);
+
+	font = font_view_new_with_model (argv[1]);
+	container = GET_GBOPJECT (xml, "font-view");
+	gtk_container_add (GTK_CONTAINER (container), font);
 	g_signal_connect (font, "size-changed", G_CALLBACK(view_size_changed), NULL);
 	gtk_widget_show (font);
+	gtk_widget_show (container);
 
-	entry = glade_xml_get_widget (xml, "render_str");
+	entry = GET_GBOPJECT (xml, "render_str");
 	str = font_view_get_text(FONT_VIEW(font));
 	gtk_entry_set_text (GTK_ENTRY(entry), str);
 	g_free (str);
 	g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
 	
-	w = glade_xml_get_widget (xml, "info_button");
+	w = GET_GBOPJECT (xml, "info_button");
 	g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
 
-	sizew = glade_xml_get_widget (xml, "size_spin");
+	sizew = GET_GBOPJECT (xml, "size_spin");
 	g_signal_connect (sizew, "value-changed", G_CALLBACK(render_size_changed), NULL);
 
 	size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (sizew));
