@@ -12,6 +12,7 @@
  * Part of the Fontable Project
  * Copyright (C) 2006 Alex Roberts
  * Copyright (C) 2006 Jon Phillips, <jon@rejon.org>
+ * Copyright (C) 2010 Khaled Hosny, <khaledhosny@eglug.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +36,7 @@
 #include <ft2build.h>
 #include FT_SFNT_NAMES_H
 #include FT_TRUETYPE_IDS_H
+#include FT_TRUETYPE_TABLES_H
 #include <pango/pango.h>
 #include <pango/pangofc-fontmap.h>
 #include <fontconfig/fontconfig.h>
@@ -81,6 +83,8 @@ GObject *font_model_new (gchar *fontfile) {
 	gint len, i;
 	FcChar8 *s;
 	FcResult result;
+	TT_OS2* os2;
+	TT_PCLT* pclt;
 
 	FcFontSet *fonts;
 
@@ -104,9 +108,27 @@ GObject *font_model_new (gchar *fontfile) {
 	model->file = g_strdup (fontfile);
 	model->family = model->ft_face->family_name;
 	model->style = model->ft_face->style_name;
+	model->units_per_em = model->ft_face->units_per_EM;
+
+	model->xheight = 0;
+	model->ascender = 0;
+	model->descender = 0;
 
 	/* Get font metadata if available/applicable */
 	if (FT_IS_SFNT(model->ft_face)) {
+		os2 = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_os2);
+		if (os2) {
+			model->xheight = os2->sxHeight;
+			model->ascender = os2->sTypoAscender;
+			model->descender = os2->sTypoDescender;
+		}
+		if (model->xheight<0){
+			pclt = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_pclt);
+			if (pclt)
+				model->xheight = pclt->xHeight;
+		}
+
+
 		len = FT_Get_Sfnt_Name_Count (model->ft_face);
 		
 		for (i = 0; i < len; i++) {

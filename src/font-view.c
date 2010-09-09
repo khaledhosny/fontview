@@ -59,8 +59,6 @@ struct _FontViewPrivate {
 	gdouble descender;
 	gdouble xheight;
 	
-	gdouble height;
-	gdouble max_ascend;
 	gdouble size;
 
 	gdouble dpi;
@@ -166,44 +164,15 @@ FontModel *font_view_get_model (FontView *view) {
 }
 
 void _font_view_get_extents (FontView *view) {
-	cairo_t *cr;
-	cairo_surface_t *buffer;
-	cairo_font_face_t *cr_face;
-	cairo_font_extents_t extents;
-	cairo_text_extents_t t_extents;
-	gint px;
-	FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
-	
-	px = priv->dpi * (priv->size/72);
+	FontModel *model;
 
-	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
-	cr = cairo_create (buffer);
-	cairo_surface_destroy (buffer);
-	buffer = NULL;
-	
-	cr_face = font_model_face_create (priv->model);
-	cairo_set_font_face (cr, cr_face);
-	cairo_set_font_size (cr, px);
-	
-	/* get font extents - for calculating descender...*/
-	cairo_font_extents (cr, &extents);
-	
-	/* get x-height */
-	cairo_text_extents (cr, "x", &t_extents);
-	priv->xheight = t_extents.y_bearing;
-	
-	/* get ascender */
-	cairo_text_extents (cr, "HJKLMTYXi", &t_extents);
-	priv->ascender = t_extents.y_bearing;
-	
-	/* get descender */
-	priv->descender = extents.descent;
-	
-	priv->height = t_extents.height;
-	
-	cairo_font_face_destroy (cr_face);
-	cairo_destroy (cr);
-	cr = NULL;
+	FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
+
+	model = priv->model;
+
+	priv->xheight = model->xheight / model->units_per_em * priv->size;
+	priv->ascender = model->ascender / model->units_per_em * priv->size;
+	priv->descender = model->descender / model->units_per_em * priv->size;
 }
 
 /* pre render the text */
@@ -238,6 +207,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	gdouble px;
 	gchar *title;
 	gint p_height;
+	gint baseline;
 	PangoLayout *layout;
 	
 	priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
@@ -260,7 +230,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	cairo_set_source_rgb (cr, 0.8, 0.8, 0.8);
 	
 	/* position text in the center */
-	y = floor ((height / 2) + (priv->height / 2) - (priv->descender / 2)) + 0.5;
+	y = height/2+20;
 	x = floor (width /2 * 0.1);
 	
 	/* baseline */
@@ -272,31 +242,30 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	
 	/* descender height */
 	if (priv->extents[DESCENDER]) {
-		cairo_move_to (cr, x, y + priv->descender);
-		cairo_line_to (cr, width - x, y + priv->descender);
+		cairo_move_to (cr, x, y - priv->descender);
+		cairo_line_to (cr, width - x, y - priv->descender);
 		cairo_stroke (cr);
 	}
 
 	/* ascender height */
 	if (priv->extents[ASCENDER]) {
-		cairo_move_to (cr, x, y + priv->ascender);
-		cairo_line_to (cr, width - x, y + priv->ascender);
+		cairo_move_to (cr, x, y - priv->ascender);
+		cairo_line_to (cr, width - x, y - priv->ascender);
 		cairo_stroke (cr);
 	}
 
 	/* x-height */
 	if (priv->extents[XHEIGHT]) {
-		cairo_move_to (cr, x, y + priv->xheight);
-		cairo_line_to (cr, width - x, y + priv->xheight);
+		cairo_move_to (cr, x, y - priv->xheight);
+		cairo_line_to (cr, width - x, y - priv->xheight);
 		cairo_stroke (cr);
 	}
 
 	/* display sample text */
 	if (priv->extents[TEXT]) {
 		pango_cairo_update_layout (cr, priv->layout);
-		pango_layout_get_pixel_size (priv->layout, NULL, &p_height);
-
-		cairo_move_to (cr, x, floor (y + priv->descender) - p_height);
+		baseline = pango_layout_get_baseline (priv->layout)/PANGO_SCALE;
+		cairo_move_to (cr, x, y-baseline);
 		gdk_cairo_set_source_color (cr, style->fg);
 		pango_cairo_show_layout (cr, priv->layout);
 	}

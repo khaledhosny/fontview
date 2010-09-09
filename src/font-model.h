@@ -59,6 +59,11 @@ struct _FontModel {
 	gchar *family;
 	gchar *style;
 	
+	double units_per_em;
+	double xheight;
+	double ascender;
+	double descender;
+
 	gchar *version;
 	gchar *copyright;
 	gchar *description;
