@@ -86,8 +86,6 @@ GObject *font_model_new (gchar *fontfile) {
 	TT_OS2* os2;
 	TT_PCLT* pclt;
 
-	FcFontSet *fonts;
-
 	g_return_val_if_fail (fontfile, NULL);
 
 	if (FcConfigAppFontAddFile (FcConfigGetCurrent(), fontfile)) {
@@ -96,9 +94,6 @@ GObject *font_model_new (gchar *fontfile) {
 		g_error ("Failed to load app font.");
 		exit;
 	}
-	
-	fonts = FcConfigGetFonts (FcConfigGetCurrent(), FcSetApplication);
-	FcPatternPrint (fonts->fonts[0]);
 	
 	FT_Init_FreeType(&library);
 
