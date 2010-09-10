@@ -33,6 +33,7 @@
 #include <gtk/gtk.h>
 #include <gdk/gdkkeysyms.h>
 #include <gdk/gdkx.h>
+#include <glib/gi18n.h>
 #include "font-view.h"
 
 G_DEFINE_TYPE (FontView, font_view, GTK_TYPE_DRAWING_AREA);
@@ -109,7 +110,7 @@ static void font_view_init (FontView *view) {
 	priv->dpi = 72;
 	
 	/* default string to render */
-	priv->render_str = "How quickly daft jumping zebras vex.";
+	priv->render_str = _("How quickly daft jumping zebras vex.");
 	
 	buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
 	cr = cairo_create (buffer);
