@@ -5,10 +5,11 @@ uidir = $(datadir)/fontview/ui
 INCLUDES = -I$(top_srcdir) -I$(includedir) \
 	   -DLOCALEDIR=\""$(datadir)/locale"\"
 
-fv_LDADD =	@FONTVIEW_LIBS@ @GTK_LIBS@
-fv_CFLAGS =	@FONTVIEW_CFLAGS@ @GTK_CFLAGS@ -DPACKAGE_DATA_DIR=\""$(uidir)"\"
+fontview_LDADD = @FONTVIEW_LIBS@ @GTK_LIBS@
+fontview_CFLAGS = @FONTVIEW_CFLAGS@ @GTK_CFLAGS@ \
+		  -DPACKAGE_DATA_DIR=\""$(uidir)"\"
 
-bin_PROGRAMS = fv
-fv_SOURCES = font-model.c font-view.c main.c
+bin_PROGRAMS = fontview
+fontview_SOURCES = font-model.c font-view.c main.c
 
 noinst_HEADERS = font-model.h font-view.h
