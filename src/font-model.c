@@ -52,123 +52,123 @@ static void font_model_init (GTypeInstance *instance, gpointer g_class) {
 }
 
 static void font_model_class_init (FontModelClass *klass) {
-	parent_class = g_type_class_peek_parent (klass);
+    parent_class = g_type_class_peek_parent (klass);
 
 }
 
 GType font_model_get_type (void) {
-	static GType type = 0;
-	
-	if (type == 0) {
-		static const GTypeInfo info = {
-			sizeof (FontModelClass),
-			NULL,	/* base_init */
-			NULL,	/* base_finalize */
-			(GClassInitFunc) font_model_class_init,
-			NULL,	/* class_finalize */
-			NULL, 	/* class_data */
-			sizeof (FontModel),
-			0,		/* n_preallocs */
-			(GInstanceInitFunc) font_model_init
-		};
-		type = g_type_register_static (G_TYPE_OBJECT, "FontModelType", &info, 0);
-	}
-	return type;
+    static GType type = 0;
+
+    if (type == 0) {
+        static const GTypeInfo info = {
+            sizeof (FontModelClass),
+            NULL,    /* base_init */
+            NULL,    /* base_finalize */
+            (GClassInitFunc) font_model_class_init,
+            NULL,    /* class_finalize */
+            NULL,     /* class_data */
+            sizeof (FontModel),
+            0,        /* n_preallocs */
+            (GInstanceInitFunc) font_model_init
+        };
+        type = g_type_register_static (G_TYPE_OBJECT, "FontModelType", &info, 0);
+    }
+    return type;
 }
 
 GObject *font_model_new (gchar *fontfile) {
-	FontModel *model;
-	FT_Library library;
-	FT_SfntName sfname;
-	gint len, i;
-	FcChar8 *s;
-	FcResult result;
-	TT_OS2* os2;
-	TT_PCLT* pclt;
+    FontModel *model;
+    FT_Library library;
+    FT_SfntName sfname;
+    gint len, i;
+    FcChar8 *s;
+    FcResult result;
+    TT_OS2* os2;
+    TT_PCLT* pclt;
 
-	g_return_val_if_fail (fontfile, NULL);
+    g_return_val_if_fail (fontfile, NULL);
 
-	if (FcConfigAppFontAddFile (FcConfigGetCurrent(), fontfile)) {
-		g_message ("Loaded application specific font.");
-	} else {
-		g_error ("Failed to load app font.");
-		exit;
-	}
-	
-	FT_Init_FreeType(&library);
+    if (FcConfigAppFontAddFile (FcConfigGetCurrent(), fontfile)) {
+        g_message ("Loaded application specific font.");
+    } else {
+        g_error ("Failed to load app font.");
+        exit;
+    }
 
-	model = g_object_new (FONT_MODEL_TYPE, NULL);
-	FT_New_Face (library, fontfile, 0, &model->ft_face);	
-	
-	model->file = g_strdup (fontfile);
-	model->family = model->ft_face->family_name;
-	model->style = model->ft_face->style_name;
-	model->units_per_em = model->ft_face->units_per_EM;
+    FT_Init_FreeType(&library);
 
-	model->xheight = 0;
-	model->ascender = 0;
-	model->descender = 0;
+    model = g_object_new (FONT_MODEL_TYPE, NULL);
+    FT_New_Face (library, fontfile, 0, &model->ft_face);
 
-	/* Get font metadata if available/applicable */
-	if (FT_IS_SFNT(model->ft_face)) {
-		os2 = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_os2);
-		if (os2) {
-			model->xheight = os2->sxHeight;
-			model->ascender = os2->sTypoAscender;
-			model->descender = os2->sTypoDescender;
-		}
-		if (model->xheight<0){
-			pclt = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_pclt);
-			if (pclt)
-				model->xheight = pclt->xHeight;
-		}
+    model->file = g_strdup (fontfile);
+    model->family = model->ft_face->family_name;
+    model->style = model->ft_face->style_name;
+    model->units_per_em = model->ft_face->units_per_EM;
+
+    model->xheight = 0;
+    model->ascender = 0;
+    model->descender = 0;
+
+    /* Get font metadata if available/applicable */
+    if (FT_IS_SFNT(model->ft_face)) {
+        os2 = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_os2);
+        if (os2) {
+            model->xheight = os2->sxHeight;
+            model->ascender = os2->sTypoAscender;
+            model->descender = os2->sTypoDescender;
+        }
+        if (model->xheight<0){
+            pclt = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_pclt);
+            if (pclt)
+                model->xheight = pclt->xHeight;
+        }
 
 
-		len = FT_Get_Sfnt_Name_Count (model->ft_face);
-		
-		for (i = 0; i < len; i++) {
-			FT_Get_Sfnt_Name (model->ft_face, i, &sfname);
+        len = FT_Get_Sfnt_Name_Count (model->ft_face);
 
-			if (sfname.platform_id != TT_PLATFORM_MACINTOSH) {
-				continue;
-			}
-			
-			switch (sfname.name_id) {
-	    		case TT_NAME_ID_COPYRIGHT:
-					model->copyright = g_locale_to_utf8 (sfname.string,
-						sfname.string_len,
-						NULL, NULL, NULL);
-					break;
-			    case TT_NAME_ID_VERSION_STRING:
-					model->version = g_locale_to_utf8 (sfname.string,
-						sfname.string_len,
-						NULL, NULL, NULL);
-					break;
-			    case TT_NAME_ID_DESCRIPTION:
-					model->description = g_locale_to_utf8 (sfname.string,
-						sfname.string_len,
-						NULL, NULL, NULL);
-					break;
-			    default:
-					break;
-		    }			
-		}
-	}
-	
-	
-	return G_OBJECT (model);
+        for (i = 0; i < len; i++) {
+            FT_Get_Sfnt_Name (model->ft_face, i, &sfname);
+
+            if (sfname.platform_id != TT_PLATFORM_MACINTOSH) {
+                continue;
+            }
+
+            switch (sfname.name_id) {
+                case TT_NAME_ID_COPYRIGHT:
+                    model->copyright = g_locale_to_utf8 (sfname.string,
+                        sfname.string_len,
+                        NULL, NULL, NULL);
+                    break;
+                case TT_NAME_ID_VERSION_STRING:
+                    model->version = g_locale_to_utf8 (sfname.string,
+                        sfname.string_len,
+                        NULL, NULL, NULL);
+                    break;
+                case TT_NAME_ID_DESCRIPTION:
+                    model->description = g_locale_to_utf8 (sfname.string,
+                        sfname.string_len,
+                        NULL, NULL, NULL);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+
+    return G_OBJECT (model);
 }
 
 cairo_font_face_t *font_model_face_create (FontModel *model) {
-	return cairo_ft_font_face_create_for_ft_face (model->ft_face, FT_LOAD_NO_AUTOHINT);
+    return cairo_ft_font_face_create_for_ft_face (model->ft_face, FT_LOAD_NO_AUTOHINT);
 
 }
 
 gchar *font_model_desc_for_size (FontModel *model, gint size) {
-	gchar *desc;
-	
-	desc = g_strdup_printf ("%s, %s %dpx", model->family, model->style, size);
-	
-	return desc;
+    gchar *desc;
+
+    desc = g_strdup_printf ("%s, %s %dpx", model->family, model->style, size);
+
+    return desc;
 }
 

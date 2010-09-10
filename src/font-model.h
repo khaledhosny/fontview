@@ -38,39 +38,39 @@
 #include <pango/pango.h>
 #include <pango/pangoft2.h>
 
-#define FONT_MODEL_TYPE				(font_model_get_type())
-#define FONT_MODEL(obj)				(G_TYPE_CHECK_INSTANCE_CAST ((obj), FONT_MODEL_TYPE, FontModel))
-#define FONT_MODEL_CLASS(klass)		(G_TYPE_CHECK_CLASS_CAST ((klass), FONT_MODEL_TYPE, FontModelClass))
-#define IS_FONT_MODEL(obj)			(G_TYPE_CHECK_INSTANCE_TYPE ((obj), FONT_MODEL_TYPE))
-#define IS_FONT_MODEL_CLASS(klass)	(G_TYPE_CHECK_CLASS_TYPE ((klass), FONT_MODEL_TYPE))
-#define FONT_MODEL_GET_CLASS(obj)	(G_TYPE_INSTANCE_GET_CLASS ((obj), FONT_MODEL_TYPE, FontModelClass))
+#define FONT_MODEL_TYPE            (font_model_get_type())
+#define FONT_MODEL(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), FONT_MODEL_TYPE, FontModel))
+#define FONT_MODEL_CLASS(klass)    (G_TYPE_CHECK_CLASS_CAST ((klass), FONT_MODEL_TYPE, FontModelClass))
+#define IS_FONT_MODEL(obj)         (G_TYPE_CHECK_INSTANCE_TYPE ((obj), FONT_MODEL_TYPE))
+#define IS_FONT_MODEL_CLASS(klass) (G_TYPE_CHECK_CLASS_TYPE ((klass), FONT_MODEL_TYPE))
+#define FONT_MODEL_GET_CLASS(obj)  (G_TYPE_INSTANCE_GET_CLASS ((obj), FONT_MODEL_TYPE, FontModelClass))
 
 typedef struct _FontModel FontModel;
 typedef struct _FontModelClass FontModelClass;
 
 struct _FontModel {
-	GObject parent;
-	
-	/* use priv in future */
-	FT_Face ft_face;
-	PangoFontDescription *desc;
-		
-	gchar *file;
-	gchar *family;
-	gchar *style;
-	
-	double units_per_em;
-	double xheight;
-	double ascender;
-	double descender;
+    GObject parent;
 
-	gchar *version;
-	gchar *copyright;
-	gchar *description;
+    /* use priv in future */
+    FT_Face ft_face;
+    PangoFontDescription *desc;
+
+    gchar *file;
+    gchar *family;
+    gchar *style;
+
+    double units_per_em;
+    double xheight;
+    double ascender;
+    double descender;
+
+    gchar *version;
+    gchar *copyright;
+    gchar *description;
 };
 
 struct _FontModelClass {
-	GObjectClass parent;
+    GObjectClass parent;
 };
 
 GType font_model_get_type (void);

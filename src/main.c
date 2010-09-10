@@ -49,77 +49,77 @@ void render_size_changed (GtkSpinButton *w, gpointer data);
 void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data);
 
 void font_view_about (GtkWidget *w, gpointer data) {
-	gtk_show_about_dialog (NULL,
-		"name", _("Font View"),
-		"version", VERSION,
-		"copyright", _("Copyright © 2007, Alex Roberts"),
-		"comments", _("A font viewing utility.\nPart of the Serif font management project."),
-		"license", _("GNU General Public License 2.0\n\nSee COPYING for more information."), 
-		NULL);
+    gtk_show_about_dialog (NULL,
+        "name", _("Font View"),
+        "version", VERSION,
+        "copyright", _("Copyright © 2007, Alex Roberts"),
+        "comments", _("A font viewing utility.\nPart of the Serif font management project."),
+        "license", _("GNU General Public License 2.0\n\nSee COPYING for more information."), 
+        NULL);
 }
 
 void font_view_info_window (GtkWidget *w, gpointer data) {
-	GtkWidget *window, *close, *about;
-	GtkWidget *name, *style, *version, *copyright, *desc, *file;
-	GtkBuilder *infowindow;
-	FontModel *model;
-	gint result;
-	GError* error = NULL;
-	
-	infowindow = gtk_builder_new ();
-	gtk_builder_add_from_file (infowindow, INFO_UI_FILE, &error);
-	if (error) {
-		g_warning ("Couldn't load builder file: %s", error->message);
-		g_error_free (error);
-	}
+    GtkWidget *window, *close, *about;
+    GtkWidget *name, *style, *version, *copyright, *desc, *file;
+    GtkBuilder *infowindow;
+    FontModel *model;
+    gint result;
+    GError* error = NULL;
 
-	gtk_builder_connect_signals (infowindow, NULL);
-	
-	window = GET_GBOPJECT (infowindow, "infowindow");
-	
-	about = GET_GBOPJECT (infowindow, "about_button");
-	g_signal_connect (about, "clicked", G_CALLBACK(font_view_about), NULL);
+    infowindow = gtk_builder_new ();
+    gtk_builder_add_from_file (infowindow, INFO_UI_FILE, &error);
+    if (error) {
+        g_warning ("Couldn't load builder file: %s", error->message);
+        g_error_free (error);
+    }
 
-	model = font_view_get_model (FONT_VIEW (font));
-	
-	name = GET_GBOPJECT (infowindow, "name_label");
-	style = GET_GBOPJECT (infowindow, "style_label");
-	version = GET_GBOPJECT (infowindow, "version_label");
-	copyright = GET_GBOPJECT (infowindow, "copyright_label");
-	desc = GET_GBOPJECT (infowindow, "descr_label");
-	file = GET_GBOPJECT (infowindow, "file_label");
-	
-	gtk_label_set_text (GTK_LABEL(name), model->family);
-	gtk_label_set_text (GTK_LABEL(style), model->style);
-	gtk_label_set_text (GTK_LABEL(version), model->version);
-	gtk_label_set_text (GTK_LABEL(copyright), model->copyright);
-	gtk_label_set_text (GTK_LABEL(desc), model->description);
-	gtk_label_set_text (GTK_LABEL(file), model->file);
-	
-	result = gtk_dialog_run (GTK_DIALOG (window));
-		
-	gtk_widget_destroy (window);
-	
+    gtk_builder_connect_signals (infowindow, NULL);
+
+    window = GET_GBOPJECT (infowindow, "infowindow");
+
+    about = GET_GBOPJECT (infowindow, "about_button");
+    g_signal_connect (about, "clicked", G_CALLBACK(font_view_about), NULL);
+
+    model = font_view_get_model (FONT_VIEW (font));
+
+    name = GET_GBOPJECT (infowindow, "name_label");
+    style = GET_GBOPJECT (infowindow, "style_label");
+    version = GET_GBOPJECT (infowindow, "version_label");
+    copyright = GET_GBOPJECT (infowindow, "copyright_label");
+    desc = GET_GBOPJECT (infowindow, "descr_label");
+    file = GET_GBOPJECT (infowindow, "file_label");
+
+    gtk_label_set_text (GTK_LABEL(name), model->family);
+    gtk_label_set_text (GTK_LABEL(style), model->style);
+    gtk_label_set_text (GTK_LABEL(version), model->version);
+    gtk_label_set_text (GTK_LABEL(copyright), model->copyright);
+    gtk_label_set_text (GTK_LABEL(desc), model->description);
+    gtk_label_set_text (GTK_LABEL(file), model->file);
+
+    result = gtk_dialog_run (GTK_DIALOG (window));
+
+    gtk_widget_destroy (window);
+
 }
 
 
 void render_text_changed (GtkEntry *w, gpointer data) {
-	gchar *text = g_strdup ((gchar *)gtk_entry_get_text (w));
-		
-	font_view_set_text (FONT_VIEW(font), text);
-	
-	g_free (text);
+    gchar *text = g_strdup ((gchar *)gtk_entry_get_text (w));
+
+    font_view_set_text (FONT_VIEW(font), text);
+
+    g_free (text);
 }
 
 void render_size_changed (GtkSpinButton *w, gpointer data) {
-	gint size = gtk_spin_button_get_value_as_int (w);
+    gint size = gtk_spin_button_get_value_as_int (w);
 
-	font_view_set_pt_size (FONT_VIEW(font), size);
+    font_view_set_pt_size (FONT_VIEW(font), size);
 }
 
 void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data) {
-	if (event == G_FILE_MONITOR_EVENT_CHANGED)
-		font_view_rerender (FONT_VIEW(font));
+    if (event == G_FILE_MONITOR_EVENT_CHANGED)
+        font_view_rerender (FONT_VIEW(font));
 }
 
 void print_usage ()
@@ -129,61 +129,61 @@ void print_usage ()
 }
 
 int main (int argc, char *argv[]) {
-	GtkWidget *w, *entry, *sizew, *container;
-	gchar *str;
-	gint size;
-	GError* error = NULL;
-	GFile *file;
-	GFileMonitor *monitor;
+    GtkWidget *w, *entry, *sizew, *container;
+    gchar *str;
+    gint size;
+    GError* error = NULL;
+    GFile *file;
+    GFileMonitor *monitor;
 
-	
-	bindtextdomain (PACKAGE, LOCALEDIR);
-	textdomain (PACKAGE);
 
-	gtk_init (&argc, &argv);
+    bindtextdomain (PACKAGE, LOCALEDIR);
+    textdomain (PACKAGE);
 
-	if (!argv[1]) {
-		print_usage();
-		return 1;
-	}	
-	
-	mainwindow = gtk_builder_new ();
-	gtk_builder_add_from_file (mainwindow, MAIN_UI_FILE, &error);
-	if (error) {
-		g_warning ("Couldn't load builder file: %s", error->message);
-		g_error_free (error);
-	}
+    gtk_init (&argc, &argv);
 
-	gtk_builder_connect_signals (mainwindow, NULL);
+    if (!argv[1]) {
+        print_usage();
+        return 1;
+    }
 
-	font = font_view_new_with_model (argv[1]);
-	container = GET_GBOPJECT (mainwindow, "font-view");
-	gtk_container_add (GTK_CONTAINER (container), font);
+    mainwindow = gtk_builder_new ();
+    gtk_builder_add_from_file (mainwindow, MAIN_UI_FILE, &error);
+    if (error) {
+        g_warning ("Couldn't load builder file: %s", error->message);
+        g_error_free (error);
+    }
 
-	gtk_widget_show (font);
-	gtk_widget_show (container);
+    gtk_builder_connect_signals (mainwindow, NULL);
 
-	entry = GET_GBOPJECT (mainwindow, "render_str");
-	str = font_view_get_text(FONT_VIEW(font));
-	gtk_entry_set_text (GTK_ENTRY(entry), str);
-	g_free (str);
-	g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
-	
-	w = GET_GBOPJECT (mainwindow, "info_button");
-	g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
+    font = font_view_new_with_model (argv[1]);
+    container = GET_GBOPJECT (mainwindow, "font-view");
+    gtk_container_add (GTK_CONTAINER (container), font);
 
-	sizew = GET_GBOPJECT (mainwindow, "size_spin");
-	g_signal_connect (sizew, "value-changed", G_CALLBACK(render_size_changed), NULL);
+    gtk_widget_show (font);
+    gtk_widget_show (container);
 
-	size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (sizew));
-	font_view_set_pt_size (FONT_VIEW (font), size);
+    entry = GET_GBOPJECT (mainwindow, "render_str");
+    str = font_view_get_text(FONT_VIEW(font));
+    gtk_entry_set_text (GTK_ENTRY(entry), str);
+    g_free (str);
+    g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
 
-	file = g_file_new_for_path(argv[1]);
-	monitor = g_file_monitor_file (file, 0, NULL, NULL);
-	g_signal_connect (monitor, "changed", G_CALLBACK(render_file_changed), NULL);
+    w = GET_GBOPJECT (mainwindow, "info_button");
+    g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
 
-	gtk_main();
+    sizew = GET_GBOPJECT (mainwindow, "size_spin");
+    g_signal_connect (sizew, "value-changed", G_CALLBACK(render_size_changed), NULL);
 
-	return 0;
+    size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (sizew));
+    font_view_set_pt_size (FONT_VIEW (font), size);
+
+    file = g_file_new_for_path(argv[1]);
+    monitor = g_file_monitor_file (file, 0, NULL, NULL);
+    g_signal_connect (monitor, "changed", G_CALLBACK(render_file_changed), NULL);
+
+    gtk_main();
+
+    return 0;
 }
 
