@@ -125,29 +125,34 @@ GObject *font_model_new (gchar *fontfile) {
 
 
         len = FT_Get_Sfnt_Name_Count (model->ft_face);
-
         for (i = 0; i < len; i++) {
-            FT_Get_Sfnt_Name (model->ft_face, i, &sfname);
-
-            if (sfname.platform_id != TT_PLATFORM_MACINTOSH) {
+            if (FT_Get_Sfnt_Name(model->ft_face, i, &sfname) != 0)
                 continue;
-            }
+
+            /* only handle the unicode names for US langid */
+            if (!(sfname.platform_id == TT_PLATFORM_MICROSOFT &&
+                  sfname.encoding_id == TT_MS_ID_UNICODE_CS &&
+                  sfname.language_id == TT_MS_LANGID_ENGLISH_UNITED_STATES))
+                continue;
 
             switch (sfname.name_id) {
                 case TT_NAME_ID_COPYRIGHT:
-                    model->copyright = g_locale_to_utf8 (sfname.string,
-                        sfname.string_len,
-                        NULL, NULL, NULL);
+                    g_free(model->copyright);
+                    model->copyright = g_convert((gchar *)sfname.string,
+                                       sfname.string_len,
+                                       "UTF-8", "UTF-16BE", NULL, NULL, NULL);
                     break;
                 case TT_NAME_ID_VERSION_STRING:
-                    model->version = g_locale_to_utf8 (sfname.string,
-                        sfname.string_len,
-                        NULL, NULL, NULL);
+                    g_free(model->version);
+                    model->version = g_convert((gchar *)sfname.string,
+                                     sfname.string_len,
+                                     "UTF-8", "UTF-16BE", NULL, NULL, NULL);
                     break;
                 case TT_NAME_ID_DESCRIPTION:
-                    model->description = g_locale_to_utf8 (sfname.string,
-                        sfname.string_len,
-                        NULL, NULL, NULL);
+                    g_free(model->description);
+                    model->description = g_convert((gchar *)sfname.string,
+                                         sfname.string_len,
+                                         "UTF-8", "UTF-16BE", NULL, NULL, NULL);
                     break;
                 default:
                     break;
