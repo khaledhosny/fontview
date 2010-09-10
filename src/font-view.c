@@ -146,6 +146,9 @@ GtkWidget *font_view_new_with_model (gchar *font) {
 
     priv->model = FONT_MODEL(font_model_new (font));
 
+    if (priv->model->sample)
+        priv->render_str = g_strdup (priv->model->sample);
+
     _font_view_pre_render (view);
 
     return GTK_WIDGET(view);

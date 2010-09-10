@@ -109,6 +109,8 @@ GObject *font_model_new (gchar *fontfile) {
     model->ascender = 0;
     model->descender = 0;
 
+    model->sample = NULL;
+
     /* Get font metadata if available/applicable */
     if (FT_IS_SFNT(model->ft_face)) {
         os2 = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_os2);
@@ -153,6 +155,12 @@ GObject *font_model_new (gchar *fontfile) {
                     model->description = g_convert((gchar *)sfname.string,
                                          sfname.string_len,
                                          "UTF-8", "UTF-16BE", NULL, NULL, NULL);
+                    break;
+                case TT_NAME_ID_SAMPLE_TEXT:
+                    g_free(model->sample);
+                    model->sample = g_convert((gchar *)sfname.string,
+                                    sfname.string_len,
+                                    "UTF-8", "UTF-16BE", NULL, NULL, NULL);
                     break;
                 default:
                     break;
