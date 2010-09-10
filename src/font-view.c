@@ -11,6 +11,7 @@
  * FontView Test - font viewing widget test app
  * Part of the Fontable Project
  * Copyright (C) 2006 Alex Roberts
+ * Copyright (C) 2010 Khaled Hosny, <khaledhosny@eglug.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -39,6 +40,7 @@
 G_DEFINE_TYPE (FontView, font_view, GTK_TYPE_DRAWING_AREA);
 
 #define FONT_VIEW_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE ((obj), FONT_VIEW_TYPE, FontViewPrivate))
+#define ISRTL(A) ((A==PANGO_DIRECTION_RTL)||(A==PANGO_DIRECTION_WEAK_RTL)||(A==PANGO_DIRECTION_TTB_LTR))
 
 #define ZOOM_LEVELS 30
 
@@ -208,7 +210,9 @@ static void render (GtkWidget *w, cairo_t *cr) {
 	gdouble px;
 	gchar *title;
 	gint p_height;
+	gint p_width;
 	gint baseline;
+	gint basedir;
 	PangoLayout *layout;
 	
 	priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
@@ -264,9 +268,16 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
 	/* display sample text */
 	if (priv->extents[TEXT]) {
-		pango_cairo_update_layout (cr, priv->layout);
 		baseline = pango_layout_get_baseline (priv->layout)/PANGO_SCALE;
-		cairo_move_to (cr, x, y-baseline);
+		pango_layout_get_pixel_size(priv->layout, &p_width, NULL);
+
+		basedir = pango_find_base_dir (priv->render_str, -1);
+		if (ISRTL(basedir)){
+			cairo_move_to (cr, width-x-p_width, y-baseline);
+		} else {
+			cairo_move_to (cr, x, y-baseline);
+		}
+
 		gdk_cairo_set_source_color (cr, style->fg);
 		pango_cairo_show_layout (cr, priv->layout);
 	}
