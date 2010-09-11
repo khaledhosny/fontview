@@ -250,7 +250,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
     }
 
     /* x-height */
-    if (priv->extents[XHEIGHT]) {
+    if (priv->extents[XHEIGHT] && priv->xheight != 0.0) {
         cairo_move_to (cr, x, y - priv->xheight);
         cairo_line_to (cr, width - x, y - priv->xheight);
         cairo_stroke (cr);
