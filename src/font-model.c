@@ -174,7 +174,7 @@ GObject *font_model_new (gchar *fontfile) {
 gchar *font_model_desc_for_size (FontModel *model, gint size) {
     gchar *desc;
 
-    desc = g_strdup_printf ("%s, %s %dpx", model->family, model->style, size);
+    desc = g_strdup_printf ("%s, %s %d", model->family, model->style, size);
 
     return desc;
 }
