@@ -37,8 +37,6 @@
 #include FT_SFNT_NAMES_H
 #include FT_TRUETYPE_IDS_H
 #include FT_TRUETYPE_TABLES_H
-#include <pango/pango.h>
-#include <pango/pangofc-fontmap.h>
 #include <fontconfig/fontconfig.h>
 
 
@@ -71,7 +69,8 @@ GType font_model_get_type (void) {
             0,        /* n_preallocs */
             (GInstanceInitFunc) font_model_init
         };
-        type = g_type_register_static (G_TYPE_OBJECT, "FontModelType", &info, 0);
+        type = g_type_register_static (G_TYPE_OBJECT,
+                "FontModelType", &info, 0);
     }
     return type;
 }
@@ -170,11 +169,6 @@ GObject *font_model_new (gchar *fontfile) {
 
 
     return G_OBJECT (model);
-}
-
-cairo_font_face_t *font_model_face_create (FontModel *model) {
-    return cairo_ft_font_face_create_for_ft_face (model->ft_face, FT_LOAD_NO_AUTOHINT);
-
 }
 
 gchar *font_model_desc_for_size (FontModel *model, gint size) {
