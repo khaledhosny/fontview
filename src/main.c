@@ -124,7 +124,7 @@ void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file,
 
 void print_usage ()
 {
-    g_print ("\nUsage:\n\tfv <path_to_font>\n\n");
+    g_print ("\nUsage:\n\tfontview <path_to_font>\n\n");
     exit(1);
 }
 

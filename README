@@ -18,7 +18,7 @@ To build:
 
 To run:
  
-    ./fv /path/to/a/typeface
+    ./fontview /path/to/a/typeface
  
 
 To clean:
