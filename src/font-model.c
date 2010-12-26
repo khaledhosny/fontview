@@ -87,9 +87,7 @@ GObject *font_model_new (gchar *fontfile) {
 
     g_return_val_if_fail (fontfile, NULL);
 
-    if (FcConfigAppFontAddFile (FcConfigGetCurrent(), fontfile)) {
-        g_message ("Loaded application specific font.");
-    } else {
+    if (!FcConfigAppFontAddFile (FcConfigGetCurrent(), fontfile)) {
         g_error ("Failed to load app font.");
         exit;
     }
