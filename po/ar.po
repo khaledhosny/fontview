@@ -6,8 +6,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2010-09-10 05:06+0300\n"
-"PO-Revision-Date: 2010-09-11 16:01+0300\n"
+"POT-Creation-Date: 2010-12-26 22:59+0200\n"
+"PO-Revision-Date: 2010-12-26 23:00+0300\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
 "Language: ar\n"
@@ -22,7 +22,7 @@ msgstr ""
 msgid "Font Information"
 msgstr "معلومات الخط"
 
-#: ../src/mainwindow.ui.h:2 ../src/main.c:53
+#: ../src/mainwindow.ui.h:2 ../src/main.c:60
 msgid "Font View"
 msgstr "عارض الخطوط"
 
@@ -58,17 +58,21 @@ msgstr "الطراز"
 msgid "Version"
 msgstr "النسخة"
 
-#: ../src/main.c:55
-msgid "Copyright © 2007, Alex Roberts"
-msgstr "حقوق النشر © 2007، ألِكس روبرتس"
+#: ../src/main.c:63
+msgid ""
+"Copyright © 2007, Alex Roberts\n"
+"Copyright © 2010, Khaled Hosny"
+msgstr ""
+"حقوق النشر © 2007، ألِكس روبرتس\n"
+"حقوق النشر © 2010، خالد حسني"
 
-#: ../src/main.c:56
+#: ../src/main.c:64
 msgid ""
 "A font viewing utility.\n"
 "Part of the Serif font management project."
 msgstr "أداة لعرض الخطوط."
 
-#: ../src/main.c:57
+#: ../src/main.c:65
 msgid ""
 "GNU General Public License 2.0\n"
 "\n"
@@ -78,8 +82,12 @@ msgstr ""
 "\n"
 "انظر ملف COPYING لمزيد من المعلومات."
 
+#: ../src/main.c:66
+msgid "translator-credits"
+msgstr "خالد حسني <khaledhosny@eglug.org>"
+
 #. default string to render
-#: ../src/font-view.c:113
+#: ../src/font-view.c:107
 msgid "How quickly daft jumping zebras vex."
 msgstr ""
 "صِف خَلقَ خَودِ كَمِثلِ الشَمسِ إِذ بَزَغَت يَحظى الضَجيعُ بِها نَجلاءَ "

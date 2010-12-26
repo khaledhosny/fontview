@@ -49,12 +49,21 @@ void render_size_changed (GtkSpinButton *w, gpointer data);
 void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data);
 
 void font_view_about (GtkWidget *w, gpointer data) {
+    static const gchar * const authors[] = {
+        "Alex Roberts <alex@redprocess.com>",
+        "Jon Phillips <jon@rejon.org>",
+        "Khaled Hosny <khaledhosnt@eglug.org>",
+	NULL
+    };
+
     gtk_show_about_dialog (NULL,
         "name", _("Font View"),
+        "authors", authors,
         "version", VERSION,
-        "copyright", _("Copyright © 2007, Alex Roberts"),
+        "copyright", _("Copyright © 2007, Alex Roberts\nCopyright © 2010, Khaled Hosny"),
         "comments", _("A font viewing utility.\nPart of the Serif font management project."),
-        "license", _("GNU General Public License 2.0\n\nSee COPYING for more information."), 
+        "license", _("GNU General Public License 2.0\n\nSee COPYING for more information."),
+        "translator-credits", _("translator-credits"),
         NULL);
 }
 
