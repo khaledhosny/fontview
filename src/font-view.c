@@ -33,6 +33,8 @@
 #include <math.h>
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <hb-ft.h>
+#include <hb-glib.h>
 #include "font-view.h"
 
 G_DEFINE_TYPE (FontView, font_view, GTK_TYPE_DRAWING_AREA);
@@ -64,7 +66,6 @@ struct _FontViewPrivate {
     gdouble size;
 
     gchar *render_str;
-    PangoLayout *layout;
 
     FontModel *model;
 };
@@ -110,8 +111,6 @@ static void font_view_init (FontView *view) {
     cr = cairo_create (buffer);
     cairo_surface_destroy (buffer);
     buffer = NULL;
-
-    priv->layout = pango_cairo_create_layout (cr);
 
     cairo_destroy (cr);
     cr = NULL;
@@ -173,7 +172,6 @@ void _font_view_get_extents (FontView *view) {
 /* pre render the text */
 static void _font_view_pre_render (FontView *view) {
     gchar *str;
-    PangoFontDescription *desc;
 
     FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
 
@@ -183,15 +181,6 @@ static void _font_view_pre_render (FontView *view) {
     } else {
         priv->extents[TEXT] = TRUE;
     }
-
-    pango_layout_set_text (priv->layout,
-            priv->render_str,
-            strlen (priv->render_str));
-
-    str = font_model_desc_for_size (priv->model, priv->size);
-    desc = pango_font_description_from_string (str);
-    pango_layout_set_font_description (priv->layout, desc);
-    pango_font_description_free (desc);
 }
 
 
@@ -202,10 +191,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
     FontViewPrivate *priv;
     gchar *title;
     gint p_height;
-    gint p_width;
     gint baseline;
-    gint basedir;
-    PangoLayout *layout;
 
     priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 
@@ -258,17 +244,60 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
-        baseline = pango_layout_get_baseline (priv->layout)/PANGO_SCALE;
-        pango_layout_get_pixel_size(priv->layout, &p_width, NULL);
+        baseline = priv->extents[BASELINE];
 
-        basedir = pango_find_base_dir (priv->render_str, -1);
-        if (ISRTL(basedir))
-            cairo_move_to (cr, width-x-p_width, y-baseline);
-        else
-            cairo_move_to (cr, x, y-baseline);
+        cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
+        cairo_set_font_face (cr, cr_face);
+        cairo_set_font_size (cr, priv->size);
+
+        cairo_scaled_font_t *cr_scaled_font = cairo_get_scaled_font (cr);
+        FT_Face ft_face = cairo_ft_scaled_font_lock_face (cr_scaled_font);
+
+        int length = strlen(priv->render_str);
+        hb_face_t *hb_face = hb_ft_face_create (ft_face, NULL);
+        hb_font_t *hb_font = hb_ft_font_create (ft_face, NULL);
+        hb_buffer_t *hb_buffer = hb_buffer_create (length);
+
+        hb_buffer_set_unicode_funcs (hb_buffer, hb_glib_get_unicode_funcs ());
+        hb_buffer_set_direction (hb_buffer, HB_DIRECTION_RTL);
+        hb_buffer_set_script (hb_buffer, HB_SCRIPT_ARABIC);
+        hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
+        hb_buffer_add_utf8 (hb_buffer, priv->render_str, length, 0, length);
+        hb_shape (hb_font, hb_face, hb_buffer, NULL, 0);
+
+        int num_glyphs = hb_buffer_get_length (hb_buffer);
+        hb_glyph_info_t *hb_glyph = hb_buffer_get_glyph_infos (hb_buffer);
+        hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer);
+
+        hb_buffer_destroy (hb_buffer);
+        hb_font_destroy (hb_font);
+        hb_face_destroy (hb_face);
+        cairo_ft_scaled_font_unlock_face (cr_scaled_font);
+
+        cairo_glyph_t glyphs[num_glyphs];
+        int i;
+        int32_t yy, xx;
+
+        xx = x;
+        yy = y-baseline;
+
+        for (i = 0; i < num_glyphs; i++) {
+            glyphs[i].index = hb_glyph->codepoint;
+            glyphs[i].x = xx + (hb_position->x_offset/64);
+            glyphs[i].y = yy - (hb_position->y_offset/64);
+            xx += (hb_position->x_advance/64);
+            hb_glyph++;
+            hb_position++;
+        }
+
+        if (ISRTL(pango_find_base_dir (priv->render_str, -1))) {
+            for (i = 0; i < num_glyphs; i++) {
+                glyphs[i].x += width-x-xx;
+            }
+        }
 
         gdk_cairo_set_source_color (cr, style->fg);
-        pango_cairo_show_layout (cr, priv->layout);
+        cairo_show_glyphs (cr, glyphs, num_glyphs);
     }
 
 
@@ -277,7 +306,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
             priv->model->family,
             priv->model->style,
             priv->size);
-    layout = gtk_widget_create_pango_layout (w, title);
+    PangoLayout *layout = gtk_widget_create_pango_layout (w, title);
     g_free (title);
 
     pango_layout_get_pixel_size (layout, NULL, &p_height);
