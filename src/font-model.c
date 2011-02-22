@@ -37,7 +37,6 @@
 #include FT_SFNT_NAMES_H
 #include FT_TRUETYPE_IDS_H
 #include FT_TRUETYPE_TABLES_H
-#include <fontconfig/fontconfig.h>
 
 
 static GObjectClass *parent_class = NULL;
@@ -80,22 +79,22 @@ GObject *font_model_new (gchar *fontfile) {
     FT_Library library;
     FT_SfntName sfname;
     gint len, i;
-    FcChar8 *s;
-    FcResult result;
     TT_OS2* os2;
     TT_PCLT* pclt;
 
     g_return_val_if_fail (fontfile, NULL);
 
-    if (!FcConfigAppFontAddFile (FcConfigGetCurrent(), fontfile)) {
-        g_error ("Failed to load app font.");
-        exit;
+    if (FT_Init_FreeType(&library)) {
+        g_error ("FT_Init_FreeType failed");
+	exit;
     }
 
-    FT_Init_FreeType(&library);
-
     model = g_object_new (FONT_MODEL_TYPE, NULL);
-    FT_New_Face (library, fontfile, 0, &model->ft_face);
+
+    if (FT_New_Face (library, fontfile, 0, &model->ft_face)) {
+        g_error ("FT_New_Face failed");
+	exit;
+    }
 
     model->file = g_strdup (fontfile);
     model->family = model->ft_face->family_name;
