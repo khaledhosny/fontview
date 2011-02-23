@@ -191,7 +191,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
     FontViewPrivate *priv;
     gchar *title;
     gint p_height;
-    gint baseline;
 
     priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 
@@ -244,8 +243,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
-        baseline = priv->extents[BASELINE];
-
         cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
         cairo_set_font_face (cr, cr_face);
         cairo_set_font_size (cr, priv->size);
@@ -279,7 +276,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         int32_t yy, xx;
 
         xx = x;
-        yy = y-baseline;
+        yy = y;
 
         for (i = 0; i < num_glyphs; i++) {
             glyphs[i].index = hb_glyph->codepoint;
