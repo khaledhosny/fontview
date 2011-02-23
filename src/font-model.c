@@ -86,14 +86,14 @@ GObject *font_model_new (gchar *fontfile) {
 
     if (FT_Init_FreeType(&library)) {
         g_error ("FT_Init_FreeType failed");
-	exit;
+        exit;
     }
 
     model = g_object_new (FONT_MODEL_TYPE, NULL);
 
     if (FT_New_Face (library, fontfile, 0, &model->ft_face)) {
         g_error ("FT_New_Face failed");
-	exit;
+        exit;
     }
 
     model->file = g_strdup (fontfile);
@@ -115,12 +115,12 @@ GObject *font_model_new (gchar *fontfile) {
             model->ascender = os2->sTypoAscender;
             model->descender = os2->sTypoDescender;
         }
+
         if (model->xheight<0){
             pclt = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_pclt);
             if (pclt)
                 model->xheight = pclt->xHeight;
         }
-
 
         len = FT_Get_Sfnt_Name_Count (model->ft_face);
         for (i = 0; i < len; i++) {
@@ -133,7 +133,39 @@ GObject *font_model_new (gchar *fontfile) {
                   sfname.language_id == TT_MS_LANGID_ENGLISH_UNITED_STATES))
                 continue;
 
+            int preferred_family = 0;
+            int preferred_subfamily = 0;
             switch (sfname.name_id) {
+                case TT_NAME_ID_PREFERRED_FAMILY:
+                    g_free(model->family);
+                    model->family = g_convert((gchar *)sfname.string,
+                                    sfname.string_len,
+                                    "UTF-8", "UTF-16BE", NULL, NULL, NULL);
+                    preferred_family = 1;
+                    break;
+                case TT_NAME_ID_FONT_FAMILY:
+                    if (!preferred_family) {
+                        g_free(model->family);
+                        model->family = g_convert((gchar *)sfname.string,
+                                        sfname.string_len,
+                                        "UTF-8", "UTF-16BE", NULL, NULL, NULL);
+                    }
+                    break;
+                case TT_NAME_ID_PREFERRED_SUBFAMILY:
+                    g_free(model->style);
+                    model->style = g_convert((gchar *)sfname.string,
+                                   sfname.string_len,
+                                   "UTF-8", "UTF-16BE", NULL, NULL, NULL);
+                    preferred_subfamily = 1;
+                    break;
+                case TT_NAME_ID_FONT_SUBFAMILY:
+                    if (!preferred_subfamily) {
+                        g_free(model->style);
+                        model->style = g_convert((gchar *)sfname.string,
+                                       sfname.string_len,
+                                       "UTF-8", "UTF-16BE", NULL, NULL, NULL);
+                    }
+                    break;
                 case TT_NAME_ID_COPYRIGHT:
                     g_free(model->copyright);
                     model->copyright = g_convert((gchar *)sfname.string,
@@ -163,7 +195,6 @@ GObject *font_model_new (gchar *fontfile) {
             }
         }
     }
-
 
     return G_OBJECT (model);
 }
