@@ -80,6 +80,4 @@ GType font_model_get_type (void);
 
 GObject *font_model_new (gchar *font);
 
-gchar *font_model_desc_for_size (FontModel *model, gint size);
-
 #endif /* __FONT_MODEL_H__ */
