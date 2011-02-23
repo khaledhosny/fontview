@@ -65,7 +65,7 @@ struct _FontViewPrivate {
 
     gdouble size;
 
-    gchar *render_str;
+    gchar *text;
 
     FontModel *model;
 };
@@ -105,7 +105,7 @@ static void font_view_init (FontView *view) {
     priv->size = 50;
 
     /* default string to render */
-    priv->render_str = _("How quickly daft jumping zebras vex.");
+    priv->text = _("How quickly daft jumping zebras vex.");
 
     buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
     cr = cairo_create (buffer);
@@ -135,7 +135,7 @@ GtkWidget *font_view_new_with_model (gchar *font) {
     priv->model = FONT_MODEL(font_model_new (font));
 
     if (priv->model->sample)
-        priv->render_str = g_strdup (priv->model->sample);
+        priv->text = g_strdup (priv->model->sample);
 
     _font_view_pre_render (view);
 
@@ -175,7 +175,7 @@ static void _font_view_pre_render (FontView *view) {
 
     FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
 
-    if ((strlen (priv->render_str) < 1)) {
+    if ((strlen (priv->text) < 1)) {
         priv->extents[TEXT] = FALSE;
         return;
     } else {
@@ -253,7 +253,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         cairo_scaled_font_t *cr_scaled_font = cairo_get_scaled_font (cr);
         FT_Face ft_face = cairo_ft_scaled_font_lock_face (cr_scaled_font);
 
-        int length = strlen(priv->render_str);
+        int length = strlen(priv->text);
         hb_face_t *hb_face = hb_ft_face_create (ft_face, NULL);
         hb_font_t *hb_font = hb_ft_font_create (ft_face, NULL);
         hb_buffer_t *hb_buffer = hb_buffer_create (length);
@@ -262,7 +262,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         hb_buffer_set_direction (hb_buffer, HB_DIRECTION_RTL);
         hb_buffer_set_script (hb_buffer, HB_SCRIPT_ARABIC);
         hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
-        hb_buffer_add_utf8 (hb_buffer, priv->render_str, length, 0, length);
+        hb_buffer_add_utf8 (hb_buffer, priv->text, length, 0, length);
         hb_shape (hb_font, hb_face, hb_buffer, NULL, 0);
 
         int num_glyphs = hb_buffer_get_length (hb_buffer);
@@ -290,7 +290,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
             hb_position++;
         }
 
-        if (ISRTL(pango_find_base_dir (priv->render_str, -1))) {
+        if (ISRTL(pango_find_base_dir (priv->text, -1))) {
             for (i = 0; i < num_glyphs; i++) {
                 glyphs[i].x += width-x-xx;
             }
@@ -398,7 +398,7 @@ gchar *font_view_get_text (FontView *view) {
     FontViewPrivate *priv;
 
     priv = FONT_VIEW_GET_PRIVATE (view);
-    return g_strdup(priv->render_str);
+    return g_strdup(priv->text);
 }
 
 void font_view_set_text (FontView *view, gchar *text) {
@@ -406,12 +406,12 @@ void font_view_set_text (FontView *view, gchar *text) {
 
     priv = FONT_VIEW_GET_PRIVATE (view);
 
-    if (g_strcasecmp (priv->render_str, text) == 0)
+    if (g_strcasecmp (priv->text, text) == 0)
         return;
 
-    priv->render_str = NULL;
+    priv->text = NULL;
 
-    priv->render_str = g_strdup(text);
+    priv->text = g_strdup(text);
     _font_view_pre_render (view);
 
     font_view_redraw (view);
