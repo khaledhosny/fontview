@@ -1,13 +1,9 @@
-
-ui_DATA = mainwindow.ui infowindow.ui
-uidir = $(datadir)/fontview/ui
-
 INCLUDES = -I$(top_srcdir) -I$(includedir) \
 	   -DLOCALEDIR=\""$(datadir)/locale"\"
 
 fontview_LDADD = @FONTVIEW_LIBS@ @GTK_LIBS@
 fontview_CFLAGS = @FONTVIEW_CFLAGS@ @GTK_CFLAGS@ \
-		  -DPACKAGE_DATA_DIR=\""$(uidir)"\"
+		  -DPACKAGE_DATA_DIR=\""$(datadir)/fontview"\"
 
 bin_PROGRAMS = fontview
 fontview_SOURCES = font-model.c font-view.c main.c

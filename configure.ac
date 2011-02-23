@@ -33,5 +33,6 @@ AM_GLIB_GNU_GETTEXT
 AC_OUTPUT(
 	  Makefile
 	  src/Makefile
+	  data/Makefile
 	  po/Makefile.in
 	  )
