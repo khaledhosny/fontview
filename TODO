@@ -1,0 +1,10 @@
+- HB
+  - no hardcoded script and language
+  - switchable font features
+
+- rendering
+  - controlable hinting
+
+- metdata
+  - more detailed reporting; preferred family, subfamily, mac and so
+  - locale specific
