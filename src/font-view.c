@@ -119,10 +119,6 @@ static void font_view_init (FontView *view) {
             GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 }
 
-GtkWidget *font_view_new () {
-    return g_object_new (FONT_VIEW_TYPE, NULL);
-}
-
 GtkWidget *font_view_new_with_model (gchar *font) {
     FontView *view;
     FontViewPrivate *priv;
@@ -140,15 +136,6 @@ GtkWidget *font_view_new_with_model (gchar *font) {
     _font_view_pre_render (view);
 
     return GTK_WIDGET(view);
-}
-
-void font_view_set_model (FontView *view, FontModel *model) {
-    FontViewPrivate *priv;
-    priv = FONT_VIEW_GET_PRIVATE(view);
-
-    if (IS_FONT_MODEL(model)) {
-        priv->model = model;
-    }
 }
 
 FontModel *font_view_get_model (FontView *view) {
@@ -361,13 +348,6 @@ static void font_view_redraw (FontView *view) {
     gdk_window_process_updates (widget->window, TRUE);
 
     gdk_region_destroy (region);
-}
-
-gdouble font_view_get_pt_size (FontView *view) {
-    FontViewPrivate *priv;
-
-    priv = FONT_VIEW_GET_PRIVATE (view);
-    return priv->size;
 }
 
 void font_view_set_pt_size (FontView *view, gdouble size) {

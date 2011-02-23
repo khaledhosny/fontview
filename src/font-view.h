@@ -68,13 +68,10 @@ struct _FontViewClass {
     void (* size_changed)(FontView *self, gdouble size);
 };
 
-GtkWidget *font_view_new ();
 GtkWidget *font_view_new_with_model (gchar *font);
 
-void font_view_set_model (FontView *view, FontModel *model);
 FontModel *font_view_get_model (FontView *view);
 
-gdouble font_view_get_pt_size (FontView *view);
 void font_view_set_pt_size (FontView *view, gdouble size);
 
 gchar *font_view_get_text (FontView *view);
