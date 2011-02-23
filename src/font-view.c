@@ -187,10 +187,10 @@ static void _font_view_pre_render (FontView *view) {
 static void render (GtkWidget *w, cairo_t *cr) {
     GtkStyle *style;
     gint width, height;
-    gdouble y, x;
+    gdouble y, x, xx;
     FontViewPrivate *priv;
     gchar *title;
-    gint p_height;
+    gint p_height, i;
 
     priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 
@@ -272,16 +272,11 @@ static void render (GtkWidget *w, cairo_t *cr) {
         cairo_ft_scaled_font_unlock_face (cr_scaled_font);
 
         cairo_glyph_t glyphs[num_glyphs];
-        int i;
-        int32_t yy, xx;
-
         xx = x;
-        yy = y;
-
         for (i = 0; i < num_glyphs; i++) {
             glyphs[i].index = hb_glyph->codepoint;
             glyphs[i].x = xx + (hb_position->x_offset/64);
-            glyphs[i].y = yy - (hb_position->y_offset/64);
+            glyphs[i].y = y - (hb_position->y_offset/64);
             xx += (hb_position->x_advance/64);
             hb_glyph++;
             hb_position++;
