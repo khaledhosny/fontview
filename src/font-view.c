@@ -177,8 +177,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
     gdouble y, x, xx;
     FontViewPrivate *priv;
     gchar *title;
-    gint p_height, i;
-    PangoDirection basedir;
+    gint p_height, i, rtl;
 
     priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 
@@ -231,7 +230,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
-        basedir = pango_find_base_dir (priv->text, -1);
+        rtl = ISRTL(pango_find_base_dir (priv->text, -1));
 
         cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
         cairo_set_font_face (cr, cr_face);
@@ -246,7 +245,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         hb_buffer_t *hb_buffer = hb_buffer_create (length);
 
         hb_buffer_set_unicode_funcs (hb_buffer, hb_glib_get_unicode_funcs ());
-        hb_buffer_set_direction (hb_buffer, ISRTL(basedir) ? HB_DIRECTION_RTL: HB_DIRECTION_LTR);
+        hb_buffer_set_direction (hb_buffer, rtl ? HB_DIRECTION_RTL: HB_DIRECTION_LTR);
         hb_buffer_set_script (hb_buffer, HB_SCRIPT_ARABIC);
         hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
         hb_buffer_add_utf8 (hb_buffer, priv->text, length, 0, length);
@@ -272,7 +271,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
             hb_position++;
         }
 
-        if (ISRTL(basedir)) {
+        if (rtl) {
             for (i = 0; i < num_glyphs; i++) {
                 glyphs[i].x += width-x-xx;
             }
