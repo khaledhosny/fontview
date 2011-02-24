@@ -392,6 +392,10 @@ void font_view_set_text (FontView *view, gchar *text) {
 }
 
 void font_view_rerender (FontView *view) {
+    FontViewPrivate *priv;
+
+    priv = FONT_VIEW_GET_PRIVATE(view);
+    priv->model = FONT_MODEL(font_model_new (priv->model->file));
     _font_view_pre_render (view);
     font_view_redraw (view);
 }
