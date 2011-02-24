@@ -92,8 +92,6 @@ static void font_view_class_init (FontViewClass *klass) {
 
 static void font_view_init (FontView *view) {
     FontViewPrivate *priv;
-    cairo_t *cr;
-    cairo_surface_t *buffer;
     gint i;
 
     priv = FONT_VIEW_GET_PRIVATE(view);
@@ -106,14 +104,6 @@ static void font_view_init (FontView *view) {
 
     /* default string to render */
     priv->text = _("How quickly daft jumping zebras vex.");
-
-    buffer = cairo_image_surface_create (CAIRO_FORMAT_ARGB32, 1, 1);
-    cr = cairo_create (buffer);
-    cairo_surface_destroy (buffer);
-    buffer = NULL;
-
-    cairo_destroy (cr);
-    cr = NULL;
 
     gtk_widget_add_events (GTK_WIDGET (view),
             GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
