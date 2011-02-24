@@ -169,14 +169,14 @@ static void render (GtkWidget *w, cairo_t *cr) {
     }
 
     /* descender height */
-    if (priv->extents[DESCENDER]) {
+    if (priv->extents[DESCENDER] && priv->descender != 0.0) {
         cairo_move_to (cr, x, y - priv->descender);
         cairo_line_to (cr, width - x, y - priv->descender);
         cairo_stroke (cr);
     }
 
     /* ascender height */
-    if (priv->extents[ASCENDER]) {
+    if (priv->extents[ASCENDER] && priv->ascender != 0.0) {
         cairo_move_to (cr, x, y - priv->ascender);
         cairo_line_to (cr, width - x, y - priv->ascender);
         cairo_stroke (cr);
