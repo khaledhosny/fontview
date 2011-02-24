@@ -134,18 +134,6 @@ FontModel *font_view_get_model (FontView *view) {
     return priv->model;
 }
 
-void _font_view_get_extents (FontView *view) {
-    FontModel *model;
-
-    FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
-
-    model = priv->model;
-
-    priv->xheight = model->xheight / model->units_per_em * priv->size;
-    priv->ascender = model->ascender / model->units_per_em * priv->size;
-    priv->descender = model->descender / model->units_per_em * priv->size;
-}
-
 /* pre render the text */
 static void _font_view_pre_render (FontView *view) {
     gchar *str;
@@ -351,7 +339,9 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
         return;
 
     priv->size = size;
-    _font_view_get_extents (view);
+    priv->xheight = priv->model->xheight / priv->model->units_per_em * size;
+    priv->ascender = priv->model->ascender / priv->model->units_per_em * size;
+    priv->descender = priv->model->descender / priv->model->units_per_em * size;
     _font_view_pre_render (view);
 
     font_view_redraw (view);
