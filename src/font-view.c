@@ -75,8 +75,6 @@ static void font_view_redraw (FontView *view);
 static gboolean font_view_expose (GtkWidget *view, GdkEventExpose *event);
 static gboolean font_view_clicked (GtkWidget *w, GdkEventButton *e);
 
-static void _font_view_pre_render (FontView *view);
-
 static void font_view_class_init (FontViewClass *klass) {
     GObjectClass *object_class;
     GtkWidgetClass *widget_class;
@@ -120,10 +118,10 @@ GtkWidget *font_view_new_with_model (gchar *font) {
 
     priv->model = FONT_MODEL(font_model_new (font));
 
-    if (priv->model->sample)
+    if (priv->model->sample) {
         priv->text = g_strdup (priv->model->sample);
-
-    _font_view_pre_render (view);
+        priv->extents[TEXT] = TRUE;
+    }
 
     return GTK_WIDGET(view);
 }
@@ -133,21 +131,6 @@ FontModel *font_view_get_model (FontView *view) {
     priv = FONT_VIEW_GET_PRIVATE(view);
     return priv->model;
 }
-
-/* pre render the text */
-static void _font_view_pre_render (FontView *view) {
-    gchar *str;
-
-    FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE(view);
-
-    if ((strlen (priv->text) < 1)) {
-        priv->extents[TEXT] = FALSE;
-        return;
-    } else {
-        priv->extents[TEXT] = TRUE;
-    }
-}
-
 
 static void render (GtkWidget *w, cairo_t *cr) {
     GtkStyle *style;
@@ -342,7 +325,7 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
     priv->xheight = priv->model->xheight / priv->model->units_per_em * size;
     priv->ascender = priv->model->ascender / priv->model->units_per_em * size;
     priv->descender = priv->model->descender / priv->model->units_per_em * size;
-    _font_view_pre_render (view);
+    priv->extents[TEXT] = TRUE;
 
     font_view_redraw (view);
 
@@ -366,7 +349,7 @@ void font_view_set_text (FontView *view, gchar *text) {
     priv->text = NULL;
 
     priv->text = g_strdup(text);
-    _font_view_pre_render (view);
+    priv->extents[TEXT] = TRUE;
 
     font_view_redraw (view);
 }
@@ -376,7 +359,7 @@ void font_view_rerender (FontView *view) {
 
     priv = FONT_VIEW_GET_PRIVATE(view);
     priv->model = FONT_MODEL(font_model_new (priv->model->file));
-    _font_view_pre_render (view);
+    priv->extents[TEXT] = TRUE;
     font_view_redraw (view);
 }
 
