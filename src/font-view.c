@@ -226,7 +226,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         for (i = 0; i < num_glyphs; i++) {
             glyphs[i].index = hb_glyph->codepoint;
             glyphs[i].x = xx + (hb_position->x_offset/64);
-            glyphs[i].y = y - (hb_position->y_offset/64);
+            glyphs[i].y = y -  (hb_position->y_offset/64);
             xx += (hb_position->x_advance/64);
             hb_glyph++;
             hb_position++;
