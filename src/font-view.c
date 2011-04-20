@@ -216,11 +216,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
         hb_glyph_info_t *hb_glyph = hb_buffer_get_glyph_infos (hb_buffer, NULL);
         hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer, NULL);
 
-        hb_buffer_destroy (hb_buffer);
-        hb_font_destroy (hb_font);
-        hb_face_destroy (hb_face);
-        cairo_ft_scaled_font_unlock_face (cr_scaled_font);
-
         cairo_glyph_t glyphs[num_glyphs];
         xx = x;
         for (i = 0; i < num_glyphs; i++) {
@@ -237,6 +232,11 @@ static void render (GtkWidget *w, cairo_t *cr) {
                 glyphs[i].x += width-x-xx;
             }
         }
+
+        hb_buffer_destroy (hb_buffer);
+        hb_font_destroy (hb_font);
+        hb_face_destroy (hb_face);
+        cairo_ft_scaled_font_unlock_face (cr_scaled_font);
 
         gdk_cairo_set_source_color (cr, style->fg);
         cairo_show_glyphs (cr, glyphs, num_glyphs);
