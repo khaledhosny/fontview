@@ -206,15 +206,15 @@ static void render (GtkWidget *w, cairo_t *cr) {
         hb_buffer_t *hb_buffer = hb_buffer_create (length);
 
         hb_buffer_set_unicode_funcs (hb_buffer, hb_glib_get_unicode_funcs ());
-        hb_buffer_set_direction (hb_buffer, rtl ? HB_DIRECTION_RTL: HB_DIRECTION_LTR);
-        hb_buffer_set_script (hb_buffer, HB_SCRIPT_INVALID);
-        hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
+        //hb_buffer_set_direction (hb_buffer, rtl ? HB_DIRECTION_RTL: HB_DIRECTION_LTR);
+        //hb_buffer_set_script (hb_buffer, hb_script_from_string ("arab"));
+        //hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
         hb_buffer_add_utf8 (hb_buffer, priv->text, length, 0, length);
         hb_shape (hb_font, hb_face, hb_buffer, NULL, 0);
 
         int num_glyphs = hb_buffer_get_length (hb_buffer);
-        hb_glyph_info_t *hb_glyph = hb_buffer_get_glyph_infos (hb_buffer);
-        hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer);
+        hb_glyph_info_t *hb_glyph = hb_buffer_get_glyph_infos (hb_buffer, NULL);
+        hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer, NULL);
 
         hb_buffer_destroy (hb_buffer);
         hb_font_destroy (hb_font);
