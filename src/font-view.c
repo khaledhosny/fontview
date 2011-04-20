@@ -201,7 +201,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         FT_Face ft_face = cairo_ft_scaled_font_lock_face (cr_scaled_font);
 
         int length = strlen(priv->text);
-        hb_face_t *hb_face = hb_ft_face_create (ft_face, NULL);
+        hb_face_t *hb_face = hb_ft_face_create_cached (ft_face);
         hb_font_t *hb_font = hb_ft_font_create (ft_face, NULL);
         hb_buffer_t *hb_buffer = hb_buffer_create (length);
 
