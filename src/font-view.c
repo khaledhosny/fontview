@@ -34,7 +34,6 @@
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <hb-ft.h>
-#include <hb-glib.h>
 #include "font-view.h"
 
 G_DEFINE_TYPE (FontView, font_view, GTK_TYPE_DRAWING_AREA);
@@ -200,17 +199,15 @@ static void render (GtkWidget *w, cairo_t *cr) {
         cairo_scaled_font_t *cr_scaled_font = cairo_get_scaled_font (cr);
         FT_Face ft_face = cairo_ft_scaled_font_lock_face (cr_scaled_font);
 
-        int length = strlen(priv->text);
-        hb_face_t *hb_face = hb_ft_face_create_cached (ft_face);
         hb_font_t *hb_font = hb_ft_font_create (ft_face, NULL);
-        hb_buffer_t *hb_buffer = hb_buffer_create (length);
+        hb_buffer_t *hb_buffer = hb_buffer_create (0);
 
-        hb_buffer_set_unicode_funcs (hb_buffer, hb_glib_get_unicode_funcs ());
         //hb_buffer_set_direction (hb_buffer, rtl ? HB_DIRECTION_RTL: HB_DIRECTION_LTR);
         //hb_buffer_set_script (hb_buffer, hb_script_from_string ("arab"));
         //hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
+        int length = strlen(priv->text);
         hb_buffer_add_utf8 (hb_buffer, priv->text, length, 0, length);
-        hb_shape (hb_font, hb_face, hb_buffer, NULL, 0);
+        hb_shape (hb_font, hb_buffer, NULL, 0);
 
         int num_glyphs = hb_buffer_get_length (hb_buffer);
         hb_glyph_info_t *hb_glyph = hb_buffer_get_glyph_infos (hb_buffer, NULL);
@@ -235,7 +232,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
         hb_buffer_destroy (hb_buffer);
         hb_font_destroy (hb_font);
-        hb_face_destroy (hb_face);
         cairo_ft_scaled_font_unlock_face (cr_scaled_font);
 
         gdk_cairo_set_source_color (cr, style->fg);
