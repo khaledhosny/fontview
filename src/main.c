@@ -127,8 +127,10 @@ void render_size_changed (GtkSpinButton *w, gpointer data) {
 }
 
 void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data) {
-    if (event == G_FILE_MONITOR_EVENT_CHANGED)
+    if (event == G_FILE_MONITOR_EVENT_CHANGED) {
+        sleep(2);
         font_view_rerender (FONT_VIEW(font));
+    }
 }
 
 void print_usage ()
