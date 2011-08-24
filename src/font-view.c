@@ -200,7 +200,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         FT_Face ft_face = cairo_ft_scaled_font_lock_face (cr_scaled_font);
 
         hb_font_t *hb_font = hb_ft_font_create (ft_face, NULL);
-        hb_buffer_t *hb_buffer = hb_buffer_create (0);
+        hb_buffer_t *hb_buffer = hb_buffer_create ();
 
         //hb_buffer_set_direction (hb_buffer, rtl ? HB_DIRECTION_RTL: HB_DIRECTION_LTR);
         //hb_buffer_set_script (hb_buffer, hb_script_from_string ("arab"));
