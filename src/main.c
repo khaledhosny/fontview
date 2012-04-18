@@ -120,10 +120,19 @@ void render_text_changed (GtkEntry *w, gpointer data) {
     g_free (text);
 }
 
-void render_size_changed (GtkSpinButton *w, gpointer data) {
+void render_size_changed (GtkSpinButton *w, gpointer titlelabel) {
     gint size = gtk_spin_button_get_value_as_int (w);
 
     font_view_set_pt_size (FONT_VIEW(font), size);
+
+    FontModel *model = font_view_get_model (FONT_VIEW (font));
+    gchar *title = g_strdup_printf ("%s %s - %.0fpt",
+		             model->family,
+			     model->style,
+			     font_view_get_pt_size (FONT_VIEW (font)));
+    gtk_label_set_text (GTK_LABEL (titlelabel), title);
+    g_free (title);
+
 }
 
 void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data) {
@@ -138,9 +147,8 @@ void print_usage ()
 }
 
 int main (int argc, char *argv[]) {
-    GtkWidget *w, *entry, *sizew, *container;
+    GtkWidget *w, *entry, *sizew, *container, *titlelabel;
     gchar *str;
-    gint size;
     GError* error = NULL;
     GFile *file;
     GFileMonitor *monitor;
@@ -181,11 +189,11 @@ int main (int argc, char *argv[]) {
     w = GET_GBOPJECT (mainwindow, "info_button");
     g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
 
-    sizew = GET_GBOPJECT (mainwindow, "size_spin");
-    g_signal_connect (sizew, "value-changed", G_CALLBACK(render_size_changed), NULL);
+    titlelabel = GET_GBOPJECT (mainwindow, "titlelabel");
 
-    size = gtk_spin_button_get_value_as_int (GTK_SPIN_BUTTON (sizew));
-    font_view_set_pt_size (FONT_VIEW (font), size);
+    sizew = GET_GBOPJECT (mainwindow, "size_spin");
+    g_signal_connect (sizew, "value-changed", G_CALLBACK(render_size_changed), titlelabel);
+    g_signal_emit_by_name (sizew, "value-changed");
 
     file = g_file_new_for_path(argv[1]);
     monitor = g_file_monitor_file (file, 0, NULL, NULL);

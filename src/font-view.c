@@ -137,8 +137,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
     gint width, height;
     gdouble y, x, xx;
     FontViewPrivate *priv;
-    gchar *title;
-    gint p_height, i, rtl;
+    gint i, rtl;
     GdkRGBA fg, bg;
 
     priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
@@ -242,25 +241,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
         gdk_cairo_set_source_rgba (cr, &fg);
         cairo_show_glyphs (cr, glyphs, num_glyphs);
     }
-
-
-    /* draw header bar */
-    title = g_strdup_printf ("%s %s - %.0fpt",
-            priv->model->family,
-            priv->model->style,
-            priv->size);
-    PangoLayout *layout = gtk_widget_create_pango_layout (w, title);
-    g_free (title);
-
-    pango_layout_get_pixel_size (layout, NULL, &p_height);
-    cairo_rectangle (cr, 0, 0, width, p_height + 1);
-    gdk_cairo_set_source_rgba (cr, &bg);
-    cairo_fill (cr);
-
-    gdk_cairo_set_source_rgba (cr, &fg);
-    cairo_move_to (cr, 5, 1);
-    pango_cairo_show_layout (cr, layout);
-
 }
 
 
@@ -329,7 +309,13 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
     priv->extents[TEXT] = TRUE;
 
     font_view_redraw (view);
+}
 
+gdouble font_view_get_pt_size (FontView *view) {
+    FontViewPrivate *priv;
+
+    priv = FONT_VIEW_GET_PRIVATE (view);
+    return priv->size;
 }
 
 gchar *font_view_get_text (FontView *view) {

@@ -66,6 +66,7 @@ GtkWidget *font_view_new_with_model (gchar *font);
 
 FontModel *font_view_get_model (FontView *view);
 
+gdouble font_view_get_pt_size (FontView *view);
 void font_view_set_pt_size (FontView *view, gdouble size);
 
 gchar *font_view_get_text (FontView *view);
