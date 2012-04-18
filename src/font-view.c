@@ -263,8 +263,11 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
 static gboolean font_view_expose (GtkWidget *w, GdkEventExpose *event) {
     cairo_t *cr;
+    GdkWindow *window;
 
-    cr = gdk_cairo_create (w->window);
+    window = gtk_widget_get_window (w);
+
+    cr = gdk_cairo_create (window);
     cairo_rectangle (cr,
             event->area.x,
             event->area.y,
@@ -298,15 +301,17 @@ static gboolean font_view_clicked (GtkWidget *w, GdkEventButton *e) {
 static void font_view_redraw (FontView *view) {
     GtkWidget *widget;
     GdkRegion *region;
+    GdkWindow *window;
 
     widget = GTK_WIDGET (view);
+    window = gtk_widget_get_window (widget);
 
-    if (!widget->window)
+    if (!window)
         return;
 
-    region = gdk_drawable_get_clip_region (widget->window);
-    gdk_window_invalidate_region (widget->window, region, TRUE);
-    gdk_window_process_updates (widget->window, TRUE);
+    region = gdk_drawable_get_clip_region (window);
+    gdk_window_invalidate_region (window, region, TRUE);
+    gdk_window_process_updates (window, TRUE);
 
     gdk_region_destroy (region);
 }
