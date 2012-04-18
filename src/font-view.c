@@ -242,17 +242,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
 
 static gboolean font_view_draw (GtkWidget *w, cairo_t *cr) {
-    GdkWindow *window;
-    GtkAllocation allocation;
-
-    window = gtk_widget_get_window (w);
-
-    cr = gdk_cairo_create (window);
-    cairo_rectangle (cr, 0, 0,
-            allocation.width,
-            allocation.height);
-    cairo_clip (cr);
-
     render (w, cr);
 
     return FALSE;
