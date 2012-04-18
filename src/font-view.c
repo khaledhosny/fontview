@@ -71,7 +71,7 @@ struct _FontViewPrivate {
 
 static void font_view_redraw (FontView *view);
 
-static gboolean font_view_expose (GtkWidget *view, GdkEventExpose *event);
+static gboolean font_view_draw (GtkWidget *view, cairo_t *cr);
 static gboolean font_view_clicked (GtkWidget *w, GdkEventButton *e);
 
 static void font_view_class_init (FontViewClass *klass) {
@@ -81,7 +81,7 @@ static void font_view_class_init (FontViewClass *klass) {
     object_class = G_OBJECT_CLASS (klass);
 
     widget_class = GTK_WIDGET_CLASS (klass);
-    widget_class->expose_event = font_view_expose;
+    widget_class->draw = font_view_draw;
     widget_class->button_release_event = font_view_clicked;
 
     g_type_class_add_private (object_class, sizeof (FontViewPrivate));
@@ -261,24 +261,19 @@ static void render (GtkWidget *w, cairo_t *cr) {
 }
 
 
-static gboolean font_view_expose (GtkWidget *w, GdkEventExpose *event) {
-    cairo_t *cr;
+static gboolean font_view_draw (GtkWidget *w, cairo_t *cr) {
     GdkWindow *window;
+    GtkAllocation allocation;
 
     window = gtk_widget_get_window (w);
 
     cr = gdk_cairo_create (window);
-    cairo_rectangle (cr,
-            event->area.x,
-            event->area.y,
-            event->area.width,
-            event->area.height);
+    cairo_rectangle (cr, 0, 0,
+            allocation.width,
+            allocation.height);
     cairo_clip (cr);
 
     render (w, cr);
-
-    cairo_destroy (cr);
-    cr = NULL;
 
     return FALSE;
 }
