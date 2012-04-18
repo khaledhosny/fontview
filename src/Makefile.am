@@ -1,8 +1,8 @@
 INCLUDES = -I$(top_srcdir) -I$(includedir) \
 	   -DLOCALEDIR=\""$(datadir)/locale"\"
 
-fontview_LDADD = @FONTVIEW_LIBS@ @GTK_LIBS@
-fontview_CFLAGS = @FONTVIEW_CFLAGS@ @GTK_CFLAGS@ \
+fontview_LDADD = @FONTVIEW_LIBS@
+fontview_CFLAGS = @FONTVIEW_CFLAGS@ \
 		  -DPACKAGE_DATA_DIR=\""$(datadir)/fontview"\"
 
 bin_PROGRAMS = fontview
