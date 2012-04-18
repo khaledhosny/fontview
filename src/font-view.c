@@ -133,7 +133,7 @@ FontModel *font_view_get_model (FontView *view) {
 
 static void render (GtkWidget *w, cairo_t *cr) {
     GtkStyleContext *style;
-    GtkAllocation *allocation;
+    GtkAllocation allocation;
     gint width, height;
     gdouble y, x, xx;
     FontViewPrivate *priv;
@@ -143,9 +143,9 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 
-    gtk_widget_get_allocation (w, allocation);
-    width = allocation->width;
-    height = allocation->height;
+    gtk_widget_get_allocation (w, &allocation);
+    width = allocation.width;
+    height = allocation.height;
 
     style = gtk_widget_get_style_context (GTK_WIDGET (w));
     gtk_style_context_get_color (style, GTK_STATE_FLAG_NORMAL, fg);
