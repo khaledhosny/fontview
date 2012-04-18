@@ -132,13 +132,14 @@ FontModel *font_view_get_model (FontView *view) {
 }
 
 static void render (GtkWidget *w, cairo_t *cr) {
-    GtkStyle *style;
+    GtkStyleContext *style;
     GtkAllocation *allocation;
     gint width, height;
     gdouble y, x, xx;
     FontViewPrivate *priv;
     gchar *title;
     gint p_height, i, rtl;
+    GdkRGBA *fg, *bg;
 
     priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 
@@ -146,7 +147,9 @@ static void render (GtkWidget *w, cairo_t *cr) {
     width = allocation->width;
     height = allocation->height;
 
-    style = gtk_rc_get_style (GTK_WIDGET (w));
+    style = gtk_widget_get_style_context (GTK_WIDGET (w));
+    gtk_style_context_get_color (style, GTK_STATE_FLAG_NORMAL, fg);
+    gtk_style_context_get_background_color (style, GTK_STATE_FLAG_NORMAL, bg);
 
     cairo_rectangle (cr, 0, 0, width, height);
     cairo_set_source_rgb (cr, 1, 1, 1);
@@ -236,7 +239,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         hb_font_destroy (hb_font);
         cairo_ft_scaled_font_unlock_face (cr_scaled_font);
 
-        gdk_cairo_set_source_color (cr, style->fg);
+        gdk_cairo_set_source_rgba (cr, fg);
         cairo_show_glyphs (cr, glyphs, num_glyphs);
     }
 
@@ -251,10 +254,10 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     pango_layout_get_pixel_size (layout, NULL, &p_height);
     cairo_rectangle (cr, 0, 0, width, p_height + 1);
-    gdk_cairo_set_source_color (cr, style->bg);
+    gdk_cairo_set_source_rgba (cr, bg);
     cairo_fill (cr);
 
-    gdk_cairo_set_source_color (cr, style->fg);
+    gdk_cairo_set_source_rgba (cr, fg);
     cairo_move_to (cr, 5, 1);
     pango_cairo_show_layout (cr, layout);
 
