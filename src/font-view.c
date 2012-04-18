@@ -300,8 +300,8 @@ static gboolean font_view_clicked (GtkWidget *w, GdkEventButton *e) {
 
 static void font_view_redraw (FontView *view) {
     GtkWidget *widget;
-    GdkRegion *region;
     GdkWindow *window;
+    cairo_region_t *region;
 
     widget = GTK_WIDGET (view);
     window = gtk_widget_get_window (widget);
@@ -309,11 +309,11 @@ static void font_view_redraw (FontView *view) {
     if (!window)
         return;
 
-    region = gdk_drawable_get_clip_region (window);
+    region = gdk_window_get_clip_region (window);
     gdk_window_invalidate_region (window, region, TRUE);
     gdk_window_process_updates (window, TRUE);
 
-    gdk_region_destroy (region);
+    cairo_region_destroy (region);
 }
 
 void font_view_set_pt_size (FontView *view, gdouble size) {
