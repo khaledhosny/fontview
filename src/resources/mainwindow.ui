@@ -29,7 +29,7 @@
             <property name="margin_left">5</property>
             <property name="margin_top">1</property>
             <property name="margin_bottom">1</property>
-            <property name="label" translatable="yes">label</property>
+            <property name="label">label</property>
             <property name="single_line_mode">True</property>
           </object>
           <packing>
