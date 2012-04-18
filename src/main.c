@@ -74,12 +74,7 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
     GError* error = NULL;
 
     infowindow = gtk_builder_new ();
-    gtk_builder_add_from_resource (infowindow, "/org/serif/fontview/infowindow.ui", &error);
-    if (error) {
-        g_warning ("Couldn't load builder file: %s", error->message);
-        g_error_free (error);
-    }
-
+    gtk_builder_add_from_resource (infowindow, "/org/serif/fontview/infowindow.ui", NULL);
     gtk_builder_connect_signals (infowindow, NULL);
 
     window = GET_GBOPJECT (infowindow, "infowindow");
@@ -162,12 +157,7 @@ int main (int argc, char *argv[]) {
     }
 
     mainwindow = gtk_builder_new ();
-    gtk_builder_add_from_resource (mainwindow, "/org/serif/fontview/mainwindow.ui", &error);
-    if (error) {
-        g_warning ("Couldn't load builder file: %s", error->message);
-        g_error_free (error);
-    }
-
+    gtk_builder_add_from_resource (mainwindow, "/org/serif/fontview/mainwindow.ui", NULL);
     gtk_builder_connect_signals (mainwindow, NULL);
 
     font = font_view_new_with_model (argv[1]);
