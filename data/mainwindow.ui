@@ -85,6 +85,7 @@
                 <property name="visible">True</property>
                 <property name="can_focus">True</property>
                 <property name="has_focus">True</property>
+                <property name="text" translatable="yes">How quickly daft jumping zebras vex.</property>
               </object>
               <packing>
                 <property name="expand">True</property>

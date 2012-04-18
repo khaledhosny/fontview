@@ -99,9 +99,6 @@ static void font_view_init (FontView *view) {
     priv->extents[TEXT] = TRUE;
     priv->size = 50;
 
-    /* default string to render */
-    priv->text = _("How quickly daft jumping zebras vex.");
-
     gtk_widget_add_events (GTK_WIDGET (view),
             GDK_BUTTON_PRESS_MASK | GDK_BUTTON_RELEASE_MASK);
 }

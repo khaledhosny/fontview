@@ -148,7 +148,6 @@ void print_usage ()
 
 int main (int argc, char *argv[]) {
     GtkWidget *w, *entry, *sizew, *container, *titlelabel;
-    gchar *str;
     GError* error = NULL;
     GFile *file;
     GFileMonitor *monitor;
@@ -181,10 +180,8 @@ int main (int argc, char *argv[]) {
     gtk_widget_show (container);
 
     entry = GET_GBOPJECT (mainwindow, "render_str");
-    str = font_view_get_text(FONT_VIEW(font));
-    gtk_entry_set_text (GTK_ENTRY(entry), str);
-    g_free (str);
     g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
+    g_signal_emit_by_name (entry, "changed");
 
     w = GET_GBOPJECT (mainwindow, "info_button");
     g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
