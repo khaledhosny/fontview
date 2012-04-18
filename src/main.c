@@ -66,12 +66,10 @@ void font_view_about (GtkWidget *w, gpointer data) {
 }
 
 void font_view_info_window (GtkWidget *w, gpointer data) {
-    GtkWidget *window, *close, *about;
+    GtkWidget *window, *about;
     GtkWidget *name, *style, *version, *copyright, *desc, *file;
     GtkBuilder *infowindow;
     FontModel *model;
-    gint result;
-    GError* error = NULL;
 
     infowindow = gtk_builder_new ();
     gtk_builder_add_from_resource (infowindow, "/org/serif/fontview/infowindow.ui", NULL);
@@ -98,10 +96,7 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
     gtk_label_set_text (GTK_LABEL(desc), model->description);
     gtk_label_set_text (GTK_LABEL(file), model->file);
 
-    result = gtk_dialog_run (GTK_DIALOG (window));
-
     gtk_widget_destroy (window);
-
 }
 
 
@@ -141,7 +136,6 @@ void print_usage ()
 
 int main (int argc, char *argv[]) {
     GtkWidget *w, *entry, *sizew, *container, *titlelabel;
-    GError* error = NULL;
     GFile *file;
     GFileMonitor *monitor;
 
