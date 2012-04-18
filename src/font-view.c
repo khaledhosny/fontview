@@ -33,6 +33,7 @@
 #include <math.h>
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <cairo/cairo-ft.h>
 #include <hb-ft.h>
 #include "font-view.h"
 
