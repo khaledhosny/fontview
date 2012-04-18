@@ -344,7 +344,7 @@ void font_view_set_text (FontView *view, gchar *text) {
 
     priv = FONT_VIEW_GET_PRIVATE (view);
 
-    if (g_strcasecmp (priv->text, text) == 0)
+    if (g_strcmp0 (priv->text, text) == 0)
         return;
 
     priv->text = NULL;
