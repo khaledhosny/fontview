@@ -38,8 +38,6 @@
 #include "font-model.h"
 #include "font-view.h"
 
-#define MAIN_UI_FILE PACKAGE_DATA_DIR"/mainwindow.ui"
-#define INFO_UI_FILE PACKAGE_DATA_DIR"/infowindow.ui"
 #define GET_GBOPJECT(A,B) GTK_WIDGET(gtk_builder_get_object(A,B));
 
 GtkBuilder *mainwindow;
@@ -76,7 +74,7 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
     GError* error = NULL;
 
     infowindow = gtk_builder_new ();
-    gtk_builder_add_from_file (infowindow, INFO_UI_FILE, &error);
+    gtk_builder_add_from_resource (infowindow, "/org/serif/fontview/infowindow.ui", &error);
     if (error) {
         g_warning ("Couldn't load builder file: %s", error->message);
         g_error_free (error);
@@ -164,7 +162,7 @@ int main (int argc, char *argv[]) {
     }
 
     mainwindow = gtk_builder_new ();
-    gtk_builder_add_from_file (mainwindow, MAIN_UI_FILE, &error);
+    gtk_builder_add_from_resource (mainwindow, "/org/serif/fontview/mainwindow.ui", &error);
     if (error) {
         g_warning ("Couldn't load builder file: %s", error->message);
         g_error_free (error);

@@ -1,1 +1,1 @@
-dist_pkgdata_DATA = mainwindow.ui infowindow.ui
+dist_pkgdata_DATA =
