@@ -1,0 +1,9 @@
+[Desktop Entry]
+_Name=Font View
+_Comment=A font viewing utility
+Icon=font
+Exec=fontview %f
+StartupNotify=true
+Terminal=false
+Type=Application
+MimeType=application/x-font;application/x-font-bdf;application/x-font-ttf;application/x-font-truetype;application/x-truetype-font;application/font-tdpfr;application/x-font-bdf
