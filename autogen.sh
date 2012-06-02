@@ -16,5 +16,5 @@ run ()
 run aclocal
 run autoheader
 run automake --add-missing --gnu
-run intltoolize
+run intltoolize --force
 run autoconf
