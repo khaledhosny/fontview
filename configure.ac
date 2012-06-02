@@ -1,10 +1,11 @@
-AC_PREREQ(2.53)
-AC_INIT(src/main.c)
+AC_PREREQ([2.68])
+AC_INIT
+AC_CONFIG_SRCDIR([src/main.c])
 PACKAGE=fontview
 VERSION=0.10
 AM_INIT_AUTOMAKE($PACKAGE, $VERSION)
 AM_SILENT_RULES([yes])
-AM_CONFIG_HEADER(config.h)
+AC_CONFIG_HEADERS([config.h])
 
 CFLAGS=
 
@@ -16,7 +17,7 @@ AC_PROG_RANLIB
 
 AM_PROG_CC_C_O
 
-AC_LANG_C
+AC_LANG([C])
 
 
 AC_SUBST(CFLAGS)
@@ -28,9 +29,9 @@ AC_SUBST(GETTEXT_PACKAGE)
 IT_PROG_INTLTOOL(0.41)
 AM_GLIB_GNU_GETTEXT
 
-AC_OUTPUT(
-	  Makefile
+AC_CONFIG_FILES([Makefile
 	  src/Makefile
 	  data/Makefile
 	  po/Makefile.in
-	  )
+	  ])
+AC_OUTPUT
