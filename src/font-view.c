@@ -222,6 +222,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
             glyphs[i].x = xx + (hb_position->x_offset/64);
             glyphs[i].y = y -  (hb_position->y_offset/64);
             xx += (hb_position->x_advance/64);
+            y  -= (hb_position->y_advance/64);
         }
 
         if (rtl) {
