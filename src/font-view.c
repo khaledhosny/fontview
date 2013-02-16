@@ -209,6 +209,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         //hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
         int length = strlen(priv->text);
         hb_buffer_add_utf8 (hb_buffer, priv->text, length, 0, length);
+        hb_buffer_guess_segment_properties (hb_buffer);
         hb_shape (hb_font, hb_buffer, NULL, 0);
 
         int num_glyphs = hb_buffer_get_length (hb_buffer);
