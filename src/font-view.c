@@ -189,6 +189,11 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
+        PangoDirection base_dir = pango_find_base_dir (priv->text, -1);
+        /* just for pango_itemize (), we don't really use them */
+        PangoContext *context = gtk_widget_get_pango_context (w);
+        PangoAttrList *attr_list = pango_attr_list_new ();
+
         cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
         cairo_set_font_face (cr, cr_face);
         cairo_set_font_size (cr, priv->size);
@@ -201,20 +206,28 @@ static void render (GtkWidget *w, cairo_t *cr) {
         int total_num_glyphs = 0;
         cairo_glyph_t *glyphs = NULL;
 
-        PangoScriptIter *iter = pango_script_iter_new (priv->text, -1);
-        do {
-            const char *start, *end;
-            PangoScript script;
-            pango_script_iter_get_range (iter, &start, &end, &script);
+        GList *items = pango_itemize_with_base_dir (context, base_dir,
+                                                    priv->text, 0, strlen (priv->text),
+                                                    attr_list, NULL);
+
+        /* reorder the items in the visual order */
+        items = pango_reorder_items (items);
+
+        for (GList *l = items; l; l = l->next) {
+            PangoItem *item = l->data;
+            PangoAnalysis analysis = item->analysis;
+
+            hb_script_t script = hb_glib_script_to_script (analysis.script);
+            hb_language_t lang = hb_language_from_string (pango_language_to_string (analysis.language), -1);
+            hb_direction_t dir = HB_DIRECTION_LTR;
+            if (analysis.level % 2)
+                dir = HB_DIRECTION_RTL;
 
             hb_buffer_t *hb_buffer = hb_buffer_create ();
-
-            hb_buffer_add_utf8 (hb_buffer, priv->text, -1, start - priv->text, end - start);
-            hb_buffer_guess_segment_properties (hb_buffer);
-
-            //hb_buffer_set_direction (hb_buffer, rtl ? HB_DIRECTION_RTL: HB_DIRECTION_LTR);
-            hb_buffer_set_script (hb_buffer, hb_glib_script_to_script (script));
-            //hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
+            hb_buffer_add_utf8 (hb_buffer, priv->text, -1, item->offset, item->length);
+            hb_buffer_set_script (hb_buffer, script);
+            hb_buffer_set_language (hb_buffer, lang);
+            hb_buffer_set_direction (hb_buffer, dir);
 
             hb_shape (hb_font, hb_buffer, NULL, 0);
 
@@ -223,6 +236,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
             hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer, NULL);
 
             glyphs = realloc (glyphs, (total_num_glyphs + num_glyphs) * sizeof (cairo_glyph_t));
+
             for (int i = total_num_glyphs; i < (total_num_glyphs + num_glyphs); i++, hb_glyph++, hb_position++) {
                 glyphs[i].index = hb_glyph->codepoint;
                 glyphs[i].x = x + (hb_position->x_offset/64);
@@ -230,19 +244,22 @@ static void render (GtkWidget *w, cairo_t *cr) {
                 x += (hb_position->x_advance/64);
                 y -= (hb_position->y_advance/64);
             }
+
             total_num_glyphs += num_glyphs;
 
             hb_buffer_destroy (hb_buffer);
-        } while (pango_script_iter_next (iter));
+        }
 
-        pango_script_iter_free (iter);
+        g_list_foreach (items, (GFunc) pango_item_free, NULL);
+        g_list_free (items);
+
         hb_font_destroy (hb_font);
         cairo_ft_scaled_font_unlock_face (cr_scaled_font);
 
         gdk_cairo_set_source_rgba (cr, &fg);
 
         /* right align if base direction is right to left */
-        if (ISRTL (pango_find_base_dir (priv->text, -1))) {
+        if (ISRTL (base_dir)) {
             for (int i = 0; i < total_num_glyphs; i++) {
                 glyphs[i].x += width - x - indent;
             }
