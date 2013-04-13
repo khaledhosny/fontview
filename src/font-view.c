@@ -35,6 +35,7 @@
 #include <glib/gi18n.h>
 #include <cairo/cairo-ft.h>
 #include <hb-ft.h>
+#include <hb-glib.h>
 #include "font-view.h"
 
 G_DEFINE_TYPE (FontView, font_view, GTK_TYPE_DRAWING_AREA);
@@ -154,8 +155,9 @@ static void render (GtkWidget *w, cairo_t *cr) {
     cairo_set_source_rgba (cr, 0.8, 0.8, 0.8, 1);
 
     /* position text in the center */
+    gdouble indent = floor (width /2 * 0.1);
     gdouble y = height/2+20;
-    gdouble x = floor (width /2 * 0.1);
+    gdouble x = indent;
 
     /* baseline */
     if (priv->extents[BASELINE]) {
@@ -187,8 +189,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
-        gboolean rtl = ISRTL(pango_find_base_dir (priv->text, -1));
-
         cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
         cairo_set_font_face (cr, cr_face);
         cairo_set_font_size (cr, priv->size);
@@ -197,42 +197,58 @@ static void render (GtkWidget *w, cairo_t *cr) {
         FT_Face ft_face = cairo_ft_scaled_font_lock_face (cr_scaled_font);
 
         hb_font_t *hb_font = hb_ft_font_create (ft_face, NULL);
-        hb_buffer_t *hb_buffer = hb_buffer_create ();
 
-        //hb_buffer_set_direction (hb_buffer, rtl ? HB_DIRECTION_RTL: HB_DIRECTION_LTR);
-        //hb_buffer_set_script (hb_buffer, hb_script_from_string ("arab"));
-        //hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
-        int length = strlen(priv->text);
-        hb_buffer_add_utf8 (hb_buffer, priv->text, length, 0, length);
-        hb_buffer_guess_segment_properties (hb_buffer);
-        hb_shape (hb_font, hb_buffer, NULL, 0);
+        int total_num_glyphs = 0;
+        cairo_glyph_t *glyphs = NULL;
 
-        int num_glyphs = hb_buffer_get_length (hb_buffer);
-        hb_glyph_info_t *hb_glyph = hb_buffer_get_glyph_infos (hb_buffer, NULL);
-        hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer, NULL);
+        PangoScriptIter *iter = pango_script_iter_new (priv->text, -1);
+        do {
+            const char *start, *end;
+            PangoScript script;
+            pango_script_iter_get_range (iter, &start, &end, &script);
 
-        cairo_glyph_t glyphs[num_glyphs];
-        gdouble xx = x;
-        for (int i = 0; i < num_glyphs; i++, hb_glyph++, hb_position++) {
-            glyphs[i].index = hb_glyph->codepoint;
-            glyphs[i].x = xx + (hb_position->x_offset/64);
-            glyphs[i].y = y -  (hb_position->y_offset/64);
-            xx += (hb_position->x_advance/64);
-            y  -= (hb_position->y_advance/64);
-        }
+            hb_buffer_t *hb_buffer = hb_buffer_create ();
 
-        if (rtl) {
-            for (int i = 0; i < num_glyphs; i++) {
-                glyphs[i].x += width - x - xx;
+            hb_buffer_add_utf8 (hb_buffer, priv->text, -1, start - priv->text, end - start);
+            hb_buffer_guess_segment_properties (hb_buffer);
+
+            //hb_buffer_set_direction (hb_buffer, rtl ? HB_DIRECTION_RTL: HB_DIRECTION_LTR);
+            hb_buffer_set_script (hb_buffer, hb_glib_script_to_script (script));
+            //hb_buffer_set_language (hb_buffer, hb_language_from_string ("ar"));
+
+            hb_shape (hb_font, hb_buffer, NULL, 0);
+
+            int num_glyphs = hb_buffer_get_length (hb_buffer);
+            hb_glyph_info_t *hb_glyph = hb_buffer_get_glyph_infos (hb_buffer, NULL);
+            hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer, NULL);
+
+            glyphs = realloc (glyphs, (total_num_glyphs + num_glyphs) * sizeof (cairo_glyph_t));
+            for (int i = total_num_glyphs; i < (total_num_glyphs + num_glyphs); i++, hb_glyph++, hb_position++) {
+                glyphs[i].index = hb_glyph->codepoint;
+                glyphs[i].x = x + (hb_position->x_offset/64);
+                glyphs[i].y = y - (hb_position->y_offset/64);
+                x += (hb_position->x_advance/64);
+                y -= (hb_position->y_advance/64);
             }
-        }
+            total_num_glyphs += num_glyphs;
 
-        hb_buffer_destroy (hb_buffer);
+            hb_buffer_destroy (hb_buffer);
+        } while (pango_script_iter_next (iter));
+
+        pango_script_iter_free (iter);
         hb_font_destroy (hb_font);
         cairo_ft_scaled_font_unlock_face (cr_scaled_font);
 
         gdk_cairo_set_source_rgba (cr, &fg);
-        cairo_show_glyphs (cr, glyphs, num_glyphs);
+
+        /* right align if base direction is right to left */
+        if (ISRTL (pango_find_base_dir (priv->text, -1))) {
+            for (int i = 0; i < total_num_glyphs; i++) {
+                glyphs[i].x += width - x - indent;
+            }
+        }
+
+        cairo_show_glyphs (cr, glyphs, total_num_glyphs);
     }
 }
 
