@@ -130,21 +130,16 @@ FontModel *font_view_get_model (FontView *view) {
 }
 
 static void render (GtkWidget *w, cairo_t *cr) {
-    GtkStyleContext *style;
     GtkAllocation allocation;
-    gint width, height;
-    gdouble y, x, xx;
-    FontViewPrivate *priv;
-    gint i, rtl;
     GdkRGBA fg, bg;
 
-    priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
+    FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 
     gtk_widget_get_allocation (w, &allocation);
-    width = allocation.width;
-    height = allocation.height;
+    gint width = allocation.width;
+    gint height = allocation.height;
 
-    style = gtk_widget_get_style_context (GTK_WIDGET (w));
+    GtkStyleContext *style = gtk_widget_get_style_context (GTK_WIDGET (w));
     gtk_style_context_get_color (style, GTK_STATE_FLAG_NORMAL, &fg);
     gtk_style_context_get_background_color (style, GTK_STATE_FLAG_NORMAL, &bg);
 
@@ -159,8 +154,8 @@ static void render (GtkWidget *w, cairo_t *cr) {
     cairo_set_source_rgba (cr, 0.8, 0.8, 0.8, 1);
 
     /* position text in the center */
-    y = height/2+20;
-    x = floor (width /2 * 0.1);
+    gdouble y = height/2+20;
+    gdouble x = floor (width /2 * 0.1);
 
     /* baseline */
     if (priv->extents[BASELINE]) {
@@ -192,7 +187,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
-        rtl = ISRTL(pango_find_base_dir (priv->text, -1));
+        gboolean rtl = ISRTL(pango_find_base_dir (priv->text, -1));
 
         cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
         cairo_set_font_face (cr, cr_face);
@@ -217,8 +212,8 @@ static void render (GtkWidget *w, cairo_t *cr) {
         hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer, NULL);
 
         cairo_glyph_t glyphs[num_glyphs];
-        xx = x;
-        for (i = 0; i < num_glyphs; i++, hb_glyph++, hb_position++) {
+        gdouble xx = x;
+        for (int i = 0; i < num_glyphs; i++, hb_glyph++, hb_position++) {
             glyphs[i].index = hb_glyph->codepoint;
             glyphs[i].x = xx + (hb_position->x_offset/64);
             glyphs[i].y = y -  (hb_position->y_offset/64);
@@ -227,8 +222,8 @@ static void render (GtkWidget *w, cairo_t *cr) {
         }
 
         if (rtl) {
-            for (i = 0; i < num_glyphs; i++) {
-                glyphs[i].x += width-x-xx;
+            for (int i = 0; i < num_glyphs; i++) {
+                glyphs[i].x += width - x - xx;
             }
         }
 
