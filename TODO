@@ -1,6 +1,6 @@
 - HB
-  - no hardcoded script and language
-  - switchable font features
+  - UI to set language
+  - User features
 
 - rendering
   - controlable hinting
