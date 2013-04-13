@@ -2,7 +2,7 @@ bin_PROGRAMS = fontview
 EXTRA_DIST = fontview.gresource.xml \
 	     $(UI_FILES)
 
-INCLUDES = -I$(top_srcdir) -I$(includedir) \
+AM_CPPFLAGS = -I$(top_srcdir) -I$(includedir) \
 	   -DLOCALEDIR=\""$(datadir)/locale"\"
 
 fontview_LDADD = @FONTVIEW_LIBS@
