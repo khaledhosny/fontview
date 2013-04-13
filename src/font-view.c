@@ -237,12 +237,15 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
             glyphs = realloc (glyphs, (total_num_glyphs + num_glyphs) * sizeof (cairo_glyph_t));
 
-            for (int i = total_num_glyphs; i < (total_num_glyphs + num_glyphs); i++, hb_glyph++, hb_position++) {
-                glyphs[i].index = hb_glyph->codepoint;
-                glyphs[i].x = x + (hb_position->x_offset/64);
-                glyphs[i].y = y - (hb_position->y_offset/64);
+            for (int i = 0; i < num_glyphs; i++) {
+                glyphs[total_num_glyphs + i].index = hb_glyph->codepoint;
+                glyphs[total_num_glyphs + i].x = x + (hb_position->x_offset/64);
+                glyphs[total_num_glyphs + i].y = y - (hb_position->y_offset/64);
                 x += (hb_position->x_advance/64);
                 y -= (hb_position->y_advance/64);
+
+                hb_glyph++;
+                hb_position++;
             }
 
             total_num_glyphs += num_glyphs;
