@@ -196,7 +196,8 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
         cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
         cairo_set_font_face (cr, cr_face);
-        cairo_set_font_size (cr, priv->size);
+        /* our size is in points, so we convert to cairo user units */
+        cairo_set_font_size (cr, priv->size * 96 / 72.0);
 
         cairo_scaled_font_t *cr_scaled_font = cairo_get_scaled_font (cr);
         FT_Face ft_face = cairo_ft_scaled_font_lock_face (cr_scaled_font);
