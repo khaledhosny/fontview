@@ -191,15 +191,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
     if (priv->extents[TEXT]) {
         PangoDirection base_dir = pango_find_base_dir (priv->text, -1);
 
-        /* We abuse pango itemazation to split text into script and direction
-         * runs, since we use our fonts directly no through pango, we don't
-         * bother changing the default font, but we disable font fallback as
-         * pango will split runs at font change */
-        PangoContext *context = gtk_widget_get_pango_context (w);
-        PangoAttrList *attr_list = pango_attr_list_new ();
-        PangoAttribute *fallback_attr = pango_attr_fallback_new (FALSE);
-        pango_attr_list_insert (attr_list, fallback_attr);
-
         cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
         cairo_set_font_face (cr, cr_face);
         /* our size is in points, so we convert to cairo user units */
@@ -213,6 +204,14 @@ static void render (GtkWidget *w, cairo_t *cr) {
         int total_num_glyphs = 0;
         cairo_glyph_t *glyphs = NULL;
 
+        /* We abuse pango itemazation to split text into script and direction
+         * runs, since we use our fonts directly no through pango, we don't
+         * bother changing the default font, but we disable font fallback as
+         * pango will split runs at font change */
+        PangoContext *context = gtk_widget_get_pango_context (w);
+        PangoAttrList *attr_list = pango_attr_list_new ();
+        PangoAttribute *fallback_attr = pango_attr_fallback_new (FALSE);
+        pango_attr_list_insert (attr_list, fallback_attr);
         GList *items = pango_itemize_with_base_dir (context, base_dir,
                                                     priv->text, 0, strlen (priv->text),
                                                     attr_list, NULL);
