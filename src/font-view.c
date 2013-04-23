@@ -190,9 +190,15 @@ static void render (GtkWidget *w, cairo_t *cr) {
     /* display sample text */
     if (priv->extents[TEXT]) {
         PangoDirection base_dir = pango_find_base_dir (priv->text, -1);
-        /* just for pango_itemize (), we don't really use them */
+
+        /* We abuse pango itemazation to split text into script and direction
+         * runs, since we use our fonts directly no through pango, we don't
+         * bother changing the default font, but we disable font fallback as
+         * pango will split runs at font change */
         PangoContext *context = gtk_widget_get_pango_context (w);
         PangoAttrList *attr_list = pango_attr_list_new ();
+        PangoAttribute *fallback_attr = pango_attr_fallback_new (FALSE);
+        pango_attr_list_insert (attr_list, fallback_attr);
 
         cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
         cairo_set_font_face (cr, cr_face);
