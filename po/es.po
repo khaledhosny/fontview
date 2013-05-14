@@ -1,0 +1,98 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# Khaled Hosny <khaledhosny@eglug.org>, 2010.
+msgid ""
+msgstr ""
+"Project-Id-Version: Fontview\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2012-04-19 13:12+0200\n"
+"PO-Revision-Date: 2013-05-14 15:42-0600\n"
+"Last-Translator: Adolfo Jayme Barrientos <fitoschido@ubuntu.com>\n"
+"Language-Team: Spanish <es@li.org>\n"
+"Language: es\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"X-Generator: Poedit 1.5.4\n"
+
+#: ../fontview.desktop.in.h:1 ../src/resources/mainwindow.ui.h:1
+#: ../src/main.c:58
+msgid "Font View"
+msgstr "Vista del tipo de letra"
+
+#: ../fontview.desktop.in.h:2
+msgid "A font viewing utility"
+msgstr "Una utilidad para visualizar tipos de letra"
+
+#: ../src/resources/mainwindow.ui.h:2
+msgid "Font Information"
+msgstr "Información del tipo de letra"
+
+#: ../src/resources/mainwindow.ui.h:3
+msgid "How quickly daft jumping zebras vex."
+msgstr ""
+"El viejo Señor Gómez pedía queso, kiwi y habas, pero le ha tocado un saxofón."
+
+#: ../src/resources/mainwindow.ui.h:4
+msgid "Size:"
+msgstr "Tamaño:"
+
+#: ../src/resources/infowindow.ui.h:1
+msgid "Font Info"
+msgstr "Información del tipo de letra"
+
+#: ../src/resources/infowindow.ui.h:2
+msgid "Name"
+msgstr "Nombre"
+
+#: ../src/resources/infowindow.ui.h:3
+msgid "Style"
+msgstr "Estilo"
+
+#: ../src/resources/infowindow.ui.h:4
+msgid "Version"
+msgstr "Versión"
+
+#: ../src/resources/infowindow.ui.h:5
+msgid "Copyright"
+msgstr "Copyright"
+
+#: ../src/resources/infowindow.ui.h:6
+msgid "Description"
+msgstr "Descripción"
+
+#: ../src/resources/infowindow.ui.h:7
+msgid "File"
+msgstr "Archivo"
+
+#: ../src/main.c:61
+msgid ""
+"Copyright © 2007, Alex Roberts\n"
+"Copyright © 2010, Khaled Hosny"
+msgstr ""
+"Copyright © 2007, Alex Roberts\n"
+"Copyright © 2010, Khaled Hosny"
+
+#: ../src/main.c:62
+msgid ""
+"A font viewing utility.\n"
+"Part of the Serif font management project."
+msgstr ""
+"Una utilidad para visualizar tipos de letra.\n"
+"Parte del proyecto de gestión tipográfica Serif."
+
+#: ../src/main.c:63
+msgid ""
+"GNU General Public License 2.0\n"
+"\n"
+"See COPYING for more information."
+msgstr ""
+"Licencia Pública General de GNU 2.0\n"
+"\n"
+"Véase COPYING para más información."
+
+#: ../src/main.c:64
+msgid "translator-credits"
+msgstr "Adolfo Jayme Barrientos <fitoschido@ubuntu.com>, 2013"
