@@ -241,7 +241,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
             hb_glyph_info_t *hb_glyph = hb_buffer_get_glyph_infos (hb_buffer, NULL);
             hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer, NULL);
 
-            glyphs = realloc (glyphs, (total_num_glyphs + num_glyphs) * sizeof (cairo_glyph_t));
+            glyphs = g_renew (cairo_glyph_t, glyphs, total_num_glyphs + num_glyphs);
 
             for (int i = 0; i < num_glyphs; i++) {
                 glyphs[total_num_glyphs + i].index = hb_glyph->codepoint;
@@ -275,6 +275,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         }
 
         cairo_show_glyphs (cr, glyphs, total_num_glyphs);
+        g_free (glyphs);
     }
 }
 
