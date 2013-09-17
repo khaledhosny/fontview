@@ -86,14 +86,14 @@ GObject *font_model_new (gchar *fontfile) {
 
     if (FT_Init_FreeType(&library)) {
         g_error ("FT_Init_FreeType failed");
-        exit;
+        exit (EXIT_FAILURE);
     }
 
     model = g_object_new (FONT_MODEL_TYPE, NULL);
 
     if (FT_New_Face (library, fontfile, 0, &model->ft_face)) {
         g_error ("FT_New_Face failed");
-        exit;
+        exit (EXIT_FAILURE);
     }
 
     model->file = g_strdup (fontfile);
