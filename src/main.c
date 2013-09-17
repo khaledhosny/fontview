@@ -35,7 +35,6 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
-#include "font-model.h"
 #include "font-view.h"
 
 #define GET_GBOPJECT(A,B) GTK_WIDGET(gtk_builder_get_object(A,B));
