@@ -30,7 +30,6 @@
  * 
  */
 
-#include <math.h>
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <cairo/cairo-ft.h>
@@ -155,8 +154,8 @@ static void render (GtkWidget *w, cairo_t *cr) {
     cairo_set_source_rgba (cr, 0.8, 0.8, 0.8, 1);
 
     /* position text in the center */
-    gdouble indent = floor (width /2 * 0.1);
-    gdouble y = height/2+20;
+    gdouble indent = width / 2 / 10;
+    gdouble y = height / 2 + 20;
     gdouble x = indent;
 
     /* baseline */
