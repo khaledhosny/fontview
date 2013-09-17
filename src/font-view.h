@@ -68,6 +68,8 @@ struct _FontViewClass {
     void (* size_changed)(FontView *self, gdouble size);
 };
 
+GType font_view_get_type (void) G_GNUC_CONST;
+
 GtkWidget *font_view_new ();
 GtkWidget *font_view_new_with_model (gchar *font);
 
