@@ -39,8 +39,6 @@
 
 #define GET_GBOPJECT(A,B) GTK_WIDGET(gtk_builder_get_object(A,B));
 
-GtkWidget *font;
-
 static void
 font_view_about (GtkWidget *w,
                  gpointer data)
@@ -118,16 +116,26 @@ static void
 render_size_changed (GtkSpinButton *w,
                      gpointer data)
 {
-    gint size = gtk_spin_button_get_value_as_int (w);
+    GtkWidget* window;
+    FontView* view;
+    FontModel *model;
+    gint size;
+    gchar *title;
 
-    font_view_set_pt_size (FONT_VIEW(font), size);
+    view = FONT_VIEW(data);
+    size = gtk_spin_button_get_value_as_int (w);
+    font_view_set_pt_size (view, size);
 
-    FontModel *model = font_view_get_model (FONT_VIEW (font));
-    gchar *title = g_strdup_printf ("%s %s - %.0fpt",
+    model = font_view_get_model (view);
+    title = g_strdup_printf ("%s %s – %.0fpt",
                              model->family,
                              model->style,
-                             font_view_get_pt_size (FONT_VIEW (font)));
-    gtk_label_set_text (GTK_LABEL (data), title);
+                             font_view_get_pt_size (view));
+
+    window = gtk_widget_get_toplevel (GTK_WIDGET (data));
+    if (gtk_widget_is_toplevel (window))
+        gtk_window_set_title (GTK_WINDOW (window), title);
+
     g_free (title);
 }
 
@@ -152,7 +160,7 @@ print_usage (void)
 int
 main (int argc, char *argv[]) {
     GtkBuilder *mainwindow;
-    GtkWidget *w, *entry, *sizew, *container, *titlelabel;
+    GtkWidget *w, *entry, *sizew, *container, *font;
     GFile *file;
     GFileMonitor *monitor;
 
@@ -187,10 +195,8 @@ main (int argc, char *argv[]) {
     w = GET_GBOPJECT (mainwindow, "info_button");
     g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), font);
 
-    titlelabel = GET_GBOPJECT (mainwindow, "titlelabel");
-
     sizew = GET_GBOPJECT (mainwindow, "size_spin");
-    g_signal_connect (sizew, "value-changed", G_CALLBACK(render_size_changed), titlelabel);
+    g_signal_connect (sizew, "value-changed", G_CALLBACK(render_size_changed), font);
     g_signal_emit_by_name (sizew, "value-changed");
 
     file = g_file_new_for_path(argv[1]);
