@@ -39,18 +39,17 @@
 
 #define GET_GBOPJECT(A,B) GTK_WIDGET(gtk_builder_get_object(A,B));
 
-GtkBuilder *mainwindow;
 GtkWidget *font;
 
-void render_size_changed (GtkSpinButton *w, gpointer data);
-void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data);
-
-void font_view_about (GtkWidget *w, gpointer data) {
+static void
+font_view_about (GtkWidget *w,
+                 gpointer data)
+{
     static const gchar * const authors[] = {
         "Alex Roberts <alex@redprocess.com>",
         "Jon Phillips <jon@rejon.org>",
         "Khaled Hosny <khaledhosnt@eglug.org>",
-	NULL
+        NULL
     };
 
     gtk_show_about_dialog (NULL,
@@ -64,7 +63,10 @@ void font_view_about (GtkWidget *w, gpointer data) {
         NULL);
 }
 
-void font_view_info_window (GtkWidget *w, gpointer data) {
+static void
+font_view_info_window (GtkWidget *w,
+                       gpointer data)
+{
     GtkWidget *window, *about;
     GtkWidget *name, *style, *version, *copyright, *desc, *file;
     GtkBuilder *infowindow;
@@ -79,7 +81,7 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
     about = GET_GBOPJECT (infowindow, "about_button");
     g_signal_connect (about, "clicked", G_CALLBACK(font_view_about), NULL);
 
-    model = font_view_get_model (FONT_VIEW (font));
+    model = font_view_get_model (FONT_VIEW (data));
 
     name = GET_GBOPJECT (infowindow, "name_label");
     style = GET_GBOPJECT (infowindow, "style_label");
@@ -95,45 +97,61 @@ void font_view_info_window (GtkWidget *w, gpointer data) {
     gtk_label_set_text (GTK_LABEL(desc), model->description);
     gtk_label_set_text (GTK_LABEL(file), model->file);
 
+    gtk_dialog_run (GTK_DIALOG (window));
+
     gtk_widget_destroy (window);
 }
 
 
-void render_text_changed (GtkEntry *w, gpointer data) {
+static void
+render_text_changed (GtkEntry *w,
+                     gpointer data)
+{
     gchar *text = g_strdup ((gchar *)gtk_entry_get_text (w));
 
-    font_view_set_text (FONT_VIEW(font), text);
+    font_view_set_text (FONT_VIEW(data), text);
 
     g_free (text);
 }
 
-void render_size_changed (GtkSpinButton *w, gpointer titlelabel) {
+static void
+render_size_changed (GtkSpinButton *w,
+                     gpointer data)
+{
     gint size = gtk_spin_button_get_value_as_int (w);
 
     font_view_set_pt_size (FONT_VIEW(font), size);
 
     FontModel *model = font_view_get_model (FONT_VIEW (font));
     gchar *title = g_strdup_printf ("%s %s - %.0fpt",
-		             model->family,
-			     model->style,
-			     font_view_get_pt_size (FONT_VIEW (font)));
-    gtk_label_set_text (GTK_LABEL (titlelabel), title);
+                             model->family,
+                             model->style,
+                             font_view_get_pt_size (FONT_VIEW (font)));
+    gtk_label_set_text (GTK_LABEL (data), title);
     g_free (title);
-
 }
 
-void render_file_changed (GFileMonitor *monitor, GFile *file, GFile *other_file, GFileMonitorEvent event, gpointer data) {
+static void
+render_file_changed (GFileMonitor *monitor,
+                     GFile *file,
+                     GFile *other_file,
+                     GFileMonitorEvent event,
+                     gpointer data)
+{
     if (event == G_FILE_MONITOR_EVENT_CHANGED)
-        font_view_rerender (FONT_VIEW(font));
+        font_view_rerender (FONT_VIEW(data));
 }
 
-void print_usage ()
+void
+print_usage (void)
 {
     g_print ("\nUsage:\n\tfontview <path_to_font>\n\n");
     exit(1);
 }
 
-int main (int argc, char *argv[]) {
+int
+main (int argc, char *argv[]) {
+    GtkBuilder *mainwindow;
     GtkWidget *w, *entry, *sizew, *container, *titlelabel;
     GFile *file;
     GFileMonitor *monitor;
@@ -163,11 +181,11 @@ int main (int argc, char *argv[]) {
     gtk_widget_show (container);
 
     entry = GET_GBOPJECT (mainwindow, "render_str");
-    g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), NULL);
+    g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), font);
     g_signal_emit_by_name (entry, "changed");
 
     w = GET_GBOPJECT (mainwindow, "info_button");
-    g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), NULL);
+    g_signal_connect (w, "clicked", G_CALLBACK(font_view_info_window), font);
 
     titlelabel = GET_GBOPJECT (mainwindow, "titlelabel");
 
@@ -177,7 +195,7 @@ int main (int argc, char *argv[]) {
 
     file = g_file_new_for_path(argv[1]);
     monitor = g_file_monitor_file (file, 0, NULL, NULL);
-    g_signal_connect (monitor, "changed", G_CALLBACK(render_file_changed), NULL);
+    g_signal_connect (monitor, "changed", G_CALLBACK(render_file_changed), font);
 
     gtk_main();
 
