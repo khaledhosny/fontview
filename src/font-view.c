@@ -111,13 +111,18 @@ GtkWidget *font_view_new () {
 GtkWidget *font_view_new_with_model (gchar *font) {
     FontView *view;
     FontViewPrivate *priv;
+    FontModel *model;
 
     g_return_val_if_fail (font, NULL);
 
     view = g_object_new (FONT_VIEW_TYPE, NULL);
     priv = FONT_VIEW_GET_PRIVATE(view);
 
-    priv->model = FONT_MODEL(font_model_new (font));
+    model = FONT_MODEL(font_model_new (font));
+    if (model == NULL)
+        return NULL;
+
+    priv->model = model;
 
     if (priv->model->sample) {
         priv->text = g_strdup (priv->model->sample);
@@ -380,10 +385,14 @@ void font_view_set_text (FontView *view, gchar *text) {
 
 void font_view_rerender (FontView *view) {
     FontViewPrivate *priv;
+    FontModel *model;
 
     priv = FONT_VIEW_GET_PRIVATE(view);
-    priv->model = FONT_MODEL(font_model_new (priv->model->file));
-    priv->extents[TEXT] = TRUE;
-    font_view_redraw (view);
+    model = FONT_MODEL(font_model_new (priv->model->file));
+    if (model != NULL) {
+        priv->model = model;
+        priv->extents[TEXT] = TRUE;
+        font_view_redraw (view);
+    }
 }
 

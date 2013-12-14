@@ -154,6 +154,8 @@ int main (int argc, char *argv[]) {
     gtk_builder_connect_signals (mainwindow, NULL);
 
     font = font_view_new_with_model (argv[1]);
+    if (font == NULL)
+        exit (EXIT_FAILURE);
     container = GET_GBOPJECT (mainwindow, "font-view");
     gtk_container_add (GTK_CONTAINER (container), font);
 
