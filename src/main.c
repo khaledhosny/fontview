@@ -146,7 +146,7 @@ render_file_changed (GFileMonitor *monitor,
                      GFileMonitorEvent event,
                      gpointer data)
 {
-    if (event == G_FILE_MONITOR_EVENT_CHANGED)
+    if (event == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT)
         font_view_rerender (FONT_VIEW(data));
 }
 
