@@ -1,7 +1,5 @@
 #!/bin/sh
 
-# autogen.sh from Valgrind
-
 run ()
 {
     echo "running: $*"
@@ -13,8 +11,4 @@ run ()
     fi
 }
 
-run aclocal
-run autoheader
-run automake --add-missing --gnu
-run intltoolize --force
-run autoconf
+run autoreconf -ivf
