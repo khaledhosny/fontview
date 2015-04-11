@@ -41,7 +41,7 @@
 
 static void
 font_view_about (GtkWidget *w,
-                 gpointer data)
+                 gpointer parent)
 {
     static const gchar * const authors[] = {
         "Alex Roberts <alex@redprocess.com>",
@@ -50,7 +50,7 @@ font_view_about (GtkWidget *w,
         NULL
     };
 
-    gtk_show_about_dialog (NULL,
+    gtk_show_about_dialog (GTK_WINDOW (parent),
         "name", _("Font View"),
         "authors", authors,
         "version", VERSION,
@@ -69,15 +69,17 @@ font_view_info_window (GtkWidget *w,
     GtkWidget *name, *style, *version, *copyright, *desc, *file;
     GtkBuilder *infowindow;
     FontModel *model;
+    GtkWindow *parent;
 
     infowindow = gtk_builder_new ();
     gtk_builder_add_from_resource (infowindow, "/org/serif/fontview/infowindow.ui", NULL);
     gtk_builder_connect_signals (infowindow, NULL);
 
+    parent = GTK_WINDOW (gtk_widget_get_toplevel (w));
     window = GET_GBOPJECT (infowindow, "infowindow");
 
     about = GET_GBOPJECT (infowindow, "about_button");
-    g_signal_connect (about, "clicked", G_CALLBACK(font_view_about), NULL);
+    g_signal_connect (about, "clicked", G_CALLBACK(font_view_about), parent);
 
     model = font_view_get_model (FONT_VIEW (data));
 
@@ -95,6 +97,7 @@ font_view_info_window (GtkWidget *w,
     gtk_label_set_text (GTK_LABEL(desc), model->description);
     gtk_label_set_text (GTK_LABEL(file), model->file);
 
+    gtk_window_set_transient_for (GTK_WINDOW (window), parent);
     gtk_dialog_run (GTK_DIALOG (window));
 
     gtk_widget_destroy (window);
