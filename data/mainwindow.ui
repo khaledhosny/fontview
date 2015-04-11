@@ -89,7 +89,7 @@
           <object class="GtkSpinButton" id="size_spin">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
-            <property name="text" translatable="yes">30</property>
+            <property name="text">30</property>
             <property name="caps_lock_warning">False</property>
             <property name="adjustment">adjustment1</property>
             <property name="numeric">True</property>
