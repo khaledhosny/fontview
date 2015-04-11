@@ -1,13 +1,13 @@
 # SOME DESCRIPTIVE TITLE.
 # Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
 # This file is distributed under the same license as the PACKAGE package.
-# Khaled Hosny <khaledhosny@eglug.org>, 2010.
+# Khaled Hosny <khaledhosny@eglug.org>, 2010, 2015.
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2012-04-19 13:12+0200\n"
-"PO-Revision-Date: 2010-12-26 23:00+0300\n"
+"POT-Creation-Date: 2015-04-11 22:50+0200\n"
+"PO-Revision-Date: 2015-04-11 22:49+0200\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
 "Language: ar\n"
@@ -16,58 +16,65 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
-"X-Generator: Virtaal 0.6.1\n"
+"X-Generator: Virtaal 0.7.1\n"
 
-#: ../fontview.desktop.in.h:1 ../src/resources/mainwindow.ui.h:1
-#: ../src/main.c:58
+#: ../data/fontview.desktop.in.h:1 ../data/mainwindow.ui.h:1 ../src/main.c:54
 msgid "Font View"
 msgstr "عارض الخطوط"
 
-#: ../fontview.desktop.in.h:2
+#: ../data/fontview.desktop.in.h:2
 msgid "A font viewing utility"
 msgstr "أداة لعرض الخطوط"
 
-#: ../src/resources/mainwindow.ui.h:2
+#: ../data/mainwindow.ui.h:2
 msgid "Font Information"
 msgstr "معلومات الخط"
 
-#: ../src/resources/mainwindow.ui.h:3
+#: ../data/mainwindow.ui.h:3
 msgid "How quickly daft jumping zebras vex."
 msgstr "صِفْ خَلْقَ خَوْدٍ كَمِثْلِ ٱلشَّمْسِ إِذْ بَزَغَتْ يَحْظَىٰ ٱلضَّجِيعُ بِهَا نَجْلَاءَ مِعْطَارِ."
 
-#: ../src/resources/mainwindow.ui.h:4
+#: ../data/mainwindow.ui.h:4
 msgid "Size:"
 msgstr "الحجم:"
 
-#: ../src/resources/infowindow.ui.h:1
+#: ../data/infowindow.ui.h:1
 msgid "Font Info"
 msgstr "معلومات الخط"
 
-#: ../src/resources/infowindow.ui.h:2
+#: ../data/infowindow.ui.h:2
+msgid "About"
+msgstr "عن"
+
+#: ../data/infowindow.ui.h:3
+msgid "Close"
+msgstr "أغلق"
+
+#: ../data/infowindow.ui.h:4
 msgid "Name"
 msgstr "الاسم"
 
-#: ../src/resources/infowindow.ui.h:3
+#: ../data/infowindow.ui.h:5
 msgid "Style"
 msgstr "الطراز"
 
-#: ../src/resources/infowindow.ui.h:4
+#: ../data/infowindow.ui.h:6
 msgid "Version"
 msgstr "النسخة"
 
-#: ../src/resources/infowindow.ui.h:5
+#: ../data/infowindow.ui.h:7
 msgid "Copyright"
 msgstr "حقوق النشر"
 
-#: ../src/resources/infowindow.ui.h:6
+#: ../data/infowindow.ui.h:8
 msgid "Description"
 msgstr "الوصف"
 
-#: ../src/resources/infowindow.ui.h:7
+#: ../data/infowindow.ui.h:9
 msgid "File"
 msgstr "الملف"
 
-#: ../src/main.c:61
+#: ../src/main.c:57
 msgid ""
 "Copyright © 2007, Alex Roberts\n"
 "Copyright © 2010, Khaled Hosny"
@@ -75,13 +82,13 @@ msgstr ""
 "حقوق النشر © 2007، ألِكس روبرتس\n"
 "حقوق النشر © 2010، خالد حسني"
 
-#: ../src/main.c:62
+#: ../src/main.c:58
 msgid ""
 "A font viewing utility.\n"
 "Part of the Serif font management project."
 msgstr "أداة لعرض الخطوط."
 
-#: ../src/main.c:63
+#: ../src/main.c:59
 msgid ""
 "GNU General Public License 2.0\n"
 "\n"
@@ -91,6 +98,6 @@ msgstr ""
 "\n"
 "انظر ملف COPYING لمزيد من المعلومات."
 
-#: ../src/main.c:64
+#: ../src/main.c:60
 msgid "translator-credits"
 msgstr "خالد حسني <khaledhosny@eglug.org>"
