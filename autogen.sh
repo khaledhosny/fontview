@@ -11,4 +11,5 @@ run ()
     fi
 }
 
-run autoreconf -ivf
+run autoreconf --install --force
+run intltoolize --force

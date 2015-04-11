@@ -2,7 +2,7 @@ AC_PREREQ([2.68])
 AC_INIT([fontview], [0.10])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
-AM_INIT_AUTOMAKE
+AM_INIT_AUTOMAKE([subdir-objects])
 AM_SILENT_RULES([yes])
 
 CFLAGS=
@@ -29,8 +29,6 @@ IT_PROG_INTLTOOL(0.41)
 AM_GLIB_GNU_GETTEXT
 
 AC_CONFIG_FILES([Makefile
-	  src/Makefile
-	  data/Makefile
 	  po/Makefile.in
 	  ])
 AC_OUTPUT
