@@ -20,7 +20,7 @@ AC_LANG([C])
 
 
 AC_SUBST(CFLAGS)
-PKG_CHECK_MODULES(FONTVIEW, [gtk+-3.0 >= 3.0.0 freetype2 >= 9.10.0 harfbuzz >= 0.6.0])
+PKG_CHECK_MODULES(FONTVIEW, [gtk+-3.0 >= 3.12.0 freetype2 >= 9.10.0 harfbuzz >= 0.6.0])
 AC_C_CONST
 
 GETTEXT_PACKAGE=AC_PACKAGE_NAME
