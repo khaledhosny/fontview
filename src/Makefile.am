@@ -24,3 +24,5 @@ BUILT_SOURCES = $(FONTVIEW_RESOURCES) $(TYPES_SOURCE)
 fontview_SOURCES = font-model.c font-view.c main.c $(FONTVIEW_RESOURCES)
 
 noinst_HEADERS = font-model.h font-view.h
+
+-include $(top_srcdir)/git.mk
