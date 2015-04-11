@@ -149,7 +149,7 @@ FontModel *font_view_get_model (FontView *view) {
 
 static void render (GtkWidget *w, cairo_t *cr) {
     GtkAllocation allocation;
-    GdkRGBA fg, bg;
+    GdkRGBA fg;
 
     FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 
@@ -159,7 +159,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     GtkStyleContext *style = gtk_widget_get_style_context (GTK_WIDGET (w));
     gtk_style_context_get_color (style, GTK_STATE_FLAG_NORMAL, &fg);
-    gtk_style_context_get_background_color (style, GTK_STATE_FLAG_NORMAL, &bg);
 
     cairo_rectangle (cr, 0, 0, width, height);
     cairo_set_source_rgba (cr, 1, 1, 1, 1);
