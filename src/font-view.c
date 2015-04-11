@@ -11,7 +11,7 @@
  * FontView Test - font viewing widget test app
  * Part of the Fontable Project
  * Copyright (C) 2006 Alex Roberts
- * Copyright (C) 2010 Khaled Hosny, <khaledhosny@eglug.org>
+ * Copyright (C) 2010-2015 Khaled Hosny, <khaledhosny@eglug.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,6 +32,7 @@
 
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
+#include <cairo/cairo.h>
 #include <cairo/cairo-ft.h>
 #include <hb-ft.h>
 #include <hb-glib.h>
@@ -211,6 +212,12 @@ static void render (GtkWidget *w, cairo_t *cr) {
         cairo_set_font_face (cr, cr_face);
         /* our size is in points, so we convert to cairo user units */
         cairo_set_font_size (cr, priv->size * 96 / 72.0);
+
+        cairo_font_options_t *font_options = cairo_font_options_create ();
+        cairo_font_options_set_antialias (font_options, CAIRO_ANTIALIAS_SUBPIXEL);
+        cairo_font_options_set_hint_style (font_options, CAIRO_HINT_STYLE_NONE);
+        cairo_font_options_set_hint_metrics (font_options, CAIRO_HINT_METRICS_OFF);
+        cairo_set_font_options (cr, font_options);
 
         cairo_scaled_font_t *cr_scaled_font = cairo_get_scaled_font (cr);
         FT_Face ft_face = cairo_ft_scaled_font_lock_face (cr_scaled_font);
