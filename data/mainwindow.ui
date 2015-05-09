@@ -65,6 +65,7 @@
           <object class="GtkEntry" id="render_str">
             <property name="visible">True</property>
             <property name="can_focus">True</property>
+            <property name="has_focus">True</property>
             <property name="hexpand">True</property>
             <property name="text" translatable="yes">How quickly daft jumping zebras vex.</property>
           </object>
