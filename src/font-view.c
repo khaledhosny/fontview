@@ -30,10 +30,13 @@
  * 
  */
 
+#include "config.h"
+
 #include <gtk/gtk.h>
 #include <glib/gi18n.h>
 #include <cairo/cairo.h>
 #include <cairo/cairo-ft.h>
+#include <pango/pangofc-fontmap.h>
 #include <hb-ft.h>
 #include <hb-glib.h>
 #include "font-view.h"
@@ -206,6 +209,47 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
+#ifdef HAVE_PANGO_FC_FONT_MAP_SET_CONFIG
+        FcConfig *config = FcConfigCreate ();
+        FcBool ok = FcConfigAppFontAddFile (config, priv->model->file);
+        PangoFontMap *fontmap = pango_cairo_font_map_new_for_font_type (CAIRO_FONT_TYPE_FT);
+        pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (fontmap), config);
+        PangoContext *context = pango_font_map_create_context (fontmap);
+
+        gdk_cairo_set_source_rgba (cr, &fg);
+
+        PangoLayout *layout = pango_layout_new (context);
+        pango_layout_set_text (layout, priv->text, -1);
+
+        PangoAttrList *attributes = pango_attr_list_new ();
+        PangoAttribute *size = pango_attr_size_new (priv->size * PANGO_SCALE);
+        pango_attr_list_insert (attributes, size);
+        pango_layout_set_attributes (layout, attributes);
+
+        gint baseline = pango_layout_get_baseline (layout) / PANGO_SCALE;
+#if 0
+        /* Causes line breaks, but we don’t handle those. */
+        pango_layout_set_width (layout, (width - indent * 2) * PANGO_SCALE);
+        cairo_translate (cr, x, y - baseline);
+#else
+        gint p_width;
+        pango_layout_get_pixel_size (layout, &p_width, NULL);
+        PangoDirection base_dir = pango_find_base_dir (priv->text, -1);
+        if (ISRTL (base_dir)) {
+            cairo_move_to (cr, width - x - p_width, y - baseline);
+        } else {
+            cairo_move_to (cr, x, y - baseline);
+        }
+#endif
+
+        pango_cairo_update_context (cr, context);
+        pango_cairo_show_layout (cr, layout);
+
+        g_object_unref (layout);
+        g_object_unref (context);
+        g_object_unref (fontmap);
+        FcConfigDestroy (config);
+#else
         PangoDirection base_dir = pango_find_base_dir (priv->text, -1);
 
         cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
@@ -299,6 +343,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
         cairo_show_glyphs (cr, glyphs, total_num_glyphs);
         g_free (glyphs);
+#endif
     }
 }
 
