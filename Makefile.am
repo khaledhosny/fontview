@@ -8,7 +8,8 @@ desktopdir = $(datadir)/applications
 desktop_in_files = fontview.desktop.in
 desktop_DATA = $(desktop_in_files:.desktop.in=.desktop)
 
-@INTLTOOL_DESKTOP_RULE@
+%.desktop: %.desktop.in
+	$(AM_V_GEN)msgfmt --desktop --template=$< -o $@ -d $(top_builddir)/po
 
 UI_FILES = data/mainwindow.ui \
 	   data/infowindow.ui

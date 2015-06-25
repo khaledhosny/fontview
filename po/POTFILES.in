@@ -1,5 +1,5 @@
-data/fontview.desktop.in
-[type: gettext/glade]data/mainwindow.ui
-[type: gettext/glade]data/infowindow.ui
+fontview.desktop.in
+data/mainwindow.ui
+data/infowindow.ui
 src/main.c
 src/font-view.c

@@ -1,6 +1,6 @@
 [Desktop Entry]
-_Name=Font View
-_Comment=A font viewing utility
+Name=Font View
+Comment=A font viewing utility
 Icon=font
 Exec=fontview %f
 StartupNotify=true

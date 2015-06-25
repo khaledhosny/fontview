@@ -1,5 +1,5 @@
 AC_PREREQ([2.68])
-AC_INIT([fontview], [0.10])
+AC_INIT([fontview], [0.10], [https://github.com/khaledhosny/fontview/issues])
 AC_CONFIG_SRCDIR([src/main.c])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE([subdir-objects])
@@ -31,10 +31,8 @@ AC_CHECK_FUNCS(pango_fc_font_map_set_config)
 LIBS="$_save_libs"
 CFLAGS="$_save_cflags"
 
-GETTEXT_PACKAGE=AC_PACKAGE_NAME
-AC_SUBST(GETTEXT_PACKAGE)
-IT_PROG_INTLTOOL(0.41)
-AM_GLIB_GNU_GETTEXT
+AM_GNU_GETTEXT([external])
+AM_GNU_GETTEXT_VERSION(0.19)
 
 AC_CONFIG_FILES([Makefile
 	  po/Makefile.in

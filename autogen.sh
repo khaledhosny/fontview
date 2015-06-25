@@ -12,4 +12,3 @@ run ()
 }
 
 run autoreconf --install --force
-run intltoolize --force
