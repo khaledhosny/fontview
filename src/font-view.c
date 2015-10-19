@@ -164,10 +164,10 @@ static void render (GtkWidget *w, cairo_t *cr) {
     GtkStyleContext *style = gtk_widget_get_style_context (GTK_WIDGET (w));
     gtk_style_context_get_color (style, GTK_STATE_FLAG_NORMAL, &fg);
 
-    cairo_rectangle (cr, 0, 0, width, height);
-    cairo_set_source_rgba (cr, 1, 1, 1, 1);
-    cairo_paint (cr);
-    cairo_stroke (cr);
+    //cairo_rectangle (cr, 0, 0, width, height);
+    //cairo_set_source_rgba (cr, 1, 1, 1, 1);
+    //cairo_paint (cr);
+    //cairo_stroke (cr);
 
     cairo_set_source_rgba (cr, 1, 0.3, 0.3, 1);
     cairo_set_line_width (cr, 1.0);
