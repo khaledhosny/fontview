@@ -153,16 +153,12 @@ FontModel *font_view_get_model (FontView *view) {
 
 static void render (GtkWidget *w, cairo_t *cr) {
     GtkAllocation allocation;
-    GdkRGBA fg;
 
     FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
 
     gtk_widget_get_allocation (w, &allocation);
     gint width = allocation.width;
     gint height = allocation.height;
-
-    GtkStyleContext *style = gtk_widget_get_style_context (GTK_WIDGET (w));
-    gtk_style_context_get_color (style, GTK_STATE_FLAG_NORMAL, &fg);
 
     cairo_rectangle (cr, 0, 0, width, height);
     cairo_set_source_rgba (cr, 1, 1, 1, 1);
@@ -216,7 +212,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (fontmap), config);
         PangoContext *context = pango_font_map_create_context (fontmap);
 
-        gdk_cairo_set_source_rgba (cr, &fg);
+        cairo_set_source_rgba (cr, 0, 0, 0, 1);
 
         PangoLayout *layout = pango_layout_new (context);
         pango_layout_set_text (layout, priv->text, -1);
@@ -332,7 +328,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         hb_font_destroy (hb_font);
         cairo_ft_scaled_font_unlock_face (cr_scaled_font);
 
-        gdk_cairo_set_source_rgba (cr, &fg);
+        cairo_set_source_rgba (cr, 0, 0, 0, 1);
 
         /* right align if base direction is right to left */
         if (ISRTL (base_dir)) {
