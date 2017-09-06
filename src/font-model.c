@@ -74,6 +74,32 @@ GType font_model_get_type (void) {
     return type;
 }
 
+gchar*
+get_font_name (FT_Face face, FT_UInt nameid) {
+    FT_UInt len;
+
+    len = FT_Get_Sfnt_Name_Count (face);
+    for (FT_UInt i = 0; i < len; i++) {
+        FT_SfntName name;
+        if (FT_Get_Sfnt_Name(face, i, &name) != 0)
+            continue;
+
+        if (name.name_id != nameid)
+            continue;
+
+        /* only handle the unicode names for US langid */
+        if (!(name.platform_id == TT_PLATFORM_MICROSOFT &&
+              name.encoding_id == TT_MS_ID_UNICODE_CS &&
+              name.language_id == TT_MS_LANGID_ENGLISH_UNITED_STATES))
+            continue;
+
+        return g_convert((gchar *)name.string, name.string_len,
+                        "UTF-8", "UTF-16BE", NULL, NULL, NULL);
+    }
+
+    return NULL;
+}
+
 GObject *font_model_new (gchar *fontfile) {
     FontModel *model;
     FT_Library library;
@@ -122,78 +148,18 @@ GObject *font_model_new (gchar *fontfile) {
                 model->xheight = pclt->xHeight;
         }
 
-        len = FT_Get_Sfnt_Name_Count (model->ft_face);
-        for (i = 0; i < len; i++) {
-            if (FT_Get_Sfnt_Name(model->ft_face, i, &sfname) != 0)
-                continue;
+        model->family = get_font_name (model->ft_face, TT_NAME_ID_PREFERRED_FAMILY);
+        if (!model->family)
+            model->family = get_font_name (model->ft_face, TT_NAME_ID_FONT_FAMILY);
 
-            /* only handle the unicode names for US langid */
-            if (!(sfname.platform_id == TT_PLATFORM_MICROSOFT &&
-                  sfname.encoding_id == TT_MS_ID_UNICODE_CS &&
-                  sfname.language_id == TT_MS_LANGID_ENGLISH_UNITED_STATES))
-                continue;
+        model->style = get_font_name (model->ft_face, TT_NAME_ID_PREFERRED_SUBFAMILY);
+        if (!model->style)
+            model->style = get_font_name (model->ft_face, TT_NAME_ID_FONT_SUBFAMILY);
 
-            int preferred_family = 0;
-            int preferred_subfamily = 0;
-            switch (sfname.name_id) {
-                case TT_NAME_ID_PREFERRED_FAMILY:
-                    g_free(model->family);
-                    model->family = g_convert((gchar *)sfname.string,
-                                    sfname.string_len,
-                                    "UTF-8", "UTF-16BE", NULL, NULL, NULL);
-                    preferred_family = 1;
-                    break;
-                case TT_NAME_ID_FONT_FAMILY:
-                    if (!preferred_family) {
-                        g_free(model->family);
-                        model->family = g_convert((gchar *)sfname.string,
-                                        sfname.string_len,
-                                        "UTF-8", "UTF-16BE", NULL, NULL, NULL);
-                    }
-                    break;
-                case TT_NAME_ID_PREFERRED_SUBFAMILY:
-                    g_free(model->style);
-                    model->style = g_convert((gchar *)sfname.string,
-                                   sfname.string_len,
-                                   "UTF-8", "UTF-16BE", NULL, NULL, NULL);
-                    preferred_subfamily = 1;
-                    break;
-                case TT_NAME_ID_FONT_SUBFAMILY:
-                    if (!preferred_subfamily) {
-                        g_free(model->style);
-                        model->style = g_convert((gchar *)sfname.string,
-                                       sfname.string_len,
-                                       "UTF-8", "UTF-16BE", NULL, NULL, NULL);
-                    }
-                    break;
-                case TT_NAME_ID_COPYRIGHT:
-                    g_free(model->copyright);
-                    model->copyright = g_convert((gchar *)sfname.string,
-                                       sfname.string_len,
-                                       "UTF-8", "UTF-16BE", NULL, NULL, NULL);
-                    break;
-                case TT_NAME_ID_VERSION_STRING:
-                    g_free(model->version);
-                    model->version = g_convert((gchar *)sfname.string,
-                                     sfname.string_len,
-                                     "UTF-8", "UTF-16BE", NULL, NULL, NULL);
-                    break;
-                case TT_NAME_ID_DESCRIPTION:
-                    g_free(model->description);
-                    model->description = g_convert((gchar *)sfname.string,
-                                         sfname.string_len,
-                                         "UTF-8", "UTF-16BE", NULL, NULL, NULL);
-                    break;
-                case TT_NAME_ID_SAMPLE_TEXT:
-                    g_free(model->sample);
-                    model->sample = g_convert((gchar *)sfname.string,
-                                    sfname.string_len,
-                                    "UTF-8", "UTF-16BE", NULL, NULL, NULL);
-                    break;
-                default:
-                    break;
-            }
-        }
+        model->copyright = get_font_name (model->ft_face, TT_NAME_ID_COPYRIGHT);
+        model->version = get_font_name (model->ft_face, TT_NAME_ID_VERSION_STRING);
+        model->description = get_font_name (model->ft_face, TT_NAME_ID_DESCRIPTION);
+        model->sample = get_font_name (model->ft_face, TT_NAME_ID_SAMPLE_TEXT);
     }
 
     return G_OBJECT (model);
