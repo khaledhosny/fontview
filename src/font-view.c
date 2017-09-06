@@ -378,7 +378,6 @@ static void font_view_redraw (FontView *view) {
 
     region = gdk_window_get_clip_region (window);
     gdk_window_invalidate_region (window, region, TRUE);
-    gdk_window_process_updates (window, TRUE);
 
     cairo_region_destroy (region);
 }
