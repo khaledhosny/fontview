@@ -205,7 +205,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
-#ifdef HAVE_PANGO_FC_FONT_MAP_SET_CONFIG
         FcConfig *config = FcConfigCreate ();
         FcBool ok = FcConfigAppFontAddFile (config, priv->model->file);
         PangoFontMap *fontmap = pango_cairo_font_map_new_for_font_type (CAIRO_FONT_TYPE_FT);
@@ -245,101 +244,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
         g_object_unref (context);
         g_object_unref (fontmap);
         FcConfigDestroy (config);
-#else
-        PangoDirection base_dir = pango_find_base_dir (priv->text, -1);
-
-        cairo_font_face_t *cr_face = cairo_ft_font_face_create_for_ft_face (priv->model->ft_face, 0);
-        cairo_set_font_face (cr, cr_face);
-        /* our size is in points, so we convert to cairo user units */
-        cairo_set_font_size (cr, priv->size * 96 / 72.0);
-
-        cairo_font_options_t *font_options = cairo_font_options_create ();
-        cairo_font_options_set_antialias (font_options, CAIRO_ANTIALIAS_SUBPIXEL);
-        cairo_font_options_set_hint_style (font_options, CAIRO_HINT_STYLE_NONE);
-        cairo_font_options_set_hint_metrics (font_options, CAIRO_HINT_METRICS_OFF);
-        cairo_set_font_options (cr, font_options);
-
-        cairo_scaled_font_t *cr_scaled_font = cairo_get_scaled_font (cr);
-        FT_Face ft_face = cairo_ft_scaled_font_lock_face (cr_scaled_font);
-
-        hb_font_t *hb_font = hb_ft_font_create (ft_face, NULL);
-
-        int total_num_glyphs = 0;
-        cairo_glyph_t *glyphs = NULL;
-
-        /* We abuse pango itemazation to split text into script and direction
-         * runs, since we use our fonts directly no through pango, we don't
-         * bother changing the default font, but we disable font fallback as
-         * pango will split runs at font change */
-        PangoContext *context = gtk_widget_get_pango_context (w);
-        PangoAttrList *attr_list = pango_attr_list_new ();
-        PangoAttribute *fallback_attr = pango_attr_fallback_new (FALSE);
-        pango_attr_list_insert (attr_list, fallback_attr);
-        GList *items = pango_itemize_with_base_dir (context, base_dir,
-                                                    priv->text, 0, strlen (priv->text),
-                                                    attr_list, NULL);
-
-        /* reorder the items in the visual order */
-        items = pango_reorder_items (items);
-
-        for (GList *l = items; l; l = l->next) {
-            PangoItem *item = l->data;
-            PangoAnalysis analysis = item->analysis;
-
-            hb_script_t script = hb_glib_script_to_script (analysis.script);
-            hb_language_t lang = hb_language_from_string (pango_language_to_string (analysis.language), -1);
-            hb_direction_t dir = HB_DIRECTION_LTR;
-            if (analysis.level % 2)
-                dir = HB_DIRECTION_RTL;
-
-            hb_buffer_t *hb_buffer = hb_buffer_create ();
-            hb_buffer_add_utf8 (hb_buffer, priv->text, -1, item->offset, item->length);
-            hb_buffer_set_script (hb_buffer, script);
-            hb_buffer_set_language (hb_buffer, lang);
-            hb_buffer_set_direction (hb_buffer, dir);
-
-            hb_shape (hb_font, hb_buffer, NULL, 0);
-
-            int num_glyphs = hb_buffer_get_length (hb_buffer);
-            hb_glyph_info_t *hb_glyph = hb_buffer_get_glyph_infos (hb_buffer, NULL);
-            hb_glyph_position_t *hb_position = hb_buffer_get_glyph_positions (hb_buffer, NULL);
-
-            glyphs = g_renew (cairo_glyph_t, glyphs, total_num_glyphs + num_glyphs);
-
-            for (int i = 0; i < num_glyphs; i++) {
-                glyphs[total_num_glyphs + i].index = hb_glyph->codepoint;
-                glyphs[total_num_glyphs + i].x = x + (hb_position->x_offset/64);
-                glyphs[total_num_glyphs + i].y = y - (hb_position->y_offset/64);
-                x += (hb_position->x_advance/64);
-                y -= (hb_position->y_advance/64);
-
-                hb_glyph++;
-                hb_position++;
-            }
-
-            total_num_glyphs += num_glyphs;
-
-            hb_buffer_destroy (hb_buffer);
-        }
-
-        g_list_foreach (items, (GFunc) pango_item_free, NULL);
-        g_list_free (items);
-
-        hb_font_destroy (hb_font);
-        cairo_ft_scaled_font_unlock_face (cr_scaled_font);
-
-        cairo_set_source_rgba (cr, 0, 0, 0, 1);
-
-        /* right align if base direction is right to left */
-        if (ISRTL (base_dir)) {
-            for (int i = 0; i < total_num_glyphs; i++) {
-                glyphs[i].x += width - x - indent;
-            }
-        }
-
-        cairo_show_glyphs (cr, glyphs, total_num_glyphs);
-        g_free (glyphs);
-#endif
     }
 }
 
