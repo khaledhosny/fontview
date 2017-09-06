@@ -211,6 +211,18 @@ static void render (GtkWidget *w, cairo_t *cr) {
         pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (fontmap), config);
         PangoContext *context = pango_font_map_create_context (fontmap);
 
+        PangoFontDescription *desc = pango_font_description_new ();
+        PangoFont *font = pango_font_map_load_font (fontmap, context, desc);
+        FT_Face ft_face = pango_fc_font_lock_face (PANGO_FC_FONT (font));
+        if (priv->model->mmcoords) {
+            FT_MM_Var* mmvar = priv->model->mmvar;
+            FT_Fixed* coords = priv->model->mmcoords;
+            if (FT_Set_Var_Design_Coordinates (ft_face, mmvar->num_axis, coords) != 0) {
+                g_warning ("FT_Set_Var_Design_Coordinates failed");
+            }
+        }
+        pango_fc_font_unlock_face (PANGO_FC_FONT (font));
+
         cairo_set_source_rgba (cr, 0, 0, 0, 1);
 
         PangoLayout *layout = pango_layout_new (context);
@@ -241,6 +253,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         pango_cairo_show_layout (cr, layout);
 
         g_object_unref (layout);
+        pango_font_description_free (desc);
         g_object_unref (context);
         g_object_unref (fontmap);
         FcConfigDestroy (config);
@@ -329,6 +342,17 @@ void font_view_set_text (FontView *view, gchar *text) {
 
     priv->text = g_strdup(text);
     priv->extents[TEXT] = TRUE;
+
+    font_view_redraw (view);
+}
+
+void font_view_select_named_instance (FontView *view, gint index)
+{
+    FontModel* model = font_view_get_model (FONT_VIEW (view));
+
+    if (model->mmvar) {
+        model->mmcoords = model->mmvar->namedstyle[index].coords;
+    }
 
     font_view_redraw (view);
 }

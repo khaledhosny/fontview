@@ -35,6 +35,7 @@
 #include <glib-object.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
+#include FT_MULTIPLE_MASTERS_H
 
 #define FONT_MODEL_TYPE            (font_model_get_type())
 #define FONT_MODEL(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), \
@@ -70,6 +71,9 @@ struct _FontModel {
     gchar *copyright;
     gchar *description;
     gchar *sample;
+
+    FT_MM_Var* mmvar;
+    FT_Fixed* mmcoords;
 };
 
 struct _FontModelClass {

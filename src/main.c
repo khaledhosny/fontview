@@ -143,6 +143,14 @@ render_size_changed (GtkSpinButton *w,
 }
 
 static void
+namedinstance_changed (GtkComboBox *w,
+                       gpointer data)
+{
+    gint index = gtk_combo_box_get_active (w);
+    font_view_select_named_instance (FONT_VIEW (data), index);
+}
+
+static void
 render_file_changed (GFileMonitor *monitor,
                      GFile *file,
                      GFile *other_file,
@@ -151,6 +159,28 @@ render_file_changed (GFileMonitor *monitor,
 {
     if (event == G_FILE_MONITOR_EVENT_CHANGES_DONE_HINT)
         font_view_rerender (FONT_VIEW(data));
+}
+
+static void
+setup_mmvar (GtkBuilder* window, GtkWidget* fontview) {
+    GtkWidget* namedinstance;
+    FontModel* model;
+
+    model = font_view_get_model (FONT_VIEW (fontview));
+    if (model->mmvar) {
+        FT_MM_Var* mmvar = model->mmvar;
+        namedinstance = GET_GBOPJECT (window, "named-instance");
+        gtk_widget_set_visible (namedinstance, TRUE);
+        for (FT_UInt i = 0; i < mmvar->num_namedstyles; i++) {
+            FT_Var_Named_Style style = mmvar->namedstyle[i];
+            gchar* name = get_font_name (model->ft_face, style.strid);
+            gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (namedinstance), name);
+//          if (g_strcmp0 (name, "Regular") == 0) {
+//              gtk_combo_box_set_active (GTK_COMBO_BOX (namedinstance), i);
+//          }
+        }
+        gtk_combo_box_set_active (GTK_COMBO_BOX (namedinstance), 3);
+    }
 }
 
 void
@@ -163,7 +193,7 @@ print_usage (void)
 int
 main (int argc, char *argv[]) {
     GtkBuilder *mainwindow;
-    GtkWidget *w, *entry, *sizew, *container, *font;
+    GtkWidget *w, *entry, *sizew, *container, *font, *namedinstance;
     GFile *file;
     GFileMonitor *monitor;
 
@@ -205,6 +235,11 @@ main (int argc, char *argv[]) {
     file = g_file_new_for_path(argv[1]);
     monitor = g_file_monitor_file (file, 0, NULL, NULL);
     g_signal_connect (monitor, "changed", G_CALLBACK(render_file_changed), font);
+
+    namedinstance = GET_GBOPJECT (mainwindow, "named-instance");
+    g_signal_connect (namedinstance, "changed", G_CALLBACK(namedinstance_changed), font);
+
+    setup_mmvar (mainwindow, font);
 
     gtk_main();
 

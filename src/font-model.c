@@ -162,5 +162,13 @@ GObject *font_model_new (gchar *fontfile) {
         model->sample = get_font_name (model->ft_face, TT_NAME_ID_SAMPLE_TEXT);
     }
 
+    model->mmvar = NULL;
+    model->mmcoords = NULL;
+    if (FT_HAS_MULTIPLE_MASTERS (model->ft_face)) {
+        if (FT_Get_MM_Var (model->ft_face, &model->mmvar) != 0) {
+            model->mmvar = NULL;
+        }
+    }
+
     return G_OBJECT (model);
 }

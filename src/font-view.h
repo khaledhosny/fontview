@@ -77,6 +77,7 @@ gdouble font_view_get_pt_size (FontView *view);
 
 gchar *font_view_get_text (FontView *view);
 void font_view_set_text (FontView *view, gchar *text);
+void font_view_select_named_instance (FontView *view, gint index);
 
 void font_view_rerender (FontView *view);
 
