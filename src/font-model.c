@@ -108,7 +108,6 @@ GObject *font_model_new (gchar *fontfile) {
     FcConfig *config;
     gint len, i;
     TT_OS2* os2;
-    TT_PCLT* pclt;
 
     g_return_val_if_fail (fontfile, NULL);
 
@@ -153,12 +152,6 @@ GObject *font_model_new (gchar *fontfile) {
         model->xheight = os2->sxHeight;
         model->ascender = os2->sTypoAscender;
         model->descender = os2->sTypoDescender;
-    }
-
-    if (model->xheight<0){
-        pclt = FT_Get_Sfnt_Table(face, ft_sfnt_pclt);
-        if (pclt)
-            model->xheight = pclt->xHeight;
     }
 
     model->family = get_font_name (face, TT_NAME_ID_PREFERRED_FAMILY);
