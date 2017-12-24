@@ -128,6 +128,11 @@ GObject *font_model_new (gchar *fontfile) {
         return NULL;
     }
 
+    if (!FT_IS_SFNT(model->ft_face)) {
+        g_error ("Not an SFNT font!");
+        return NULL;
+    }
+
     model->file = g_strdup (fontfile);
     model->family = model->ft_face->family_name;
     model->style = model->ft_face->style_name;
@@ -140,33 +145,31 @@ GObject *font_model_new (gchar *fontfile) {
     model->sample = NULL;
 
     /* Get font metadata if available/applicable */
-    if (FT_IS_SFNT(model->ft_face)) {
-        os2 = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_os2);
-        if (os2) {
-            model->xheight = os2->sxHeight;
-            model->ascender = os2->sTypoAscender;
-            model->descender = os2->sTypoDescender;
-        }
-
-        if (model->xheight<0){
-            pclt = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_pclt);
-            if (pclt)
-                model->xheight = pclt->xHeight;
-        }
-
-        model->family = get_font_name (model->ft_face, TT_NAME_ID_PREFERRED_FAMILY);
-        if (!model->family)
-            model->family = get_font_name (model->ft_face, TT_NAME_ID_FONT_FAMILY);
-
-        model->style = get_font_name (model->ft_face, TT_NAME_ID_PREFERRED_SUBFAMILY);
-        if (!model->style)
-            model->style = get_font_name (model->ft_face, TT_NAME_ID_FONT_SUBFAMILY);
-
-        model->copyright = get_font_name (model->ft_face, TT_NAME_ID_COPYRIGHT);
-        model->version = get_font_name (model->ft_face, TT_NAME_ID_VERSION_STRING);
-        model->description = get_font_name (model->ft_face, TT_NAME_ID_DESCRIPTION);
-        model->sample = get_font_name (model->ft_face, TT_NAME_ID_SAMPLE_TEXT);
+    os2 = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_os2);
+    if (os2) {
+        model->xheight = os2->sxHeight;
+        model->ascender = os2->sTypoAscender;
+        model->descender = os2->sTypoDescender;
     }
+
+    if (model->xheight<0){
+        pclt = FT_Get_Sfnt_Table(model->ft_face, ft_sfnt_pclt);
+        if (pclt)
+            model->xheight = pclt->xHeight;
+    }
+
+    model->family = get_font_name (model->ft_face, TT_NAME_ID_PREFERRED_FAMILY);
+    if (!model->family)
+        model->family = get_font_name (model->ft_face, TT_NAME_ID_FONT_FAMILY);
+
+    model->style = get_font_name (model->ft_face, TT_NAME_ID_PREFERRED_SUBFAMILY);
+    if (!model->style)
+        model->style = get_font_name (model->ft_face, TT_NAME_ID_FONT_SUBFAMILY);
+
+    model->copyright = get_font_name (model->ft_face, TT_NAME_ID_COPYRIGHT);
+    model->version = get_font_name (model->ft_face, TT_NAME_ID_VERSION_STRING);
+    model->description = get_font_name (model->ft_face, TT_NAME_ID_DESCRIPTION);
+    model->sample = get_font_name (model->ft_face, TT_NAME_ID_SAMPLE_TEXT);
 
     model->mmvar = NULL;
     model->mmcoords = NULL;
