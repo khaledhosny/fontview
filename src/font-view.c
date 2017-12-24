@@ -205,15 +205,26 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
-        FcConfig *config = FcConfigCreate ();
-        FcBool ok = FcConfigAppFontAddFile (config, priv->model->file);
-        PangoFontMap *fontmap = pango_cairo_font_map_new_for_font_type (CAIRO_FONT_TYPE_FT);
-        pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (fontmap), config);
-        PangoContext *context = pango_font_map_create_context (fontmap);
+        FcBool ok;
+        FcConfig *config;
+        FT_Face ft_face;
+        PangoAttribute *size;
+        PangoAttrList *attributes;
+        PangoContext *context;
+        PangoFontDescription *desc;
+        PangoFont *font;
+        PangoFontMap *fontmap;
+        PangoLayout *layout;
 
-        PangoFontDescription *desc = pango_font_description_new ();
-        PangoFont *font = pango_font_map_load_font (fontmap, context, desc);
-        FT_Face ft_face = pango_fc_font_lock_face (PANGO_FC_FONT (font));
+        config = FcConfigCreate ();
+        ok = FcConfigAppFontAddFile (config, priv->model->file);
+        fontmap = pango_cairo_font_map_new_for_font_type (CAIRO_FONT_TYPE_FT);
+        pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (fontmap), config);
+        context = pango_font_map_create_context (fontmap);
+
+        desc = pango_font_description_new ();
+        font = pango_font_map_load_font (fontmap, context, desc);
+        ft_face = pango_fc_font_lock_face (PANGO_FC_FONT (font));
         if (priv->model->mmcoords) {
             FT_MM_Var* mmvar = priv->model->mmvar;
             FT_Fixed* coords = priv->model->mmcoords;
@@ -225,11 +236,11 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
         cairo_set_source_rgba (cr, 0, 0, 0, 1);
 
-        PangoLayout *layout = pango_layout_new (context);
+        layout = pango_layout_new (context);
         pango_layout_set_text (layout, priv->text, -1);
 
-        PangoAttrList *attributes = pango_attr_list_new ();
-        PangoAttribute *size = pango_attr_size_new (priv->size * PANGO_SCALE);
+        attributes = pango_attr_list_new ();
+        size = pango_attr_size_new (priv->size * PANGO_SCALE);
         pango_attr_list_insert (attributes, size);
         pango_layout_set_attributes (layout, attributes);
 
