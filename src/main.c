@@ -196,7 +196,7 @@ main (int argc, char *argv[]) {
     GtkWidget *w, *entry, *sizew, *container, *font, *namedinstance;
     GFile *file;
     GFileMonitor *monitor;
-
+    gchar *text;
 
     bindtextdomain (PACKAGE, LOCALEDIR);
     textdomain (PACKAGE);
@@ -222,6 +222,9 @@ main (int argc, char *argv[]) {
     gtk_widget_show (container);
 
     entry = GET_GBOPJECT (mainwindow, "render_str");
+    text = font_view_get_text (FONT_VIEW (font));
+    if (text)
+        gtk_entry_set_text (GTK_ENTRY (entry), text);
     g_signal_connect (entry, "changed", G_CALLBACK(render_text_changed), font);
     g_signal_emit_by_name (entry, "changed");
 
