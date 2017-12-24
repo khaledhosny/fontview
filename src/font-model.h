@@ -33,6 +33,7 @@
 #define __FONT_MODEL_H__
 
 #include <glib-object.h>
+#include <fontconfig/fontconfig.h>
 #include <ft2build.h>
 #include FT_FREETYPE_H
 #include FT_MULTIPLE_MASTERS_H
@@ -74,6 +75,8 @@ struct _FontModel {
 
     FT_MM_Var* mmvar;
     FT_Fixed* mmcoords;
+
+    FcConfig *config;
 };
 
 struct _FontModelClass {

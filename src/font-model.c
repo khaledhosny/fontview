@@ -117,6 +117,12 @@ GObject *font_model_new (gchar *fontfile) {
 
     model = g_object_new (FONT_MODEL_TYPE, NULL);
 
+    model->config = FcConfigCreate ();
+    if (!FcConfigAppFontAddFile (model->config, fontfile)) {
+        g_error ("FcConfigAppFontAddFile failed");
+        return NULL;
+    }
+
     if (FT_New_Face (library, fontfile, 0, &model->ft_face)) {
         g_warning ("FT_New_Face failed");
         return NULL;

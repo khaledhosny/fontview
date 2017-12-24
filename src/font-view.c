@@ -205,8 +205,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
-        FcBool ok;
-        FcConfig *config;
         FT_Face ft_face;
         PangoAttribute *size;
         PangoAttrList *attributes;
@@ -216,10 +214,8 @@ static void render (GtkWidget *w, cairo_t *cr) {
         PangoFontMap *fontmap;
         PangoLayout *layout;
 
-        config = FcConfigCreate ();
-        ok = FcConfigAppFontAddFile (config, priv->model->file);
         fontmap = pango_cairo_font_map_new_for_font_type (CAIRO_FONT_TYPE_FT);
-        pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (fontmap), config);
+        pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (fontmap), priv->model->config);
         context = pango_font_map_create_context (fontmap);
 
         desc = pango_font_description_new ();
@@ -267,7 +263,6 @@ static void render (GtkWidget *w, cairo_t *cr) {
         pango_font_description_free (desc);
         g_object_unref (context);
         g_object_unref (fontmap);
-        FcConfigDestroy (config);
     }
 }
 
