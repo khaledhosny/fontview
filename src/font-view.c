@@ -291,6 +291,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
                             cx = x + (double)(x_position + gi->geometry.x_offset) / PANGO_SCALE;
                             cy = y + (double)(gi->geometry.y_offset) / PANGO_SCALE;
+
                             if (g_hash_table_contains (model->color.glyphs, key)) {
                                 ColorGlyph *color_glyph = g_hash_table_lookup (model->color.glyphs, key);
                                 for (int j = 0; j < color_glyph->num_layers; j++) {
