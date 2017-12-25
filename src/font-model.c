@@ -100,6 +100,177 @@ get_font_name (FT_Face face, FT_UInt nameid) {
     return NULL;
 }
 
+FT_ULong
+load_table (FT_Face face, FT_ULong tag, FT_Byte** buffer) {
+    FT_ULong len = 0;
+
+    if (FT_Load_Sfnt_Table (face, tag, 0, NULL, &len))
+        return 0;
+
+    *buffer = g_new (FT_Byte, len);
+    if (FT_Load_Sfnt_Table (face, tag, 0, *buffer, &len)) {
+        g_free (*buffer);
+        *buffer = NULL;
+        return 0;
+    }
+
+    return len;
+}
+
+static FT_Byte GetByte(FT_Byte **ptr)
+{
+    FT_Byte v = (*ptr)[0];
+    *ptr += 1;
+    return v;
+}
+
+static FT_UShort GetUShort(FT_Byte **ptr)
+{
+    FT_UShort v = (*ptr)[0] << 8 | (*ptr)[1];
+    *ptr += 2;
+    return v;
+}
+
+static FT_ULong GetULong(FT_Byte **ptr)
+{
+    FT_ULong v = (*ptr)[0] << 24 | (*ptr)[1] << 16 |
+                 (*ptr)[2] << 8  | (*ptr)[3];
+    *ptr += 4;
+    return v;
+}
+
+static const size_t BaseGlyphSize = 6;
+static const size_t LayerSize = 4;
+static const size_t ColrHeaderSize = 14;
+static const size_t CpalV0HeaderBaseSize = 12;
+static const size_t ColorSize = 4;
+
+void
+load_color_table (FontModel *model) {
+    FT_Face face;
+    FT_Byte *colr_table = NULL;
+    FT_Byte *cpal_table = NULL;
+    FT_Byte *p = NULL;
+    FT_ULong len = 0;
+    FT_ULong colr_base_glyph_begin, colr_base_glyph_end, colr_layer_begin, colr_layer_end;
+    FT_ULong cpal_colors_begin, cpal_colors_end;
+    FT_UShort colr_version, colr_num_base_glyphs, colr_num_layers;
+    FT_Byte *colr_base_glyphs, *colr_layers;
+    FT_UShort cpal_version, cpal_num_palettes_entries, cpal_num_palettes, cpal_num_colors;
+    FT_Byte *cpal_colors, *cpal_color_indices;
+
+    face = model->ft_face;
+
+    len = load_table (face, FT_MAKE_TAG ('C','O','L','R'), &colr_table);
+    if (!len)
+        goto done;
+
+    if (len < ColrHeaderSize)
+        goto bad;
+
+    p = colr_table;
+
+    colr_version = GetUShort(&p);
+    colr_num_base_glyphs = GetUShort(&p);
+    colr_base_glyph_begin = GetULong(&p);
+    colr_layer_begin = GetULong(&p);
+    colr_num_layers = GetUShort(&p);
+    colr_base_glyphs = colr_table + colr_base_glyph_begin;
+    colr_layers = colr_table + colr_layer_begin;
+
+    if (colr_version != 0)
+        goto done;
+
+    colr_base_glyph_end = colr_base_glyph_begin + colr_num_base_glyphs * BaseGlyphSize;
+    colr_layer_end = colr_layer_begin + colr_num_layers * LayerSize;
+    if (colr_base_glyph_end < colr_base_glyph_begin ||
+        colr_base_glyph_end > len ||
+        colr_layer_end < colr_layer_begin ||
+        colr_layer_end > len)
+        goto bad;
+
+    if (colr_base_glyphs < colr_table || colr_layers < colr_table)
+        goto bad;
+
+    len = load_table (face, FT_MAKE_TAG ('C','P','A','L'), &cpal_table);
+    if (!len)
+        goto done;
+
+    if (len < CpalV0HeaderBaseSize)
+        goto bad;
+
+    p = cpal_table;
+    cpal_version = GetUShort(&p);
+    cpal_num_palettes_entries = GetUShort(&p);
+    cpal_num_palettes = GetUShort(&p);
+    cpal_num_colors = GetUShort(&p);
+    cpal_colors_begin = GetULong(&p);
+    cpal_color_indices = p;
+    cpal_colors = cpal_table + cpal_colors_begin;
+
+    if (cpal_version != 0 && cpal_version != 1)
+        goto done;
+
+    cpal_colors_end = cpal_colors_begin + cpal_num_colors * ColorSize;
+    if (cpal_colors_end < cpal_colors_begin || cpal_colors_end > len)
+        goto bad;
+
+    if (cpal_colors < cpal_table)
+        goto bad;
+
+    model->color_layers = g_hash_table_new (g_direct_hash, g_direct_equal);
+
+    p = colr_base_glyphs;
+    while (p <= colr_table + colr_base_glyph_end) {
+        ColorGlyph *glyph;
+        FT_Byte *pp;
+        FT_UShort gid, first_layer, num_layers;
+
+        gid = GetUShort(&p);
+        first_layer = GetUShort(&p);
+        num_layers = GetUShort(&p);
+
+        glyph = g_new (ColorGlyph, 1);
+        glyph->num_layers = num_layers;
+        glyph->layers = g_new (ColorLayer, num_layers);
+
+        pp = colr_layers + first_layer * LayerSize;
+        for (FT_UShort idx = 0; idx < num_layers; idx++) {
+            FT_UShort color_index;
+            FT_Int color_offset;
+
+            glyph->layers[idx].gid = GetUShort(&pp);
+            color_index = GetUShort(&pp);
+
+            glyph->layers[idx].r = glyph->layers[idx].g = glyph->layers[idx].b = 0;
+            glyph->layers[idx].a = 1;
+
+            if (color_index != 0xFFFF) {
+                FT_Byte *ppp;
+                ppp = cpal_color_indices + 0 /*palette_index*/ * sizeof(FT_UShort);
+
+                color_offset = GetUShort(&ppp);
+                ppp = cpal_colors + color_offset + ColorSize * color_index;
+                glyph->layers[idx].b = GetByte(&ppp) / 255.0;
+                glyph->layers[idx].g = GetByte(&ppp) / 255.0;
+                glyph->layers[idx].r = GetByte(&ppp) / 255.0;
+                glyph->layers[idx].a = GetByte(&ppp) / 255.0;
+            }
+        }
+
+        g_hash_table_insert (model->color_layers, GINT_TO_POINTER (gid), glyph);
+    }
+
+    goto done;
+
+bad:
+    g_warning ("Ignoring bad or corrupt COLR or CPAL table");
+
+done:
+    g_free (colr_table);
+    g_free (cpal_table);
+}
+
 GObject *font_model_new (gchar *fontfile) {
     FontModel *model;
     FT_Library library;
@@ -146,6 +317,8 @@ GObject *font_model_new (gchar *fontfile) {
 
     model->sample = NULL;
 
+    model->color_layers = NULL;
+
     /* Get font metadata if available/applicable */
     os2 = FT_Get_Sfnt_Table(face, ft_sfnt_os2);
     if (os2) {
@@ -174,6 +347,8 @@ GObject *font_model_new (gchar *fontfile) {
             model->mmvar = NULL;
         }
     }
+
+    load_color_table (model);
 
     return G_OBJECT (model);
 }

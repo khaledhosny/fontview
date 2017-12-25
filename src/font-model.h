@@ -77,6 +77,8 @@ struct _FontModel {
     FT_Fixed* mmcoords;
 
     FcConfig *config;
+
+    GHashTable *color_layers;
 };
 
 struct _FontModelClass {
@@ -88,5 +90,15 @@ GType font_model_get_type (void);
 GObject *font_model_new (gchar *font);
 
 gchar* get_font_name (FT_Face face, FT_UInt nameid);
+
+typedef struct {
+    int gid;
+    double r, g, b, a;
+} ColorLayer;
+
+typedef struct {
+    int num_layers;
+    ColorLayer *layers;
+} ColorGlyph;
 
 #endif /* __FONT_MODEL_H__ */
