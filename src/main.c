@@ -200,7 +200,7 @@ setup_palette (GtkBuilder* window, GtkWidget* fontview) {
     if (model->color.glyphs) {
         colorpalette = GET_GBOPJECT (window, "color-palette");
         gtk_widget_set_visible (colorpalette, TRUE);
-        for (FT_UInt i = 0; i < model->color.num_palettes; i++) {
+        for (gint i = 0; i < model->color.num_palettes; i++) {
             gchar* name = model->color.palette_names[i];
             gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (colorpalette), name);
         }
