@@ -296,7 +296,7 @@ GObject *font_model_new (gchar *fontfile) {
     }
 
     config = FcConfigCreate ();
-    if (!FcConfigAppFontAddFile (config, fontfile)) {
+    if (!FcConfigAppFontAddFile (config, (FcChar8*)fontfile)) {
         g_error ("FcConfigAppFontAddFile failed");
         return NULL;
     }
