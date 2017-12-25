@@ -33,6 +33,7 @@
 
 #include "font-model.h"
 
+#include <glib/gi18n.h>
 #include <ft2build.h>
 #include FT_SFNT_NAMES_H
 #include FT_TRUETYPE_IDS_H
@@ -144,6 +145,8 @@ static const size_t LayerSize = 4;
 static const size_t ColrHeaderSize = 14;
 static const size_t CpalV0HeaderBaseSize = 12;
 static const size_t ColorSize = 4;
+static const size_t NameIdSize = 2;
+static const size_t ColorIndexSize = 2;
 
 void
 load_color_table (FontModel *model) {
@@ -153,7 +156,7 @@ load_color_table (FontModel *model) {
     FT_Byte *p = NULL;
     FT_ULong len = 0;
     FT_ULong colr_base_glyph_begin, colr_base_glyph_end, colr_layer_begin, colr_layer_end;
-    FT_ULong cpal_colors_begin, cpal_colors_end;
+    FT_ULong cpal_colors_begin, cpal_colors_end, cpal_palette_labels_begin, cpal_palette_labels_end;
     FT_UShort colr_version, colr_num_base_glyphs, colr_num_layers;
     FT_Byte *colr_base_glyphs, *colr_layers;
     FT_UShort cpal_version, cpal_num_palettes_entries, cpal_num_palettes, cpal_num_colors;
@@ -207,6 +210,7 @@ load_color_table (FontModel *model) {
     cpal_colors_begin = GetULong(&p);
     cpal_color_indices = p;
     cpal_colors = cpal_table + cpal_colors_begin;
+    cpal_palette_labels_begin = 0;
 
     if (cpal_version != 0 && cpal_version != 1)
         goto done;
@@ -218,12 +222,32 @@ load_color_table (FontModel *model) {
     if (cpal_colors < cpal_table)
         goto bad;
 
+    if (cpal_version >= 1) {
+        p = cpal_table + CpalV0HeaderBaseSize + cpal_num_palettes * ColorIndexSize;
+        /*cpal_types_begin =*/ GetULong(&p);
+        cpal_palette_labels_begin = GetULong(&p);
+        cpal_palette_labels_end = cpal_palette_labels_begin + cpal_num_palettes * NameIdSize;
+        if (cpal_palette_labels_end < cpal_palette_labels_begin ||
+            cpal_palette_labels_end > len)
+            goto bad;
+    }
+
     model->color.glyphs = g_hash_table_new (g_direct_hash, g_direct_equal);
     model->color.num_palettes = cpal_num_palettes;
-    model->color.palette_names = g_new (gchar*, cpal_num_palettes);
+    model->color.palette_names = g_new0 (gchar*, cpal_num_palettes);
+
+    if (cpal_palette_labels_begin) {
+        p = cpal_table + cpal_palette_labels_begin;
+        for (int i = 0; i < cpal_num_palettes; i++) {
+            FT_UShort nameid = GetUShort (&p);
+            if (nameid != 0xFFFF)
+                model->color.palette_names[i] = get_font_name (face, nameid);
+        }
+    }
 
     for (int i = 0; i < cpal_num_palettes; i++) {
-        model->color.palette_names[i] = g_strdup_printf("%i", i);
+        if (!model->color.palette_names[i])
+            model->color.palette_names[i] = g_strdup_printf (_("Palette %i"), i);
     }
 
     p = colr_base_glyphs;
