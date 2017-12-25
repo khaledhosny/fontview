@@ -151,6 +151,78 @@ FontModel *font_view_get_model (FontView *view) {
     return priv->model;
 }
 
+static void
+show_layout_with_color (cairo_t *cr,
+                        PangoLayout *layout,
+                        FontViewPrivate *priv,
+                        double x,
+                        double y)
+{
+    int x_position = 0;
+    PangoLayoutIter *iter;
+    FontModel *model;
+
+    model = priv->model;
+
+    iter = pango_layout_get_iter (layout);
+
+    do {
+        PangoLayoutRun *run = pango_layout_iter_get_run (iter);
+        if (run) {
+            cairo_font_face_t *cr_face;
+            PangoGlyphString* glyphs;
+            PangoGlyphInfo *gi;
+            double cx, cy;
+
+            glyphs = run->glyphs;
+
+            cr_face = cairo_ft_font_face_create_for_ft_face (model->ft_face, 0);
+            cairo_set_font_face (cr, cr_face);
+            /* our size is in points, so we convert to cairo user units */
+            cairo_set_font_size (cr, priv->size * 96 / 72.0);
+
+            for (int i = 0; i < glyphs->num_glyphs; i++) {
+                cairo_glyph_t glyph;
+
+                gi = &glyphs->glyphs[i];
+                if (gi->glyph != PANGO_GLYPH_EMPTY) {
+                    gconstpointer key = GINT_TO_POINTER (gi->glyph);
+
+                    cx = x + (double)(x_position + gi->geometry.x_offset) / PANGO_SCALE;
+                    cy = y + (double)(gi->geometry.y_offset) / PANGO_SCALE;
+
+                    if (g_hash_table_contains (model->color.glyphs, key)) {
+                        ColorGlyph *color_glyph = g_hash_table_lookup (model->color.glyphs, key);
+                        for (int j = 0; j < color_glyph->num_layers; j++) {
+                            ColorLayer layer = color_glyph->layers[j];
+                            Color color = layer.colors[model->color.palette];
+                            glyph.index = layer.gid;
+                            glyph.x = cx;
+                            glyph.y = cy;
+
+                            cairo_set_source_rgba (cr, color.r, color.g, color.b, color.a);
+                            cairo_show_glyphs (cr, &glyph, 1);
+                        }
+                    } else {
+                        glyph.index = gi->glyph & PANGO_GLYPH_UNKNOWN_FLAG ? 0 : gi->glyph;
+                        glyph.x = cx;
+                        glyph.y = cy;
+
+                        cairo_set_source_rgba (cr, 0, 0, 0, 1);
+                        cairo_show_glyphs (cr, &glyph, 1);
+                    }
+                }
+
+                x_position += gi->geometry.width;
+            }
+        }
+    } while (pango_layout_iter_next_run (iter));
+
+    cairo_set_source_rgba (cr, 0, 0, 0, 1);
+
+    pango_layout_iter_free (iter);
+}
+
 static void render (GtkWidget *w, cairo_t *cr) {
     GtkAllocation allocation;
 
@@ -262,66 +334,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
             pango_cairo_update_context (cr, context);
             pango_cairo_show_layout (cr, layout);
         } else {
-            int x_position = 0;
-            PangoLayoutIter *iter;
-
-            iter = pango_layout_get_iter (layout);
-
-            do {
-                PangoLayoutRun *run = pango_layout_iter_get_run (iter);
-                if (run) {
-                    cairo_font_face_t *cr_face;
-                    PangoGlyphString* glyphs;
-                    PangoGlyphInfo *gi;
-                    double cx, cy;
-
-                    glyphs = run->glyphs;
-
-                    cr_face = cairo_ft_font_face_create_for_ft_face (model->ft_face, 0);
-                    cairo_set_font_face (cr, cr_face);
-                    /* our size is in points, so we convert to cairo user units */
-                    cairo_set_font_size (cr, priv->size * 96 / 72.0);
-
-                    for (int i = 0; i < glyphs->num_glyphs; i++) {
-                        cairo_glyph_t glyph;
-
-                        gi = &glyphs->glyphs[i];
-                        if (gi->glyph != PANGO_GLYPH_EMPTY) {
-                            gconstpointer key = GINT_TO_POINTER (gi->glyph);
-
-                            cx = x + (double)(x_position + gi->geometry.x_offset) / PANGO_SCALE;
-                            cy = y + (double)(gi->geometry.y_offset) / PANGO_SCALE;
-
-                            if (g_hash_table_contains (model->color.glyphs, key)) {
-                                ColorGlyph *color_glyph = g_hash_table_lookup (model->color.glyphs, key);
-                                for (int j = 0; j < color_glyph->num_layers; j++) {
-                                    ColorLayer layer = color_glyph->layers[j];
-                                    Color color = layer.colors[model->color.palette];
-                                    glyph.index = layer.gid;
-                                    glyph.x = cx;
-                                    glyph.y = cy;
-
-                                    cairo_set_source_rgba (cr, color.r, color.g, color.b, color.a);
-                                    cairo_show_glyphs (cr, &glyph, 1);
-                                }
-                            } else {
-                                glyph.index = gi->glyph & PANGO_GLYPH_UNKNOWN_FLAG ? 0 : gi->glyph;
-                                glyph.x = cx;
-                                glyph.y = cy;
-
-                                cairo_set_source_rgba (cr, 0, 0, 0, 1);
-                                cairo_show_glyphs (cr, &glyph, 1);
-                            }
-                        }
-
-                        x_position += gi->geometry.width;
-                    }
-                }
-            } while (pango_layout_iter_next_run (iter));
-
-            cairo_set_source_rgba (cr, 0, 0, 0, 1);
-
-            pango_layout_iter_free (iter);
+            show_layout_with_color (cr, layout, priv, x, y);
         }
 
         g_object_unref (layout);
