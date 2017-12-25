@@ -205,6 +205,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
     /* display sample text */
     if (priv->extents[TEXT]) {
+        FontModel *model;
         FT_Face ft_face;
         PangoAttribute *size;
         PangoAttrList *attributes;
@@ -214,16 +215,18 @@ static void render (GtkWidget *w, cairo_t *cr) {
         PangoFontMap *fontmap;
         PangoLayout *layout;
 
+        model = priv->model;
+
         fontmap = pango_cairo_font_map_new_for_font_type (CAIRO_FONT_TYPE_FT);
-        pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (fontmap), priv->model->config);
+        pango_fc_font_map_set_config (PANGO_FC_FONT_MAP (fontmap), model->config);
         context = pango_font_map_create_context (fontmap);
 
         desc = pango_font_description_new ();
         font = pango_font_map_load_font (fontmap, context, desc);
         ft_face = pango_fc_font_lock_face (PANGO_FC_FONT (font));
-        if (priv->model->mmcoords) {
-            FT_MM_Var* mmvar = priv->model->mmvar;
-            FT_Fixed* coords = priv->model->mmcoords;
+        if (model->mmcoords) {
+            FT_MM_Var* mmvar = model->mmvar;
+            FT_Fixed* coords = model->mmcoords;
             if (FT_Set_Var_Design_Coordinates (ft_face, mmvar->num_axis, coords) != 0) {
                 g_warning ("FT_Set_Var_Design_Coordinates failed");
             }
