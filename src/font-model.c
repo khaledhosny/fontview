@@ -275,9 +275,7 @@ GObject *font_model_new (gchar *fontfile) {
     FontModel *model;
     FT_Library library;
     FT_Face face;
-    FT_SfntName sfname;
     FcConfig *config;
-    gint len, i;
     TT_OS2* os2;
 
     g_return_val_if_fail (fontfile, NULL);
