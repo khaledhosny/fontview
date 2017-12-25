@@ -218,7 +218,13 @@ load_color_table (FontModel *model) {
     if (cpal_colors < cpal_table)
         goto bad;
 
-    model->color_layers = g_hash_table_new (g_direct_hash, g_direct_equal);
+    model->color.glyphs = g_hash_table_new (g_direct_hash, g_direct_equal);
+    model->color.num_palettes = cpal_num_palettes;
+    model->color.palette_names = g_new (gchar*, cpal_num_palettes);
+
+    for (int i = 0; i < cpal_num_palettes; i++) {
+        model->color.palette_names[i] = g_strdup_printf("%i", i);
+    }
 
     p = colr_base_glyphs;
     while (p <= colr_table + colr_base_glyph_end) {
@@ -238,27 +244,33 @@ load_color_table (FontModel *model) {
         for (FT_UShort idx = 0; idx < num_layers; idx++) {
             FT_UShort color_index;
             FT_Int color_offset;
+            ColorLayer *layer = &glyph->layers[idx];
 
-            glyph->layers[idx].gid = GetUShort(&pp);
+            layer->colors = g_new (Color, cpal_num_palettes);
+            layer->gid = GetUShort(&pp);
             color_index = GetUShort(&pp);
 
-            glyph->layers[idx].r = glyph->layers[idx].g = glyph->layers[idx].b = 0;
-            glyph->layers[idx].a = 1;
+            for (int palette = 0; palette < cpal_num_palettes; palette++) {
+                Color *color = &layer->colors[palette];
 
-            if (color_index != 0xFFFF) {
-                FT_Byte *ppp;
-                ppp = cpal_color_indices + 0 /*palette_index*/ * sizeof(FT_UShort);
+                if (color_index != 0xFFFF && color_index < cpal_num_palettes_entries) {
+                    FT_Byte *ppp;
+                    ppp = cpal_color_indices + palette * sizeof(FT_UShort);
 
-                color_offset = GetUShort(&ppp);
-                ppp = cpal_colors + color_offset + ColorSize * color_index;
-                glyph->layers[idx].b = GetByte(&ppp) / 255.0;
-                glyph->layers[idx].g = GetByte(&ppp) / 255.0;
-                glyph->layers[idx].r = GetByte(&ppp) / 255.0;
-                glyph->layers[idx].a = GetByte(&ppp) / 255.0;
+                    color_offset = GetUShort(&ppp);
+                    ppp = cpal_colors + color_offset + ColorSize * color_index;
+                    color->b = GetByte(&ppp) / 255.0;
+                    color->g = GetByte(&ppp) / 255.0;
+                    color->r = GetByte(&ppp) / 255.0;
+                    color->a = GetByte(&ppp) / 255.0;
+                } else {
+                    color->r = color->g = color->b = 0;
+                    color->a = 1;
+                }
             }
         }
 
-        g_hash_table_insert (model->color_layers, GINT_TO_POINTER (gid), glyph);
+        g_hash_table_insert (model->color.glyphs, GINT_TO_POINTER (gid), glyph);
     }
 
     goto done;
@@ -315,7 +327,7 @@ GObject *font_model_new (gchar *fontfile) {
 
     model->sample = NULL;
 
-    model->color_layers = NULL;
+    memset(&model->color, 0, sizeof(ColorTable));
 
     /* Get font metadata if available/applicable */
     os2 = FT_Get_Sfnt_Table(face, ft_sfnt_os2);

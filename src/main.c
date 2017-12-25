@@ -151,6 +151,14 @@ namedinstance_changed (GtkComboBox *w,
 }
 
 static void
+colorpalette_changed (GtkComboBox *w,
+                      gpointer data)
+{
+    gint index = gtk_combo_box_get_active (w);
+    font_view_set_palette (FONT_VIEW (data), index);
+}
+
+static void
 render_file_changed (GFileMonitor *monitor,
                      GFile *file,
                      GFile *other_file,
@@ -183,6 +191,22 @@ setup_mmvar (GtkBuilder* window, GtkWidget* fontview) {
     }
 }
 
+static void
+setup_palette (GtkBuilder* window, GtkWidget* fontview) {
+    GtkWidget* colorpalette;
+    FontModel* model;
+
+    model = font_view_get_model (FONT_VIEW (fontview));
+    if (model->color.glyphs) {
+        colorpalette = GET_GBOPJECT (window, "color-palette");
+        gtk_widget_set_visible (colorpalette, TRUE);
+        for (FT_UInt i = 0; i < model->color.num_palettes; i++) {
+            gchar* name = model->color.palette_names[i];
+            gtk_combo_box_text_append_text (GTK_COMBO_BOX_TEXT (colorpalette), name);
+        }
+        gtk_combo_box_set_active (GTK_COMBO_BOX (colorpalette), 0);
+    }
+}
 void
 print_usage (void)
 {
@@ -193,7 +217,7 @@ print_usage (void)
 int
 main (int argc, char *argv[]) {
     GtkBuilder *mainwindow;
-    GtkWidget *w, *entry, *sizew, *container, *font, *namedinstance;
+    GtkWidget *w, *entry, *sizew, *container, *font, *namedinstance, *colorpalette;
     GFile *file;
     GFileMonitor *monitor;
     gchar *text;
@@ -241,8 +265,11 @@ main (int argc, char *argv[]) {
 
     namedinstance = GET_GBOPJECT (mainwindow, "named-instance");
     g_signal_connect (namedinstance, "changed", G_CALLBACK(namedinstance_changed), font);
-
     setup_mmvar (mainwindow, font);
+
+    colorpalette = GET_GBOPJECT (mainwindow, "color-palette");
+    g_signal_connect (colorpalette, "changed", G_CALLBACK(colorpalette_changed), font);
+    setup_palette (mainwindow, font);
 
     gtk_main();
 

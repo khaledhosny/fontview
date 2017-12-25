@@ -256,7 +256,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         }
 #endif
 
-        if (!model->color_layers) {
+        if (!model->color.glyphs) {
             gint baseline = pango_layout_get_baseline (layout) / PANGO_SCALE;
             cairo_translate (cr, x, y - baseline);
             pango_cairo_update_context (cr, context);
@@ -291,15 +291,16 @@ static void render (GtkWidget *w, cairo_t *cr) {
 
                             cx = x + (double)(x_position + gi->geometry.x_offset) / PANGO_SCALE;
                             cy = y + (double)(gi->geometry.y_offset) / PANGO_SCALE;
-                            if (g_hash_table_contains (model->color_layers, key)) {
-                                ColorGlyph *color_glyph = g_hash_table_lookup (model->color_layers, key);
+                            if (g_hash_table_contains (model->color.glyphs, key)) {
+                                ColorGlyph *color_glyph = g_hash_table_lookup (model->color.glyphs, key);
                                 for (int j = 0; j < color_glyph->num_layers; j++) {
                                     ColorLayer layer = color_glyph->layers[j];
+                                    Color color = layer.colors[model->color.palette];
                                     glyph.index = layer.gid;
                                     glyph.x = cx;
                                     glyph.y = cy;
 
-                                    cairo_set_source_rgba (cr, layer.r, layer.g, layer.b, layer.a);
+                                    cairo_set_source_rgba (cr, color.r, color.g, color.b, color.a);
                                     cairo_show_glyphs (cr, &glyph, 1);
                                 }
                             } else {
@@ -423,6 +424,13 @@ void font_view_select_named_instance (FontView *view, gint index)
         model->mmcoords = model->mmvar->namedstyle[index].coords;
     }
 
+    font_view_redraw (view);
+}
+
+void font_view_set_palette (FontView *view, gint index)
+{
+    FontModel* model = font_view_get_model (FONT_VIEW (view));
+    model->color.palette = index;
     font_view_redraw (view);
 }
 

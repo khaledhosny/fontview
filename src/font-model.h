@@ -38,6 +38,28 @@
 #include FT_FREETYPE_H
 #include FT_MULTIPLE_MASTERS_H
 
+
+typedef struct {
+    double r, g, b, a;
+} Color;
+
+typedef struct {
+    int gid;
+    Color *colors;
+} ColorLayer;
+
+typedef struct {
+    int num_layers;
+    ColorLayer *layers;
+} ColorGlyph;
+
+typedef struct {
+    GHashTable *glyphs;
+    gint palette;
+    gint num_palettes;
+    gchar **palette_names;
+} ColorTable;
+
 #define FONT_MODEL_TYPE            (font_model_get_type())
 #define FONT_MODEL(obj)            (G_TYPE_CHECK_INSTANCE_CAST ((obj), \
                                     FONT_MODEL_TYPE, FontModel))
@@ -78,7 +100,7 @@ struct _FontModel {
 
     FcConfig *config;
 
-    GHashTable *color_layers;
+    ColorTable color;
 };
 
 struct _FontModelClass {
@@ -90,15 +112,5 @@ GType font_model_get_type (void);
 GObject *font_model_new (gchar *font);
 
 gchar* get_font_name (FT_Face face, FT_UInt nameid);
-
-typedef struct {
-    int gid;
-    double r, g, b, a;
-} ColorLayer;
-
-typedef struct {
-    int num_layers;
-    ColorLayer *layers;
-} ColorGlyph;
 
 #endif /* __FONT_MODEL_H__ */
