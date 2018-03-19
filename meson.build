@@ -21,14 +21,14 @@ pangoft = dependency('pangoft2', version : '>= 1.37.0')
 deps = [gtk, freetype, harfbuzz, pangoft]
 
 resources = gnome.compile_resources(
-  'fontview-resources', 'data/fontview.gresource.xml',
-  source_dir : 'data',
+  'fontview-resources', 'fontview.gresource.xml',
+  source_dir : '.',
   c_name : 'fontview'
 )
 
 fontview = executable(
   meson.project_name(),
-  'src/font-model.c', 'src/font-view.c', 'src/main.c',
+  'font-model.c', 'font-view.c', 'main.c',
   resources,
   dependencies: deps,
   install: true
