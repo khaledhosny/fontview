@@ -1,7 +1,7 @@
 FontView
 (c) 2006, Alex Roberts <alex AT redprocess DOT com>
 (c) 2006, Jon Phillips <jon AT rejon DOT org>
-(c) 2010, 2011 Khaled Hosny <khaledhosnt AT eglug DOT org>
+(c) 2010, 2018 Khaled Hosny <khaledhosnt AT eglug DOT org>
 
 A simple font viewer
 
@@ -13,18 +13,12 @@ Requires Gtk+, Cairo, Freetype2, HarfBuzz
 
 To build:
 
-$ ./configure
-$ make
-$ make install
-
+$ meson build
+$ ninja -C build
+$ ninja -C build install
 
 To run:
  
 $ fontview /path/to/a/typeface
- 
-
-To clean:
-
-$ make clean
 
 See COPYING for license information.
