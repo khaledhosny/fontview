@@ -1,5 +1,7 @@
-FontView
-========
+Font View
+=========
+
+![Screenshot](screenshot.png)
 
 A simple font viewer.
 
