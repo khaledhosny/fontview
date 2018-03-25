@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: fontview\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-19 03:16+0200\n"
+"POT-Creation-Date: 2018-03-25 12:37+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: fontview.desktop.in:3 data/mainwindow.ui:18 src/main.c:54
+#: fontview.desktop.in:3 mainwindow.ui:18 main.c:54
 msgid "Font View"
 msgstr ""
 
@@ -29,78 +29,78 @@ msgstr ""
 msgid "font"
 msgstr ""
 
-#: data/mainwindow.ui:49
+#: mainwindow.ui:49
 msgid "Font Information"
 msgstr ""
 
-#: data/mainwindow.ui:71
+#: mainwindow.ui:71
 msgid "How quickly daft jumping zebras vex."
 msgstr ""
 
-#: data/mainwindow.ui:83
+#: mainwindow.ui:83
 msgid "Size:"
 msgstr ""
 
-#: data/infowindow.ui:9
+#: infowindow.ui:9
 msgid "Font Info"
 msgstr ""
 
-#: data/infowindow.ui:27
+#: infowindow.ui:27
 msgid "About"
 msgstr ""
 
-#: data/infowindow.ui:42
+#: infowindow.ui:42
 msgid "Close"
 msgstr ""
 
-#: data/infowindow.ui:75
+#: infowindow.ui:75
 msgid "Name"
 msgstr ""
 
-#: data/infowindow.ui:94
+#: infowindow.ui:94
 msgid "Style"
 msgstr ""
 
-#: data/infowindow.ui:113
+#: infowindow.ui:113
 msgid "Version"
 msgstr ""
 
-#: data/infowindow.ui:131
+#: infowindow.ui:131
 msgid "Copyright"
 msgstr ""
 
-#: data/infowindow.ui:149
+#: infowindow.ui:149
 msgid "Description"
 msgstr ""
 
-#: data/infowindow.ui:167
+#: infowindow.ui:167
 msgid "File"
 msgstr ""
 
-#: src/main.c:57
+#: main.c:57
 msgid ""
 "Copyright © 2007, Alex Roberts\n"
 "Copyright © 2010, Khaled Hosny"
 msgstr ""
 
-#: src/main.c:58
+#: main.c:58
 msgid ""
 "A font viewing utility.\n"
 "Part of the Serif font management project."
 msgstr ""
 
-#: src/main.c:59
+#: main.c:59
 msgid ""
 "GNU General Public License 2.0\n"
 "\n"
 "See COPYING for more information."
 msgstr ""
 
-#: src/main.c:60
+#: main.c:60
 msgid "translator-credits"
 msgstr ""
 
-#: src/font-model.c:257
+#: font-model.c:257
 #, c-format
 msgid "Palette %i"
 msgstr ""

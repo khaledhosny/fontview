@@ -1,6 +1,6 @@
 fontview.desktop.in
-data/mainwindow.ui
-data/infowindow.ui
-src/main.c
-src/font-view.c
-src/font-model.c
+mainwindow.ui
+infowindow.ui
+main.c
+font-view.c
+font-model.c

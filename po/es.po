@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Fontview\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-19 03:16+0200\n"
+"POT-Creation-Date: 2018-03-25 12:37+0200\n"
 "PO-Revision-Date: 2018-03-25 02:10-0600\n"
 "Last-Translator: Adolfo Jayme Barrientos <fitojb@ubuntu.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.0.6\n"
 
-#: fontview.desktop.in:3 data/mainwindow.ui:18 src/main.c:54
+#: fontview.desktop.in:3 mainwindow.ui:18 main.c:54
 msgid "Font View"
 msgstr "Visor tipográfico"
 
@@ -29,55 +29,56 @@ msgstr "Una utilidad para visualizar tipos de letra"
 msgid "font"
 msgstr "tipo de letra"
 
-#: data/mainwindow.ui:49
+#: mainwindow.ui:49
 msgid "Font Information"
 msgstr "Información del tipo de letra"
 
-#: data/mainwindow.ui:71
+#: mainwindow.ui:71
 msgid "How quickly daft jumping zebras vex."
-msgstr "El viejo señor Gómez pedía queso, kiwi y habas, pero le ha tocado un saxofón."
+msgstr ""
+"El viejo señor Gómez pedía queso, kiwi y habas, pero le ha tocado un saxofón."
 
-#: data/mainwindow.ui:83
+#: mainwindow.ui:83
 msgid "Size:"
 msgstr "Tamaño:"
 
-#: data/infowindow.ui:9
+#: infowindow.ui:9
 msgid "Font Info"
 msgstr "Información del tipo de letra"
 
-#: data/infowindow.ui:27
+#: infowindow.ui:27
 msgid "About"
 msgstr "Acerca de"
 
-#: data/infowindow.ui:42
+#: infowindow.ui:42
 msgid "Close"
 msgstr "Cerrar"
 
-#: data/infowindow.ui:75
+#: infowindow.ui:75
 msgid "Name"
 msgstr "Nombre"
 
-#: data/infowindow.ui:94
+#: infowindow.ui:94
 msgid "Style"
 msgstr "Estilo"
 
-#: data/infowindow.ui:113
+#: infowindow.ui:113
 msgid "Version"
 msgstr "Versión"
 
-#: data/infowindow.ui:131
+#: infowindow.ui:131
 msgid "Copyright"
 msgstr "Derechos de autor"
 
-#: data/infowindow.ui:149
+#: infowindow.ui:149
 msgid "Description"
 msgstr "Descripción"
 
-#: data/infowindow.ui:167
+#: infowindow.ui:167
 msgid "File"
 msgstr "Archivo"
 
-#: src/main.c:57
+#: main.c:57
 msgid ""
 "Copyright © 2007, Alex Roberts\n"
 "Copyright © 2010, Khaled Hosny"
@@ -85,7 +86,7 @@ msgstr ""
 "© 2007, Alex Roberts\n"
 "© 2010, Khaled Hosny"
 
-#: src/main.c:58
+#: main.c:58
 msgid ""
 "A font viewing utility.\n"
 "Part of the Serif font management project."
@@ -93,7 +94,7 @@ msgstr ""
 "Una utilidad para visualizar tipos de letra.\n"
 "Parte del proyecto de gestión tipográfica Serif."
 
-#: src/main.c:59
+#: main.c:59
 msgid ""
 "GNU General Public License 2.0\n"
 "\n"
@@ -103,11 +104,11 @@ msgstr ""
 "\n"
 "Véase COPYING para más información."
 
-#: src/main.c:60
+#: main.c:60
 msgid "translator-credits"
 msgstr "Adolfo Jayme Barrientos <fitojb@ubuntu.com>, 2013, 2018"
 
-#: src/font-model.c:257
+#: font-model.c:257
 #, c-format
 msgid "Palette %i"
 msgstr "Paleta %i"
