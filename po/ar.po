@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-25 12:37+0200\n"
+"POT-Creation-Date: 2018-03-25 12:42+0200\n"
 "PO-Revision-Date: 2017-12-25 17:15+0200\n"
 "Last-Translator: Khaled Hosny <khaledhosny@eglug.org>\n"
 "Language-Team: Arabic <doc@arabeyes.org>\n"
@@ -18,7 +18,7 @@ msgstr ""
 "&& n%100<=10 ? 3 : n%100>=11 ? 4 : 5;\n"
 "X-Generator: Virtaal 1.0.0-beta1\n"
 
-#: fontview.desktop.in:3 mainwindow.ui:18 main.c:54
+#: fontview.desktop.in:3 mainwindow.ui:18 main.c:45
 msgid "Font View"
 msgstr "عارض الخطوط"
 
@@ -78,21 +78,21 @@ msgstr "الوصف"
 msgid "File"
 msgstr "الملف"
 
-#: main.c:57
+#: main.c:48
 msgid ""
 "Copyright © 2007, Alex Roberts\n"
-"Copyright © 2010, Khaled Hosny"
+"Copyright © 2010-2018, Khaled Hosny"
 msgstr ""
 "حقوق النشر © 2007، ألِكس روبرتس\n"
-"حقوق النشر © 2010، خالد حسني"
+"حقوق النشر © 2010-2018، خالد حسني"
 
-#: main.c:58
+#: main.c:49
 msgid ""
 "A font viewing utility.\n"
 "Part of the Serif font management project."
 msgstr "أداة لعرض الخطوط."
 
-#: main.c:59
+#: main.c:50
 msgid ""
 "GNU General Public License 2.0\n"
 "\n"
@@ -102,11 +102,11 @@ msgstr ""
 "\n"
 "انظر ملف COPYING لمزيد من المعلومات."
 
-#: main.c:60
+#: main.c:51
 msgid "translator-credits"
 msgstr "خالد حسني <khaledhosny@eglug.org>"
 
-#: font-model.c:257
+#: font-model.c:248
 #, c-format
 msgid "Palette %i"
 msgstr "لوح ألوان %i"

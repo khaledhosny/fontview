@@ -1,18 +1,9 @@
 /*
- * font-model.h
- *
- * GTK+ widget to display and handle fonts
- *
- * - Alex Roberts, 2006
- *
- */
-
-/*
- * FontView Test - font viewing widget test app
+ * FontView - font viewing app
  * Part of the Fontable Project
  * Copyright (C) 2006 Alex Roberts
  * Copyright (C) 2006 Jon Phillips, <jon@rejon.org>
- * Copyright (C) 2010 Khaled Hosny, <khaledhosny@eglug.org>
+ * Copyright (C) 2010-2018 Khaled Hosny, <khaledhosny@eglug.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

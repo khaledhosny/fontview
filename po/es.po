@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Fontview\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2018-03-25 12:37+0200\n"
+"POT-Creation-Date: 2018-03-25 12:42+0200\n"
 "PO-Revision-Date: 2018-03-25 02:10-0600\n"
 "Last-Translator: Adolfo Jayme Barrientos <fitojb@ubuntu.com>\n"
 "Language-Team: Spanish <es@li.org>\n"
@@ -17,7 +17,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "X-Generator: Poedit 2.0.6\n"
 
-#: fontview.desktop.in:3 mainwindow.ui:18 main.c:54
+#: fontview.desktop.in:3 mainwindow.ui:18 main.c:45
 msgid "Font View"
 msgstr "Visor tipográfico"
 
@@ -78,15 +78,15 @@ msgstr "Descripción"
 msgid "File"
 msgstr "Archivo"
 
-#: main.c:57
+#: main.c:48
 msgid ""
 "Copyright © 2007, Alex Roberts\n"
-"Copyright © 2010, Khaled Hosny"
+"Copyright © 2010-2018, Khaled Hosny"
 msgstr ""
 "© 2007, Alex Roberts\n"
-"© 2010, Khaled Hosny"
+"© 2010-2018, Khaled Hosny"
 
-#: main.c:58
+#: main.c:49
 msgid ""
 "A font viewing utility.\n"
 "Part of the Serif font management project."
@@ -94,7 +94,7 @@ msgstr ""
 "Una utilidad para visualizar tipos de letra.\n"
 "Parte del proyecto de gestión tipográfica Serif."
 
-#: main.c:59
+#: main.c:50
 msgid ""
 "GNU General Public License 2.0\n"
 "\n"
@@ -104,11 +104,11 @@ msgstr ""
 "\n"
 "Véase COPYING para más información."
 
-#: main.c:60
+#: main.c:51
 msgid "translator-credits"
 msgstr "Adolfo Jayme Barrientos <fitojb@ubuntu.com>, 2013, 2018"
 
-#: font-model.c:257
+#: font-model.c:248
 #, c-format
 msgid "Palette %i"
 msgstr "Paleta %i"

@@ -1,18 +1,9 @@
 /*
- * main.c
- *
- * GTK+ widget to display and handle fonts
- *
- * - Alex Roberts, 2006
- *
- */
-
-/*
- * FontView Test - font viewing widget test app
+ * FontView - font viewing app
  * Part of the Fontable Project
  * Copyright (C) 2006 Alex Roberts
  * Copyright (C) 2006 Jon Phillips, <jon@rejon.org>
- * Copyright (C) 2010 Khaled Hosny, <khaledhosny@eglug.org>
+ * Copyright (C) 2010-2018 Khaled Hosny, <khaledhosny@eglug.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -54,7 +45,7 @@ font_view_about (GtkWidget *w,
         "name", _("Font View"),
         "authors", authors,
         "version", VERSION,
-        "copyright", _("Copyright \u00A9 2007, Alex Roberts\nCopyright \u00A9 2010, Khaled Hosny"),
+        "copyright", _("Copyright \u00A9 2007, Alex Roberts\nCopyright \u00A9 2010-2018, Khaled Hosny"),
         "comments", _("A font viewing utility.\nPart of the Serif font management project."),
         "license", _("GNU General Public License 2.0\n\nSee COPYING for more information."),
         "translator-credits", _("translator-credits"),
