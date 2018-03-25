@@ -5,39 +5,39 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: Fontview\n"
-"Report-Msgid-Bugs-To: https://github.com/khaledhosny/fontview/issues\n"
-"POT-Creation-Date: 2015-06-25 13:12+0200\n"
-"PO-Revision-Date: 2013-05-14 15:41-0600\n"
-"Last-Translator: Adolfo Jayme Barrientos <fitoschido@ubuntu.com>\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2018-03-19 03:16+0200\n"
+"PO-Revision-Date: 2018-03-25 02:09-0600\n"
+"Last-Translator: Adolfo Jayme Barrientos <fitojb@ubuntu.com>\n"
 "Language-Team: Spanish <ca@li.org>\n"
 "Language: ca\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 1.5.4\n"
+"X-Generator: Poedit 2.0.6\n"
 
 #: fontview.desktop.in:3 data/mainwindow.ui:18 src/main.c:54
 msgid "Font View"
-msgstr "Visualitza el tipus de lletra"
+msgstr "Visor tipogràfic"
 
 #: fontview.desktop.in:4
 msgid "A font viewing utility"
-msgstr "Una utilitat per visualitzar tipus de lletra"
+msgstr "Una utilitat per a visualitzar tipus de lletra"
 
 #: fontview.desktop.in:5
 msgid "font"
-msgstr ""
+msgstr "tipus de lletra"
 
 #: data/mainwindow.ui:49
 msgid "Font Information"
 msgstr "Informació del tipus de lletra"
 
-#: data/mainwindow.ui:70
+#: data/mainwindow.ui:71
 msgid "How quickly daft jumping zebras vex."
 msgstr "Jove xef, porti whisky amb quinze glaçons d’hidrogen, coi!"
 
-#: data/mainwindow.ui:81
+#: data/mainwindow.ui:83
 msgid "Size:"
 msgstr "Mida:"
 
@@ -47,33 +47,33 @@ msgstr "Informació del tipus de lletra"
 
 #: data/infowindow.ui:27
 msgid "About"
-msgstr ""
+msgstr "Quant a"
 
 #: data/infowindow.ui:42
 msgid "Close"
-msgstr ""
+msgstr "Tanca"
 
-#: data/infowindow.ui:73
+#: data/infowindow.ui:75
 msgid "Name"
 msgstr "Nom"
 
-#: data/infowindow.ui:90
+#: data/infowindow.ui:94
 msgid "Style"
 msgstr "Estil"
 
-#: data/infowindow.ui:107
+#: data/infowindow.ui:113
 msgid "Version"
 msgstr "Versió"
 
-#: data/infowindow.ui:123
+#: data/infowindow.ui:131
 msgid "Copyright"
-msgstr "Copyright"
+msgstr "Drets d’autor"
 
-#: data/infowindow.ui:139
+#: data/infowindow.ui:149
 msgid "Description"
 msgstr "Descripció"
 
-#: data/infowindow.ui:155
+#: data/infowindow.ui:167
 msgid "File"
 msgstr "Fitxer"
 
@@ -82,15 +82,15 @@ msgid ""
 "Copyright © 2007, Alex Roberts\n"
 "Copyright © 2010, Khaled Hosny"
 msgstr ""
-"Copyright © 2007, Alex Roberts\n"
-"Copyright © 2010, Khaled Hosny"
+"© 2007, Alex Roberts\n"
+"© 2010, Khaled Hosny"
 
 #: src/main.c:58
 msgid ""
 "A font viewing utility.\n"
 "Part of the Serif font management project."
 msgstr ""
-"Una utilitat per visualitzar tipus de lletra.\n"
+"Una utilitat per a visualitzar tipus de lletra.\n"
 "Part del projecte de gestió tipogràfica Serif."
 
 #: src/main.c:59
@@ -101,8 +101,13 @@ msgid ""
 msgstr ""
 "Llicència Pública General de GNU 2.0\n"
 "\n"
-"Vegeu COPYING para més informació."
+"Vegeu COPYING per a més informació."
 
 #: src/main.c:60
 msgid "translator-credits"
-msgstr "Adolfo Jayme Barrientos <fitoschido@ubuntu.com>, 2013"
+msgstr "Adolfo Jayme Barrientos <fitojb@ubuntu.com>, 2013, 2018"
+
+#: src/font-model.c:257
+#, c-format
+msgid "Palette %i"
+msgstr "Paleta %i"
