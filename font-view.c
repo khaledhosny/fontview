@@ -269,12 +269,8 @@ static void render (GtkWidget *w, cairo_t *cr) {
     /* display sample text */
     if (priv->extents[TEXT]) {
         FontModel *model;
-        FT_Face ft_face;
-        PangoAttribute *size;
-        PangoAttrList *attributes;
         PangoContext *context;
         PangoFontDescription *desc;
-        PangoFont *font;
         PangoFontMap *fontmap;
         PangoLayout *layout;
 
@@ -285,26 +281,31 @@ static void render (GtkWidget *w, cairo_t *cr) {
         context = pango_font_map_create_context (fontmap);
 
         desc = pango_font_description_new ();
-        font = pango_font_map_load_font (fontmap, context, desc);
-        ft_face = pango_fc_font_lock_face (PANGO_FC_FONT (font));
+#define UNTAG(tag) ((char)((tag)>>24)), ((char)((tag)>>16)), ((char)((tag)>>8)), ((char)(tag))
         if (model->mmcoords) {
-            FT_MM_Var* mmvar = model->mmvar;
-            FT_Fixed* coords = model->mmcoords;
-            if (FT_Set_Var_Design_Coordinates (ft_face, mmvar->num_axis, coords) != 0) {
-                g_warning ("FT_Set_Var_Design_Coordinates failed");
+            GString* variations = g_string_new ("");
+            FT_UInt i;
+            char *sep = "";
+
+            for (i = 0; i < model->mmvar->num_axis; i++) {
+                g_string_append_printf (variations, "%s%c%c%c%c=%g", sep,
+                                        UNTAG(model->mmvar->axis[i].tag),
+                                        model->mmcoords[i] / 65536.);
+                sep = ",";
             }
+
+            pango_font_description_set_variations (desc, variations->str);
+            g_string_free (variations, TRUE);
         }
-        pango_fc_font_unlock_face (PANGO_FC_FONT (font));
+#undef UNTAG
 
         cairo_set_source_rgba (cr, 0, 0, 0, 1);
 
+        pango_font_description_set_size (desc, priv->size * PANGO_SCALE);
+
         layout = pango_layout_new (context);
         pango_layout_set_text (layout, priv->text, -1);
-
-        attributes = pango_attr_list_new ();
-        size = pango_attr_size_new (priv->size * PANGO_SCALE);
-        pango_attr_list_insert (attributes, size);
-        pango_layout_set_attributes (layout, attributes);
+        pango_layout_set_font_description (layout, desc);
 
 #if 0
         gint baseline = pango_layout_get_baseline (layout) / PANGO_SCALE;

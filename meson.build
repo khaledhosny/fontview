@@ -17,7 +17,7 @@ configure_file(
 gtk = dependency('gtk+-3.0', version : '>= 3.12.0')
 freetype = dependency('freetype2', version : '>= 9.10.0')
 harfbuzz = dependency('harfbuzz', version : '>= 0.6.0')
-pangoft = dependency('pangoft2', version : '>= 1.37.0')
+pangoft = dependency('pangoft2', version : '>= 1.41.1')
 deps = [gtk, freetype, harfbuzz, pangoft]
 
 resources = gnome.compile_resources(
