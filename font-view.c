@@ -32,10 +32,6 @@
 #include <hb-glib.h>
 #include "font-view.h"
 
-G_DEFINE_TYPE (FontView, font_view, GTK_TYPE_DRAWING_AREA);
-
-#define FONT_VIEW_GET_PRIVATE(obj) (G_TYPE_INSTANCE_GET_PRIVATE ((obj),\
-                                    FONT_VIEW_TYPE, FontViewPrivate))
 #define ISRTL(A)                   ((A==PANGO_DIRECTION_RTL)|| \
                                     (A==PANGO_DIRECTION_WEAK_RTL)|| \
                                     (A==PANGO_DIRECTION_TTB_LTR))
@@ -65,29 +61,26 @@ struct _FontViewPrivate {
     FontModel *model;
 };
 
+G_DEFINE_TYPE_WITH_PRIVATE (FontView, font_view, GTK_TYPE_DRAWING_AREA);
+
 static void font_view_redraw (FontView *view);
 
 static gboolean font_view_draw (GtkWidget *view, cairo_t *cr);
 static gboolean font_view_clicked (GtkWidget *w, GdkEventButton *e);
 
 static void font_view_class_init (FontViewClass *klass) {
-    GObjectClass *object_class;
     GtkWidgetClass *widget_class;
-
-    object_class = G_OBJECT_CLASS (klass);
 
     widget_class = GTK_WIDGET_CLASS (klass);
     widget_class->draw = font_view_draw;
     widget_class->button_release_event = font_view_clicked;
-
-    g_type_class_add_private (object_class, sizeof (FontViewPrivate));
 }
 
 static void font_view_init (FontView *view) {
     FontViewPrivate *priv;
     gint i;
 
-    priv = FONT_VIEW_GET_PRIVATE(view);
+    priv = font_view_get_instance_private(view);
 
     for (i = 0; i < G_N_ELEMENTS(priv->extents); i++) {
         priv->extents[i] = FALSE;
@@ -111,7 +104,7 @@ GtkWidget *font_view_new_with_model (gchar *font) {
     g_return_val_if_fail (font, NULL);
 
     view = g_object_new (FONT_VIEW_TYPE, NULL);
-    priv = FONT_VIEW_GET_PRIVATE(view);
+    priv = font_view_get_instance_private (view);
 
     model = FONT_MODEL(font_model_new (font));
     if (model == NULL)
@@ -129,7 +122,7 @@ GtkWidget *font_view_new_with_model (gchar *font) {
 
 void font_view_set_model (FontView *view, FontModel *model) {
     FontViewPrivate *priv;
-    priv = FONT_VIEW_GET_PRIVATE(view);
+    priv = font_view_get_instance_private (view);
 
     if (IS_FONT_MODEL(model)) {
         priv->model = model;
@@ -138,7 +131,7 @@ void font_view_set_model (FontView *view, FontModel *model) {
 
 FontModel *font_view_get_model (FontView *view) {
     FontViewPrivate *priv;
-    priv = FONT_VIEW_GET_PRIVATE(view);
+    priv = font_view_get_instance_private (view);
     return priv->model;
 }
 
@@ -217,7 +210,7 @@ show_layout_with_color (cairo_t *cr,
 static void render (GtkWidget *w, cairo_t *cr) {
     GtkAllocation allocation;
 
-    FontViewPrivate *priv = FONT_VIEW_GET_PRIVATE (FONT_VIEW(w));
+    FontViewPrivate *priv = font_view_get_instance_private (FONT_VIEW(w));
 
     gtk_widget_get_allocation (w, &allocation);
     gint width = allocation.width;
@@ -346,7 +339,7 @@ static gboolean font_view_draw (GtkWidget *w, cairo_t *cr) {
 static gboolean font_view_clicked (GtkWidget *w, GdkEventButton *e) {
     FontViewPrivate *priv;
 
-    priv = FONT_VIEW_GET_PRIVATE (w);
+    priv = font_view_get_instance_private (FONT_VIEW (w));
 
     priv->extents[BASELINE] = !priv->extents[BASELINE];
     priv->extents[ASCENDER] = !priv->extents[ASCENDER];
@@ -378,14 +371,14 @@ static void font_view_redraw (FontView *view) {
 gdouble font_view_get_pt_size (FontView *view) {
     FontViewPrivate *priv;
 
-    priv = FONT_VIEW_GET_PRIVATE (view);
+    priv = font_view_get_instance_private (view);
     return priv->size;
 }
 
 void font_view_set_pt_size (FontView *view, gdouble size) {
     FontViewPrivate *priv;
 
-    priv = FONT_VIEW_GET_PRIVATE (view);
+    priv = font_view_get_instance_private (view);
 
     if (priv->size == size)
         return;
@@ -402,14 +395,14 @@ void font_view_set_pt_size (FontView *view, gdouble size) {
 gchar *font_view_get_text (FontView *view) {
     FontViewPrivate *priv;
 
-    priv = FONT_VIEW_GET_PRIVATE (view);
+    priv = font_view_get_instance_private (view);
     return g_strdup(priv->text);
 }
 
 void font_view_set_text (FontView *view, gchar *text) {
     FontViewPrivate *priv;
 
-    priv = FONT_VIEW_GET_PRIVATE (view);
+    priv = font_view_get_instance_private (view);
 
     if (g_strcmp0 (priv->text, text) == 0)
         return;
@@ -444,7 +437,7 @@ void font_view_rerender (FontView *view) {
     FontViewPrivate *priv;
     FontModel *model;
 
-    priv = FONT_VIEW_GET_PRIVATE(view);
+    priv = font_view_get_instance_private (view);
     model = FONT_MODEL(font_model_new (priv->model->file));
     if (model != NULL) {
         priv->model = model;
