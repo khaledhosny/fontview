@@ -17,7 +17,8 @@ configure_file(
 gtk = dependency('gtk+-3.0', version : '>= 3.12.0')
 freetype = dependency('freetype2', version : '>= 22.0.16')
 pangoft = dependency('pangoft2', version : '>= 1.41.1')
-deps = [gtk, freetype, pangoft]
+fribidi = dependency('fribidi', version : '>= 1.0.0')
+deps = [gtk, freetype, pangoft, fribidi]
 
 resources = gnome.compile_resources(
   'fontview-resources', 'fontview.gresource.xml',

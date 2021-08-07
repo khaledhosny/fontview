@@ -30,11 +30,8 @@
 #include <pango/pangofc-fontmap.h>
 #include <hb-ft.h>
 #include <hb-glib.h>
+#include <fribidi.h>
 #include "font-view.h"
-
-#define ISRTL(A)                   ((A==PANGO_DIRECTION_RTL)|| \
-                                    (A==PANGO_DIRECTION_WEAK_RTL)|| \
-                                    (A==PANGO_DIRECTION_TTB_LTR))
 
 enum {
     BASELINE,
@@ -207,6 +204,23 @@ show_layout_with_color (cairo_t *cr,
     pango_layout_iter_free (iter);
 }
 
+static gboolean
+is_rtl_paragraph (gchar *text)
+{
+    FriBidiChar* unicode = g_new (FriBidiChar, strlen (text));
+    FriBidiStrIndex len = fribidi_charset_to_unicode (FRIBIDI_CHAR_SET_UTF8,
+                                                      text, strlen (text),
+                                                      unicode);
+    FriBidiCharType *types = g_new (FriBidiCharType, len);
+    fribidi_get_bidi_types (unicode, len, types);
+    FriBidiParType par = fribidi_get_par_direction (types, len);
+
+    g_free (unicode);
+    g_free (types);
+
+    return !!(par == FRIBIDI_PAR_RTL || par == FRIBIDI_PAR_WLTR);
+}
+
 static void render (GtkWidget *w, cairo_t *cr) {
     GtkAllocation allocation;
 
@@ -306,7 +320,7 @@ static void render (GtkWidget *w, cairo_t *cr) {
         pango_layout_set_width (layout, (width - indent * 2) * PANGO_SCALE);
         cairo_translate (cr, x, y - baseline);
 #else
-        if (ISRTL (pango_find_base_dir (priv->text, -1))) {
+        if (is_rtl_paragraph (priv->text)) {
             gint layout_width;
             pango_layout_get_pixel_size (layout, &layout_width, NULL);
             x = width - x - layout_width;
